@@ -1,8 +1,13 @@
+import AddressForm from "@/components/form/AddressForm";
+import { VStack } from "@/components/ui/vstack";
 import { Text } from "react-native";
 
 
 export default function SignUp() {
   return (
-    <Text>Sign up</Text>
+    <VStack className="items-center justify-center h-full">
+      <AddressForm />
+    </VStack>
+
   )
 }

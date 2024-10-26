@@ -179,7 +179,7 @@ cssInterop(SelectTriggerWrapper, { className: 'style' });
 //@ts-ignore
 cssInterop(UISelect.Icon, {
   className: {
-    target: 'style',
+    target: 'style' as any,
     nativeStyleToProp: {
       height: true,
       width: true,

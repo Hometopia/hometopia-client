@@ -52,6 +52,7 @@ export default function Landing() {
               size="lg"
               variant="link"
               action="primary"
+              onPress={() => router.navigate('/(auth)/sign-in')}
             >
               <ButtonText>Login</ButtonText>
             </Button>

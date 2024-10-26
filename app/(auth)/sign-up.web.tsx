@@ -1,42 +1,49 @@
-import { IMAGE_URL } from "@/constants/public"
 import { useEffect, useState } from "react";
-import { FormControl } from "@/components/ui/form-control";
-import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { VStack } from "@/components/ui/vstack";
-import { Text } from "@/components/ui/text";
-import { EyeClosedIcon, EyeIcon } from "lucide-react-native";
-import { Button, ButtonText } from "@/components/ui/button";
-import { Divider } from "@/components/ui/divider";
-import { HStack } from "@/components/ui/hstack";
-import { useRouter } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 
 import SignUpForm from "@/components/form/SignUpForm";
+import ConfirmEmailForm from "@/components/form/ConfirmEmailForm";
+import { Button, ButtonIcon } from "@/components/ui/button";
+import { ChevronLeftIcon } from "lucide-react-native";
+import AddressForm from "@/components/form/AddressForm";
 
 export default function SignUp_Web() {
-
+  const navigator = useNavigation()
   const router = useRouter()
+  const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
-    document.title = "Hometopia | Đăng ký";
+    document.title = "Hometopia | Đăng ký"
   }, []);
 
-  const [showPassword, setShowPassword] = useState(false)
+
+  //stepper
+  const steps = [
+    <SignUpForm
+      submit={() => setActiveStep(prev => prev + 1)}
+      signIn={() => router.navigate('/sign-in')} />,
+    <ConfirmEmailForm
+      submit={() => setActiveStep(prev => prev + 1)}
+      signIn={() => router.navigate('/sign-in')}
+      resend={() => router.navigate('/sign-in')}
+    />,
+    < AddressForm />,
+  ]
 
   return (
-    <div className="flex h-full">
-      <div className="flex flex-col grow items-center py-8 px-10">
-        <div className="w-full">
-          <img className="h-10" src={`${IMAGE_URL}/logo-full.svg`} alt="" />
-        </div>
-        <SignUpForm submit={() => router.navigate('/sign-in')} signIn={() => router.navigate('/sign-in')} />
-      </div>
-      <div className="w-[480px] h-full overflow-hidden ">
-        <img
-          className="w-full h-full object-cover object-left"
-          src={`${IMAGE_URL}/dreamlike.png`}
-          alt="display-img" />
-      </div>
-
+    <div className="h-full w-full flex justify-center items-center relative bg-white">
+      <Button
+        className="absolute top-4 left-0 rounded-full"
+        variant="outline"
+        action="secondary"
+        isDisabled={activeStep > 0 ? false : true}
+        onPress={() => setActiveStep(prev => prev - 1)}
+      >
+        <ButtonIcon
+          as={ChevronLeftIcon}
+        />
+      </Button>
+      {steps[activeStep]}
     </div>
   )
 }
