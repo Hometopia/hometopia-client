@@ -6,7 +6,8 @@ export default function OnBoarding() {
   return (
     <VStack className="items-center justify-center h-full">
       <Text>It's mobile, bitch!</Text>
-      <Link href='/(auth)/sign-up'>Sign up</Link>
+      <Link className="w-[100px] h-10 bg-primary-500 text-typography-0" href='/(auth)/sign-up'>Sign up</Link>
+      <Link className="w-[100px] h-10 bg-primary-500 text-typography-0" href='/(nav)/dashboard'>Drawer</Link>
     </VStack>
   )
 }

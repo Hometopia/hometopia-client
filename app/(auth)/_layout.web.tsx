@@ -8,10 +8,8 @@ export default function AuthLayout_Web() {
         <div className="w-full">
           <img className="h-10" src={`${IMAGE_URL}/logo-full.svg`} alt="" />
         </div>
-        <Stack>
-          <Stack.Screen name="sign-up" options={{ headerShown: false }} />
-          <Stack.Screen name="sign-in" options={{ headerShown: false }} />
-          <Stack.Screen name="forgot-password" options={{ headerShown: false }} />
+        <Stack
+          screenOptions={{ headerShown: false }}>
         </Stack>
       </div>
       <div className="w-[480px] h-full overflow-hidden ">
