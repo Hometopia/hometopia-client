@@ -35,6 +35,20 @@ export default function Sidebar({ data }: { data: NavigationItemType[] }) {
     setActive(pathname.split('/').filter(Boolean))
   }, [pathname])
 
+  useEffect(() => {
+    setState(data.map(i => {
+      if (i.slug === active.at(0))
+        return {
+          key: i.slug,
+          state: SidebarItemState.active,
+        }
+      return {
+        key: i.slug,
+        state: SidebarItemState.default,
+      }
+    }))
+  }, [active])
+
   const handleActive = (item: NavigationItemType) => {
     setState(prev => prev.map(i => {
       if (i.key === item.slug) {
