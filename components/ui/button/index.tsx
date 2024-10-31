@@ -125,9 +125,9 @@ const buttonStyle = tva({
   variants: {
     action: {
       primary:
-        "border-primary-300 bg-primary-500 data-[focus-visible=true]:web:ring-indicator-info data-[hover=true]:border-primary-400 data-[hover=true]:bg-primary-600 data-[active=true]:border-primary-500 data-[active=true]:bg-primary-700",
+        "border-primary-500 bg-primary-500 data-[focus-visible=true]:web:ring-indicator-info data-[hover=true]:border-primary-400 data-[hover=true]:bg-primary-600 data-[active=true]:border-primary-500 data-[active=true]:bg-primary-700",
       secondary:
-        "border-secondary-300 bg-secondary-500 data-[focus-visible=true]:web:ring-indicator-info data-[hover=true]:border-secondary-400 data-[hover=true]:bg-secondary-600 data-[active=true]:border-secondary-500 data-[active=true]:bg-secondary-700",
+        "border-secondary-300 bg-secondary-100 data-[focus-visible=true]:web:ring-indicator-info data-[hover=true]:border-secondary-400 data-[hover=true]:bg-secondary-200 data-[active=true]:border-secondary-500 data-[active=true]:bg-secondary-300",
       positive:
         "border-success-300 bg-success-500 data-[focus-visible=true]:web:ring-indicator-info data-[hover=true]:border-success-400 data-[hover=true]:bg-success-600 data-[active=true]:border-success-500 data-[active=true]:bg-success-700",
       negative:
@@ -207,7 +207,7 @@ const buttonTextStyle = tva({
   parentVariants: {
     action: {
       primary:
-        "text-white data-[hover=true]:text-white data-[active=true]:text-white",
+        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
       secondary:
         "text-secondary-600 data-[hover=true]:text-secondary-600 data-[active=true]:text-secondary-700",
       positive:
@@ -240,7 +240,7 @@ const buttonTextStyle = tva({
       variant: "solid",
       action: "secondary",
       class:
-        "text-typography-0 data-[hover=true]:text-typography-0 data-[active=true]:text-typography-0",
+        "text-typography-900 data-[hover=true]:text-typography-900 data-[active=true]:text-typography-900",
     },
     {
       variant: "solid",

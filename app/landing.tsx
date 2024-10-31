@@ -23,7 +23,7 @@ export default function Landing() {
   const { platform, isLogged } = useGlobalContext();
   useFocusEffect(
     useCallback(() => {
-      if (isLogged) router.replace("/assets");
+      if (isLogged) router.replace("/asset");
       else if (platform !== "web") {
         router.replace("/onboarding");
       }

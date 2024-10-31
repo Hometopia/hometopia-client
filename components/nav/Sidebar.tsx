@@ -3,7 +3,7 @@ import { Text } from "@/components/ui/text";
 import { BoltIcon, BoxIcon, CalendarCogIcon, FileChartColumnIcon, LayoutDashboardIcon, PanelLeftClose, PanelLeftCloseIcon, PanelLeftOpenIcon, TagIcon, WrenchIcon } from "lucide-react-native";
 import { ReactElement, useEffect, useState } from "react";
 import { IMAGE_URL } from "@/constants/public";
-import { Href, useRouter } from "expo-router";
+import { Href, usePathname, useRouter } from "expo-router";
 import { NavigationItemType } from "@/constants/types";
 import { Avatar, AvatarBadge, AvatarFallbackText, AvatarImage } from "../ui/avatar";
 import { HStack } from "../ui/hstack";
@@ -13,68 +13,31 @@ enum SidebarItemState {
   default = 0, hover = 1, active = 2
 }
 
-const SidebarItem = ({
-  active = false,
-  setActive,
-  collapse = false,
-  item,
-}: {
-  active?: boolean,
-  setActive: any,
-  collapse?: boolean,
-  item: NavigationItemType
-}) => {
+export default function Sidebar({ data }: { data: NavigationItemType[] }) {
 
   const router = useRouter()
-  const [state, setState] = useState(active ? SidebarItemState.active : SidebarItemState.default)
-
-
-  const stateColor = [
-    'text-typography-600',
-    'text-typography-600',
-    'text-typography-0',
-  ]
-
-  const bgStateColor = [
-    'bg-white',
-    'bg-background-50',
-    'bg-primary-400',
-  ]
-
-  const handleHover = () => {
-    setState(active ? SidebarItemState.active : SidebarItemState.hover)
-  }
-  const handleMouseLeave = () => {
-    setState(active ? SidebarItemState.active : SidebarItemState.default)
-  }
-
-  return (
-    <div className={`py-2 px-4 rounded-md flex items-center gap-2 ${bgStateColor.at(state)} hover:cursor-pointer`}
-      onMouseEnter={handleHover}
-      onMouseLeave={handleMouseLeave}
-      onClick={() => {
-        setActive(item)
-        router.push(item.href as Href<string | object>)
-      }}>
-      <item.icon className={` ${stateColor.at(state)}`} strokeWidth={2} size={20} />
-      {collapse ? <></> : <Text className={`text-sm font-medium capitalize ${stateColor.at(state)}`} >{item.label}</Text>}
-    </div>
-  )
-}
-
-
-export default function Sidebar({ data, active, setActive }: { data: NavigationItemType[], active: NavigationItemType, setActive: any }) {
-
-  const router = useRouter()
+  const pathname = usePathname()
+  const [active, setActive] = useState(pathname.split('/').filter(Boolean))
   const [collapse, setCollapse] = useState(false)
-  const [state, setState] = useState(data.map(i => ({
-    key: i.key,
-    state: SidebarItemState.default,
-  })))
+  const [state, setState] = useState(data.map(i => {
+    if (i.slug === active.at(0))
+      return {
+        key: i.slug,
+        state: SidebarItemState.active,
+      }
+    return {
+      key: i.slug,
+      state: SidebarItemState.default,
+    }
+  }))
+
+  useEffect(() => {
+    setActive(pathname.split('/').filter(Boolean))
+  }, [pathname])
 
   const handleActive = (item: NavigationItemType) => {
     setState(prev => prev.map(i => {
-      if (i.key === item.key) {
+      if (i.key === item.slug) {
         i.state = SidebarItemState.active
       }
       else
@@ -83,9 +46,6 @@ export default function Sidebar({ data, active, setActive }: { data: NavigationI
     }))
   }
 
-  useEffect(() => {
-    handleActive(active)
-  }, [])
 
   const stateColor = [
     'text-typography-600',
@@ -101,18 +61,18 @@ export default function Sidebar({ data, active, setActive }: { data: NavigationI
 
 
   const handleHover = (item: NavigationItemType) => {
-    if (item.key === active.key) return
+    if (item.slug === active.at(0)) return
     setState(prev => prev.map(i => {
-      if (i.key === item.key) {
+      if (i.key === item.slug) {
         i.state = SidebarItemState.hover
       }
       return i
     }))
   }
   const handleMouseLeave = (item: NavigationItemType) => {
-    if (item.key === active.key) return
+    if (item.slug === active.at(0)) return
     setState(prev => prev.map(i => {
-      if (i.key === item.key) {
+      if (i.key === item.slug) {
         i.state = SidebarItemState.default
       }
       return i
@@ -134,14 +94,13 @@ export default function Sidebar({ data, active, setActive }: { data: NavigationI
         <VStack className="gap-2">
           {data.map((i, index) =>
             <div
-              key={i.key}
-              className={`py-2 px-4 rounded-md flex items-center gap-2 ${bgStateColor.at(state.at(index)?.state as number)} hover:cursor-pointer`}
+              key={i.slug}
+              className={`py-2 px-3 rounded-md flex items-center gap-3 ${bgStateColor.at(state.at(index)?.state as number)} hover:cursor-pointer`}
               onMouseEnter={() => handleHover(i)}
               onMouseLeave={() => handleMouseLeave(i)}
               onClick={() => {
-                setActive(i)
                 handleActive(i)
-                router.push(i.href as Href<string | object>)
+                router.push(`/${i.slug}` as Href<string | object>)
               }}>
               <i.icon className={` ${stateColor.at(state.at(index)?.state as number)}`} strokeWidth={2} size={20} />
               {collapse ? <></> : <Text className={`text-sm font-normal capitalize ${stateColor.at(state.at(index)?.state as number)}`} >{i.label}</Text>}
@@ -149,12 +108,12 @@ export default function Sidebar({ data, active, setActive }: { data: NavigationI
         </VStack>
       </VStack>
       <HStack className="w-full">
-        <Avatar size='md'>
+        <Avatar size='sm'>
           <AvatarFallbackText>name</AvatarFallbackText>
-          {/* <AvatarImage source={require('@/assets/images/favicon.png')} /> */}
+          <AvatarImage source={require('@/assets/images/favicon.png')} />
           <AvatarBadge />
         </Avatar>
-        <Text>Name</Text>
+        {collapse ? <></> : <Text>Name</Text>}
       </HStack>
     </VStack>
   )

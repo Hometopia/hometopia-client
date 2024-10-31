@@ -6,25 +6,25 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 const navData = [
   {
-    name: 'dashboard', drawerLabel: 'Dashboard', title: 'Dashboard', icon: LayoutDashboardIcon
+    slug: 'dashboard', label: 'Dashboard', title: 'Dashboard', icon: LayoutDashboardIcon
   },
   {
-    name: 'assets', drawerLabel: 'Tài sản', title: 'Danh sách tài sản', icon: BoxIcon
+    slug: 'asset', label: 'Tài sản', title: 'Danh sách tài sản', icon: BoxIcon
   },
   {
-    name: 'categories', drawerLabel: 'Danh mục', title: 'Danh mục', icon: TagIcon
+    slug: 'categories', label: 'Danh mục', title: 'Danh mục', icon: TagIcon
   },
   {
-    name: 'fix', drawerLabel: 'Sửa chữa', title: 'Sửa chữa', icon: WrenchIcon
+    slug: 'fix', label: 'Sửa chữa', title: 'Sửa chữa', icon: WrenchIcon
   },
   {
-    name: 'maintenance', drawerLabel: 'Bảo trì', title: 'Bảo trì', icon: BoltIcon
+    slug: 'maintenance', label: 'Bảo trì', title: 'Bảo trì', icon: BoltIcon
   },
   {
-    name: 'calendar', drawerLabel: 'Lịch', title: 'Lịch', icon: CalendarCogIcon
+    slug: 'calendar', label: 'Lịch', title: 'Lịch', icon: CalendarCogIcon
   },
   {
-    name: 'reports', drawerLabel: 'Báo cáo', title: 'Báo cáo', icon: FileChartColumnIcon
+    slug: 'reports', label: 'Báo cáo', title: 'Báo cáo', icon: FileChartColumnIcon
   },
 ]
 
@@ -49,10 +49,10 @@ export default function NavLayout() {
       >
         {navData.map(i => (
           <Drawer.Screen
-            key={i.name}
-            name={i.name}
+            key={i.slug}
+            name={i.slug}
             options={{
-              drawerLabel: i.drawerLabel,
+              drawerLabel: i.label,
               title: i.title,
               drawerIcon: ({ size, color }) => (
                 <i.icon size={size} color={color} />

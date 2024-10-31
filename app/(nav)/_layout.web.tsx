@@ -7,54 +7,32 @@ import { useState } from "react";
 
 const navData: NavigationItemType[] = [
   {
-    key: 'dashboard',
-    label: 'Dashboard',
-    icon: LayoutDashboardIcon,
-    href: '/(nav)/dashboard'
+    slug: 'dashboard', label: 'Dashboard', title: 'Dashboard', icon: LayoutDashboardIcon
   },
   {
-    key: 'assets',
-    label: 'Tài sản',
-    icon: BoxIcon,
-    href: '/(nav)/assets'
+    slug: 'asset', label: 'Tài sản', title: 'Danh sách tài sản', icon: BoxIcon
   },
   {
-    key: 'categories',
-    label: 'Danh mục',
-    icon: TagIcon,
-    href: '/(nav)/categories'
+    slug: 'categories', label: 'Danh mục', title: 'Danh mục', icon: TagIcon
   },
   {
-    key: 'fix',
-    label: 'Sửa chữa',
-    icon: WrenchIcon,
-    href: '/(nav)/fix'
+    slug: 'fix', label: 'Sửa chữa', title: 'Sửa chữa', icon: WrenchIcon
   },
   {
-    key: 'maintenance',
-    label: 'Bảo trì',
-    icon: BoltIcon,
-    href: '/(nav)/maintenance'
+    slug: 'maintenance', label: 'Bảo trì', title: 'Bảo trì', icon: BoltIcon
   },
   {
-    key: 'calendar',
-    label: 'Lịch',
-    icon: CalendarCogIcon,
-    href: '/(nav)/calendar'
+    slug: 'calendar', label: 'Lịch', title: 'Lịch', icon: CalendarCogIcon
   },
   {
-    key: 'reports',
-    label: 'Báo cáo',
-    icon: FileChartColumnIcon,
-    href: '/(nav)/reports'
+    slug: 'reports', label: 'Báo cáo', title: 'Báo cáo', icon: FileChartColumnIcon
   },
 ]
 
 export default function NavLayout_Web() {
-  const [active, setActive] = useState(navData.at(0) as NavigationItemType)
   return (
     <div className="flex h-full bg-white">
-      <Sidebar data={navData} active={active} setActive={setActive} />
+      <Sidebar data={navData} />
       <Stack
         screenOptions={{
           headerShown: false

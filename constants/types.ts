@@ -1,8 +1,8 @@
 import { LucideIcon } from "lucide-react-native"
 
 export type NavigationItemType = {
-  key: string,
+  slug: string,
   label: string,
+  title: string,
   icon: LucideIcon,
-  href: string
 }
