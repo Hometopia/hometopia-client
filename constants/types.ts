@@ -6,3 +6,8 @@ export type NavigationItemType = {
   title: string,
   icon: LucideIcon,
 }
+
+export type TabItemType = {
+  slug: string,
+  label: string,
+}

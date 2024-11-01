@@ -14,7 +14,7 @@ import { IMAGE_URL } from '@/constants/public'
 import { useRouter } from 'expo-router'
 import { CheckIcon, SearchIcon } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
-import { View } from 'react-native'
+import { Pressable, View } from 'react-native'
 
 
 
@@ -94,7 +94,7 @@ export default function Asset_Web() {
               </TableHeader>
               <TableBody>
                 {tableData.map((i, index) => (
-                  <TableRow key={index} className='hover:bg-background-50 hover:cursor-pointer'>
+                  <tr key={index} className='hover:bg-background-50 hover:cursor-pointer' onClick={() => router.push(`/asset/${index}`)}>
                     <TableData>
                       <Checkbox size="md" isInvalid={false} isDisabled={false} value='s'>
                         <CheckboxIndicator>
@@ -119,7 +119,7 @@ export default function Asset_Web() {
                     <TableData>
                       <Text className="text-md text-typography-900 font-normal">{i.desc}</Text>
                     </TableData>
-                  </TableRow>
+                  </tr>
                 ))}
               </TableBody>
             </Table>
