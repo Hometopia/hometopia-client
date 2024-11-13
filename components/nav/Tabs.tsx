@@ -1,136 +1,169 @@
 import { VStack } from "@/components/ui/vstack";
 import { Text } from "@/components/ui/text";
-import { BoltIcon, BoxIcon, CalendarCogIcon, FileChartColumnIcon, LayoutDashboardIcon, PanelLeftClose, PanelLeftCloseIcon, PanelLeftOpenIcon, TagIcon, WrenchIcon } from "lucide-react-native";
-import { ReactElement, useEffect, useState } from "react";
-import { IMAGE_URL } from "@/constants/public";
-import { Href, usePathname, useRouter } from "expo-router";
+import {
+  BoltIcon,
+  BoxIcon,
+  CalendarCogIcon,
+  FileChartColumnIcon,
+  LayoutDashboardIcon,
+  PanelLeftClose,
+  PanelLeftCloseIcon,
+  PanelLeftOpenIcon,
+  TagIcon,
+  WrenchIcon,
+} from "lucide-react-native";
+import { ReactElement, useCallback, useEffect, useState } from "react";
+import { Href, useFocusEffect, usePathname, useRouter } from "expo-router";
 import { TabItemType } from "@/constants/types";
-import { Avatar, AvatarBadge, AvatarFallbackText, AvatarImage } from "../ui/avatar";
+import {
+  Avatar,
+  AvatarBadge,
+  AvatarFallbackText,
+  AvatarImage,
+} from "../ui/avatar";
 import { HStack } from "../ui/hstack";
 import { useGlobalContext } from "@/contexts/GlobalProvider";
 import { View } from "react-native";
 import { Pressable } from "../ui/pressable";
 
-
 enum TabItemState {
-  default = 0, hover = 1, active = 2
+  default = 0,
+  hover = 1,
+  active = 2,
 }
 
+export default function Tabs({
+  data,
+  size = "pc",
+}: {
+  data: TabItemType[];
+  size?: string;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const [active, setActive] = useState(
+    pathname
+      .split("/")
+      .filter(Boolean)
+      .at(pathname.split("/").filter(Boolean).length - 1),
+  );
+  const [state, setState] = useState<{ key: string; state: TabItemState }[]>(
+    [],
+  );
 
-export default function Tabs({ data, size = 'pc', endPoint }: { data: TabItemType[], size?: string, endPoint: string }) {
-
-  const router = useRouter()
-  const pathname = usePathname()
-  const [active, setActive] = useState(pathname.split('/').filter(Boolean))
-  const [collapse, setCollapse] = useState(false)
-  const [state, setState] = useState(data.map(i => {
-    if (i.slug === active.at(0))
-      return {
-        key: i.slug,
-        state: TabItemState.active,
-      }
-    return {
-      key: i.slug,
-      state: TabItemState.default,
-    }
-  }))
+  useFocusEffect(
+    useCallback(() => {
+      setActive(
+        pathname
+          .split("/")
+          .filter(Boolean)
+          .at(pathname.split("/").filter(Boolean).length - 1),
+      );
+    }, [pathname]),
+  );
 
   useEffect(() => {
-    setActive(pathname.split('/').filter(Boolean))
-  }, [pathname])
-
-  useEffect(() => {
-    setState(data.map(i => {
-      if (i.slug === active.at(0))
-        return {
-          key: i.slug,
-          state: TabItemState.active,
-        }
-      return {
-        key: i.slug,
-        state: TabItemState.default,
-      }
-    }))
-  }, [active])
+    setState(
+      data.map((i) => {
+        if (i.slug === active)
+          return {
+            key: i.slug,
+            state: TabItemState.active,
+          };
+        else
+          return {
+            key: i.slug,
+            state: TabItemState.default,
+          };
+      }),
+    );
+  }, [active]);
 
   const handleActive = (item: TabItemType) => {
-    setState(prev => prev.map(i => {
-      if (i.key === item.slug) {
-        i.state = TabItemState.active
-      }
-      else
-        i.state = TabItemState.default
-      return i
-    }))
-  }
-
+    setState((prev) =>
+      prev.map((i) => {
+        if (i.key === item.slug) i.state = TabItemState.active;
+        else i.state = TabItemState.default;
+        return i;
+      }),
+    );
+  };
 
   const stateColor = [
-    'text-typography-600',
-    'text-typography-600',
-    'text-primary-500',
-  ]
+    "text-typography-400",
+    "text-typography-600",
+    "text-primary-400",
+  ];
 
-  const bgStateColor = [
-    'bg-white',
-    'bg-background-200',
-    'bg-primary-400',
-  ]
-
+  const borderStateStyle = ["", "", "border-b-2 border-primary-400"];
 
   const handleHover = (item: TabItemType) => {
-    // if (item.slug === active.at(0)) return
-    setState(prev => prev.map(i => {
-      if (i.key === item.slug) {
-        i.state = TabItemState.hover
-      }
-      return i
-    }))
-  }
+    if (item.slug === active) return
+    setState((prev) =>
+      prev?.map((i) => {
+        if (i.key === item.slug) {
+          i.state = TabItemState.hover;
+        }
+        return i;
+      }),
+    );
+  };
   const handleMouseLeave = (item: TabItemType) => {
-    // if (item.slug === active.at(0)) return
-    setState(prev => prev.map(i => {
-      if (i.key === item.slug) {
-        i.state = TabItemState.default
-        console.log("hey, i'm leave")
-      }
-      return i
-    }))
-  }
+    if (item.slug === active) return
+    setState((prev) =>
+      prev?.map((i) => {
+        if (i.key === item.slug) {
+          i.state = TabItemState.default;
+          console.log("hey, i'm leave");
+        }
+        return i;
+      }),
+    );
+  };
   const { platform } = useGlobalContext();
 
   return (
-    <HStack className={`w-full h-fit`}>
+    <HStack className={`h-fit w-full`}>
       {data.map((i, index) => {
-        // if (platform === 'web') {
-        //   return (
-        //     <div
-        //       key={i.slug}
-        //       className={`py-2 px-4 rounded-md flex items-center gap-3 ${bgStateColor.at(state.at(index)?.state as number)} hover:cursor-pointer`}
-        //       onMouseEnter={() => handleHover(i)}
-        //       onMouseLeave={() => handleMouseLeave(i)}
-        //       onClick={() => {
-        //         handleActive(i)
-        //         // router.push(`/${data.slug}` as Href<string | object>)
-        //         console.log(endPoint)
-        //       }}>
-        //       <Text>{i.label}</Text>
-        //     </div>)
-        // }
+        if (platform === 'web') {
+          return (
+            <div
+              key={i.slug}
+              className={`flex items-center px-4 py-2 ${borderStateStyle.at(state?.at(index)?.state as number)} hover:cursor-pointer`}
+              onMouseEnter={() => handleHover(i)}
+              onMouseLeave={() => handleMouseLeave(i)}
+              onClick={() => {
+                handleActive(i);
+                router.push(
+                  `${pathname.substring(0, pathname.lastIndexOf("/"))}/${i.slug}` as Href<`${string}/${string}`>,
+                );
+              }}>
+              <Text
+                className={`text-md font-medium ${stateColor.at(state?.at(index)?.state as number)}`}
+              >
+                {i.label}
+              </Text>
+            </div>)
+        }
         return (
           <Pressable
             key={i.slug}
-            className={`py-2 px-4 rounded-md flex items-center gap-3 `}
+            className={`flex items-center px-4 py-2 ${borderStateStyle.at(state?.at(index)?.state as number)}`}
             onPress={() => {
-              handleActive(i)
-              // router.push(`/${data.slug}` as Href<string | object>)
-              console.log(endPoint)
+              handleActive(i);
+              router.push(
+                `${pathname.substring(0, pathname.lastIndexOf("/"))}/${i.slug}` as Href<`${string}/${string}`>,
+              );
             }}
           >
-            <Text className={`text-sm ${stateColor.at(state.at(index)?.state as number)}`}>{i.label}</Text>
+            <Text
+              className={`text-sm font-medium ${stateColor.at(state?.at(index)?.state as number)}`}
+            >
+              {i.label}
+            </Text>
           </Pressable>
-        )
+        );
       })}
-    </HStack >
-  )
+    </HStack>
+  );
 }

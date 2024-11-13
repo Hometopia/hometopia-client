@@ -1,12 +1,49 @@
+import { useGlobalContext } from "@/contexts/GlobalProvider";
 import { HStack } from "../ui/hstack";
 import { Text } from "../ui/text";
 import { VStack } from "../ui/vstack";
+import { Image } from "../ui/image";
 
-export default function SimpleWidget({ size = 180, label = 'Label', number = 123 }: { size?: number, label?: string, number?: number }) {
-  return (
-    <VStack style={{ width: size }} className="h-fit px-4 pt-2 pb-3 rounded-2xl bg-gradient-to-b from-blue-500 to-cyan-400 shadow-hard-2">
-      <Text className="text-xs text-typography-0">{label}</Text>
-      <Text className="text-3xl text-typography-0 w-full text-center ">{number}</Text>
-    </VStack>
-  )
+export default function SimpleWidget({
+  className = 'w-[185px]',
+  label = "Label",
+  number = 123,
+}: {
+  className?: string;
+  label?: string;
+  number?: number;
+}) {
+  const { platform } = useGlobalContext()
+  if (platform === 'web')
+    return (
+      <VStack
+        className={`${className} relative h-fit rounded-2xl px-4 pb-3 pt-2 shadow-hard-2 bg-transparent`}
+      >
+        <Text className="text-xs text-typography-0">{label}</Text>
+        <Text className="w-full text-center text-3xl text-typography-0">
+          {number}
+        </Text>
+        <Image
+          className="absolute w-full h-full top-0 left-0 -z-10 rounded-2xl"
+          source={require('@/assets/images/illustration/holo-1.png')}
+          alt="holo-1"
+        />
+      </VStack>
+    )
+  else
+    return (
+      <VStack
+        className={`${className} relative rounded-2xl justify-between`}
+      >
+        <Text className="text-sm text-typography-0 mt-2 ml-4">{label}</Text>
+        <Text className="w-full text-right justify-center px-4 text-3xl text-typography-0 mb-2 font-bold">
+          {number}
+        </Text>
+        <Image
+          className="absolute w-full h-full top-0 left-0 -z-10 rounded-2xl"
+          source={require('@/assets/images/illustration/holo-1.png')}
+          alt="holo-1"
+        />
+      </VStack>
+    );
 }

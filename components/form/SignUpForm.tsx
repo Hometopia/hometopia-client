@@ -9,17 +9,18 @@ import { HStack } from "@/components/ui/hstack";
 
 export default function SignUpForm({
   submit,
-  signIn
+  signIn,
 }: {
-  submit: any,
-  signIn: any
+  submit: any;
+  signIn: any;
 }) {
-
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <VStack className="flex flex-col w-96 justify-center gap-12">
-      <Text className="text-center text-3xl font-bold text-typography-900">Tạo tài khoản</Text>
+    <VStack className="flex w-96 flex-col justify-center gap-12">
+      <Text className="text-center text-3xl font-bold text-typography-900">
+        Tạo tài khoản
+      </Text>
       <FormControl className="gap-8">
         <VStack className="gap-4">
           <VStack>
@@ -32,7 +33,10 @@ export default function SignUpForm({
             <Text className="text-sm text-typography-500">Mật khẩu</Text>
             <Input className="text-center">
               <InputField type={showPassword ? "text" : "password"} />
-              <InputSlot className="pr-3" onPress={() => setShowPassword(!showPassword)}>
+              <InputSlot
+                className="pr-3"
+                onPress={() => setShowPassword(!showPassword)}
+              >
                 <InputIcon
                   as={showPassword ? EyeIcon : EyeClosedIcon}
                   className="text-typography-500"
@@ -41,10 +45,15 @@ export default function SignUpForm({
             </Input>
           </VStack>
           <VStack>
-            <Text className="text-sm text-typography-500">Xác minh mật khẩu</Text>
+            <Text className="text-sm text-typography-500">
+              Xác minh mật khẩu
+            </Text>
             <Input className="text-center">
               <InputField type={showPassword ? "text" : "password"} />
-              <InputSlot className="pr-3" onPress={() => setShowPassword(!showPassword)}>
+              <InputSlot
+                className="pr-3"
+                onPress={() => setShowPassword(!showPassword)}
+              >
                 <InputIcon
                   as={showPassword ? EyeIcon : EyeClosedIcon}
                   className="text-typography-500"
@@ -53,18 +62,20 @@ export default function SignUpForm({
             </Input>
           </VStack>
         </VStack>
-        <Button size='md' onPress={submit}>
+        <Button size="md" onPress={submit}>
           <ButtonText>Đăng ký</ButtonText>
         </Button>
       </FormControl>
       <VStack className="items-center">
         <HStack className="items-center gap-4">
-          <Text className='text-sm text-typography-500' >Đã có tài khoản ?</Text>
-          <Button className="w-fit" variant="link" size='xs' onPress={signIn}>
-            <ButtonText className='text-sm text-primary-500'>Đăng nhập ngay</ButtonText>
+          <Text className="text-sm text-typography-500">Đã có tài khoản ?</Text>
+          <Button className="w-fit" variant="link" size="xs" onPress={signIn}>
+            <ButtonText className="text-sm text-primary-500">
+              Đăng nhập ngay
+            </ButtonText>
           </Button>
         </HStack>
       </VStack>
     </VStack>
-  )
+  );
 }

@@ -52,13 +52,18 @@ export default function Landing() {
               size="lg"
               variant="link"
               action="primary"
-              onPress={() => router.navigate('/(auth)/sign-in')}
+              onPress={() => router.navigate("/(auth)/sign-in")}
             >
               <ButtonText>Login</ButtonText>
             </Button>
           </li>
           <li>
-            <Button size="lg" variant="solid" action="primary" onPress={() => router.navigate('/(auth)/sign-up')}>
+            <Button
+              size="lg"
+              variant="solid"
+              action="primary"
+              onPress={() => router.navigate("/(auth)/sign-up")}
+            >
               <ButtonText>Get started</ButtonText>
             </Button>
           </li>
@@ -76,7 +81,7 @@ export default function Landing() {
             />
           </div>
           <div className="w-1/3 rounded-2xl bg-gradient-to-r from-blue-500 to-cyan-400 px-6 py-3 text-center transition delay-150 duration-300 ease-in-out hover:-translate-y-2 hover:scale-110 hover:shadow-[0_4px_9px_0_rgb(0,0,0,0.1)]">
-            <span className="text-sm color-white cursor-default">
+            <span className="cursor-default text-sm color-white">
               Phần mềm này được tạo ra với mục đích tốt nghiệp :3
             </span>
           </div>

@@ -12,9 +12,9 @@ export default function GlobalProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLogged, setIsLogged] = useState(false);
 
-  useEffect(() => {
-    setIsLogged(false);
-  }, []);
+  // useEffect(() => {
+  //   setIsLogged(false);
+  // }, []);
 
   return (
     <GlobalContext.Provider

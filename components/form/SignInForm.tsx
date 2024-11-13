@@ -11,16 +11,18 @@ import { Divider } from "@/components/ui/divider";
 export default function SignInForm({
   submit,
   signUp,
-  forgotPassword
+  forgotPassword,
 }: {
-  submit: any,
-  signUp: any,
-  forgotPassword: any
+  submit: any;
+  signUp: any;
+  forgotPassword: any;
 }) {
-  const [showPassword, setShowPassword] = useState(false)
+  const [showPassword, setShowPassword] = useState(false);
   return (
-    <VStack className="flex flex-col w-96 justify-center gap-12">
-      <Text className="text-center text-3xl font-bold text-typography-900">Đăng nhập</Text>
+    <VStack className="flex w-96 flex-col justify-center gap-12">
+      <Text className="text-center text-3xl font-bold text-typography-900">
+        Đăng nhập
+      </Text>
       <FormControl className="gap-8">
         <VStack className="gap-4">
           <VStack>
@@ -33,7 +35,10 @@ export default function SignInForm({
             <Text className="text-sm text-typography-500">Mật khẩu</Text>
             <Input className="text-center">
               <InputField type={showPassword ? "text" : "password"} />
-              <InputSlot className="pr-3" onPress={() => setShowPassword(!showPassword)}>
+              <InputSlot
+                className="pr-3"
+                onPress={() => setShowPassword(!showPassword)}
+              >
                 <InputIcon
                   as={showPassword ? EyeIcon : EyeClosedIcon}
                   className="text-typography-500"
@@ -42,22 +47,33 @@ export default function SignInForm({
             </Input>
           </VStack>
         </VStack>
-        <Button size='md' onPress={submit}>
+        <Button size="md" onPress={submit}>
           <ButtonText>Đăng nhập</ButtonText>
         </Button>
       </FormControl>
       <VStack className="items-center">
-        <Button className="w-fit" variant="link" size='xs' onPress={forgotPassword}>
-          <ButtonText className='text-sm text-primary-500'>Quên mật khẩu</ButtonText>
+        <Button
+          className="w-fit"
+          variant="link"
+          size="xs"
+          onPress={forgotPassword}
+        >
+          <ButtonText className="text-sm text-primary-500">
+            Quên mật khẩu
+          </ButtonText>
         </Button>
         <Divider className="my-4 w-16" />
         <HStack className="items-center gap-4">
-          <Text className='text-sm text-typography-500' >Chưa có tài khoản ?</Text>
-          <Button className="w-fit" variant="link" size='xs' onPress={signUp}>
-            <ButtonText className='text-sm text-primary-500'>Đăng ký ngay</ButtonText>
+          <Text className="text-sm text-typography-500">
+            Chưa có tài khoản ?
+          </Text>
+          <Button className="w-fit" variant="link" size="xs" onPress={signUp}>
+            <ButtonText className="text-sm text-primary-500">
+              Đăng ký ngay
+            </ButtonText>
           </Button>
         </HStack>
       </VStack>
     </VStack>
-  )
+  );
 }

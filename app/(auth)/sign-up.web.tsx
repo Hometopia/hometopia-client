@@ -8,42 +8,40 @@ import { ChevronLeftIcon } from "lucide-react-native";
 import AddressForm from "@/components/form/AddressForm";
 
 export default function SignUp_Web() {
-  const navigator = useNavigation()
-  const router = useRouter()
+  const navigator = useNavigation();
+  const router = useRouter();
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
-    document.title = "Hometopia | Đăng ký"
+    document.title = "Hometopia | Đăng ký";
   }, []);
-
 
   //stepper
   const steps = [
     <SignUpForm
-      submit={() => setActiveStep(prev => prev + 1)}
-      signIn={() => router.navigate('/sign-in')} />,
-    <ConfirmEmailForm
-      submit={() => setActiveStep(prev => prev + 1)}
-      signIn={() => router.navigate('/sign-in')}
-      resend={() => router.navigate('/sign-in')}
+      submit={() => setActiveStep((prev) => prev + 1)}
+      signIn={() => router.navigate("/sign-in")}
     />,
-    < AddressForm />,
-  ]
+    <ConfirmEmailForm
+      submit={() => setActiveStep((prev) => prev + 1)}
+      signIn={() => router.navigate("/sign-in")}
+      resend={() => router.navigate("/sign-in")}
+    />,
+    <AddressForm />,
+  ];
 
   return (
-    <div className="h-full w-full flex justify-center items-center relative bg-white">
+    <div className="relative flex h-full w-full items-center justify-center bg-white">
       <Button
-        className="absolute top-4 left-0 rounded-full"
+        className="absolute left-0 top-4 rounded-full"
         variant="outline"
         action="secondary"
         isDisabled={activeStep > 0 ? false : true}
-        onPress={() => setActiveStep(prev => prev - 1)}
+        onPress={() => setActiveStep((prev) => prev - 1)}
       >
-        <ButtonIcon
-          as={ChevronLeftIcon}
-        />
+        <ButtonIcon as={ChevronLeftIcon} />
       </Button>
       {steps[activeStep]}
     </div>
-  )
+  );
 }

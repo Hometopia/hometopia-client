@@ -1,50 +1,120 @@
-import Pagination from '@/components/custom/Pagination'
-import { Select } from '@/components/custom/Select'
-import { FilterSelect } from '@/components/filter/FilterSelect'
-import { Button, ButtonText } from '@/components/ui/button'
-import { Checkbox, CheckboxIcon, CheckboxIndicator } from '@/components/ui/checkbox'
-import { HStack } from '@/components/ui/hstack'
-import { Image } from '@/components/ui/image'
-import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input'
-import { Table, TableBody, TableData, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { Text } from '@/components/ui/text'
-import { VStack } from '@/components/ui/vstack'
-import SimpleWidget from '@/components/widget/SimpleWidget'
-import { IMAGE_URL } from '@/constants/public'
-import { useRouter } from 'expo-router'
-import { CheckIcon, SearchIcon } from 'lucide-react-native'
-import { useEffect, useState } from 'react'
-import { Pressable, View } from 'react-native'
-
-
+import Pagination from "@/components/custom/Pagination";
+import { Select } from "@/components/custom/Select";
+import { FilterSelect } from "@/components/filter/FilterSelect";
+import { Button, ButtonText } from "@/components/ui/button";
+import {
+  Checkbox,
+  CheckboxIcon,
+  CheckboxIndicator,
+} from "@/components/ui/checkbox";
+import { HStack } from "@/components/ui/hstack";
+import { Image } from "@/components/ui/image";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableData,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Text } from "@/components/ui/text";
+import { VStack } from "@/components/ui/vstack";
+import SimpleWidget from "@/components/widget/SimpleWidget";
+import { IMAGE_URL } from "@/constants/public";
+import { useRouter } from "expo-router";
+import { CheckIcon, SearchIcon } from "lucide-react-native";
+import { useEffect, useState } from "react";
+import { Pressable, View } from "react-native";
 
 const tableData = [
-  { img: IMAGE_URL + '/dreamlike.png', name: 'Device', category: 'Electrical', state: 'Đang dùng', desc: 'abcdxyz@!#$%^' },
-  { img: IMAGE_URL + '/dreamlike.png', name: 'Device', category: 'Electrical', state: 'Đang dùng', desc: 'abcdxyz@!#$%^' },
-  { img: IMAGE_URL + '/dreamlike.png', name: 'Device', category: 'Electrical', state: 'Đang dùng', desc: 'abcdxyz@!#$%^' },
-  { img: IMAGE_URL + '/dreamlike.png', name: 'Device', category: 'Electrical', state: 'Đang dùng', desc: 'abcdxyz@!#$%^' },
-  { img: IMAGE_URL + '/dreamlike.png', name: 'Device', category: 'Electrical', state: 'Đang dùng', desc: 'abcdxyz@!#$%^' },
-  { img: IMAGE_URL + '/dreamlike.png', name: 'Device', category: 'Electrical', state: 'Đang dùng', desc: 'abcdxyz@!#$%^' },
-  { img: IMAGE_URL + '/dreamlike.png', name: 'Device', category: 'Electrical', state: 'Đang dùng', desc: 'abcdxyz@!#$%^' },
-  { img: IMAGE_URL + '/dreamlike.png', name: 'Device', category: 'Electrical', state: 'Đang dùng', desc: 'abcdxyz@!#$%^' },
-  { img: IMAGE_URL + '/dreamlike.png', name: 'Device', category: 'Electrical', state: 'Đang dùng', desc: 'abcdxyz@!#$%^' },
-  { img: IMAGE_URL + '/dreamlike.png', name: 'Device', category: 'Electrical', state: 'Đang dùng', desc: 'abcdxyz@!#$%^' },
-]
+  {
+    img: IMAGE_URL + "/dreamlike.png",
+    name: "Device",
+    category: "Electrical",
+    state: "Đang dùng",
+    desc: "abcdxyz@!#$%^",
+  },
+  {
+    img: IMAGE_URL + "/dreamlike.png",
+    name: "Device",
+    category: "Electrical",
+    state: "Đang dùng",
+    desc: "abcdxyz@!#$%^",
+  },
+  {
+    img: IMAGE_URL + "/dreamlike.png",
+    name: "Device",
+    category: "Electrical",
+    state: "Đang dùng",
+    desc: "abcdxyz@!#$%^",
+  },
+  {
+    img: IMAGE_URL + "/dreamlike.png",
+    name: "Device",
+    category: "Electrical",
+    state: "Đang dùng",
+    desc: "abcdxyz@!#$%^",
+  },
+  {
+    img: IMAGE_URL + "/dreamlike.png",
+    name: "Device",
+    category: "Electrical",
+    state: "Đang dùng",
+    desc: "abcdxyz@!#$%^",
+  },
+  {
+    img: IMAGE_URL + "/dreamlike.png",
+    name: "Device",
+    category: "Electrical",
+    state: "Đang dùng",
+    desc: "abcdxyz@!#$%^",
+  },
+  {
+    img: IMAGE_URL + "/dreamlike.png",
+    name: "Device",
+    category: "Electrical",
+    state: "Đang dùng",
+    desc: "abcdxyz@!#$%^",
+  },
+  {
+    img: IMAGE_URL + "/dreamlike.png",
+    name: "Device",
+    category: "Electrical",
+    state: "Đang dùng",
+    desc: "abcdxyz@!#$%^",
+  },
+  {
+    img: IMAGE_URL + "/dreamlike.png",
+    name: "Device",
+    category: "Electrical",
+    state: "Đang dùng",
+    desc: "abcdxyz@!#$%^",
+  },
+  {
+    img: IMAGE_URL + "/dreamlike.png",
+    name: "Device",
+    category: "Electrical",
+    state: "Đang dùng",
+    desc: "abcdxyz@!#$%^",
+  },
+];
 
 export default function Asset_Web() {
-
-  const router = useRouter()
+  const router = useRouter();
   useEffect(() => {
-    document.title = "Tài sản"
-  }, [])
+    document.title = "Tài sản";
+  }, []);
 
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(1);
 
   return (
-    <View className="flex flex-col h-full bg-white py-6 pl-6 pr-0 gap-4">
-      <HStack className='justify-between min-h-fit pr-6'>
-        <Text className='text-2xl font-bold text-typography-900'>Danh sách tài sản</Text>
-        <HStack className='gap-3'>
+    <View className="flex h-full flex-col gap-4 bg-white py-6 pl-6 pr-0">
+      <HStack className="min-h-fit justify-between pr-6">
+        <Text className="text-2xl font-bold text-typography-900">
+          Danh sách tài sản
+        </Text>
+        <HStack className="gap-3">
           <Button size="sm" variant="solid" action="secondary">
             <ButtonText>Nhập liệu</ButtonText>
           </Button>
@@ -53,10 +123,10 @@ export default function Asset_Web() {
           </Button>
         </HStack>
       </HStack>
-      <View className="grow shrink overflow-y-scroll pr-2">
+      <View className="shrink grow overflow-y-scroll pr-2">
         <View className="flex flex-col gap-4 overflow-y-auto">
-          <HStack className="justify-between items-end">
-            <SimpleWidget size={185}></SimpleWidget>
+          <HStack className="items-end justify-between">
+            <SimpleWidget ></SimpleWidget>
             <HStack className="gap-4">
               <Input
                 className="w-[360px]"
@@ -75,28 +145,58 @@ export default function Asset_Web() {
               <FilterSelect placeholder="Trạng thái" />
             </HStack>
           </HStack>
-          <div className="flex flex-col gap-2 pb-4 items-center border border-outline-200  rounded-md overflow-hidden">
-            <Table className="w-full ">
+          <div className="flex flex-col items-center gap-2 overflow-hidden rounded-md border border-outline-200 pb-4">
+            <Table className="w-full">
               <TableHeader>
                 <TableRow className="bg-background-100">
                   <TableHead className="w-4">
-                    <Checkbox size="md" isInvalid={false} isDisabled={false} value='s'>
+                    <Checkbox
+                      size="md"
+                      isInvalid={false}
+                      isDisabled={false}
+                      value="s"
+                    >
                       <CheckboxIndicator>
                         <CheckboxIcon as={CheckIcon} />
                       </CheckboxIndicator>
                     </Checkbox>
                   </TableHead>
-                  <TableHead><Text className="text-md text-typography-900 font-bold">Tên</Text></TableHead>
-                  <TableHead><Text className="text-md text-typography-900 font-bold">Danh mục</Text></TableHead>
-                  <TableHead><Text className="text-md text-typography-900 font-bold">Trạng thái</Text></TableHead>
-                  <TableHead><Text className="text-md text-typography-900 font-bold">Mô tả</Text></TableHead>
+                  <TableHead>
+                    <Text className="text-md font-bold text-typography-900">
+                      Tên
+                    </Text>
+                  </TableHead>
+                  <TableHead>
+                    <Text className="text-md font-bold text-typography-900">
+                      Danh mục
+                    </Text>
+                  </TableHead>
+                  <TableHead>
+                    <Text className="text-md font-bold text-typography-900">
+                      Trạng thái
+                    </Text>
+                  </TableHead>
+                  <TableHead>
+                    <Text className="text-md font-bold text-typography-900">
+                      Mô tả
+                    </Text>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {tableData.map((i, index) => (
-                  <tr key={index} className='hover:bg-background-50 hover:cursor-pointer' onClick={() => router.push(`/asset/${index}`)}>
+                  <tr
+                    key={index}
+                    className="hover:cursor-pointer hover:bg-background-50"
+                    onClick={() => router.push(`/asset/${index}`)}
+                  >
                     <TableData>
-                      <Checkbox size="md" isInvalid={false} isDisabled={false} value='s'>
+                      <Checkbox
+                        size="md"
+                        isInvalid={false}
+                        isDisabled={false}
+                        value="s"
+                      >
                         <CheckboxIndicator>
                           <CheckboxIcon as={CheckIcon} />
                         </CheckboxIndicator>
@@ -104,20 +204,28 @@ export default function Asset_Web() {
                     </TableData>
                     <TableData className="flex items-center gap-2">
                       <Image
-                        className='w-[40px] h-[40px] rounded-md'
+                        className="h-[40px] w-[40px] rounded-md"
                         source={i.img}
                         alt="image"
                       />
-                      <Text className="text-md text-typography-900 font-normal">{i.name}</Text>
+                      <Text className="text-md font-normal text-typography-900">
+                        {i.name}
+                      </Text>
                     </TableData>
                     <TableData>
-                      <Text className="text-md text-typography-900 font-normal">{i.category}</Text>
+                      <Text className="text-md font-normal text-typography-900">
+                        {i.category}
+                      </Text>
                     </TableData>
                     <TableData>
-                      <Text className="text-md text-typography-900 font-normal">{i.state}</Text>
+                      <Text className="text-md font-normal text-typography-900">
+                        {i.state}
+                      </Text>
                     </TableData>
                     <TableData>
-                      <Text className="text-md text-typography-900 font-normal">{i.desc}</Text>
+                      <Text className="text-md font-normal text-typography-900">
+                        {i.desc}
+                      </Text>
                     </TableData>
                   </tr>
                 ))}
@@ -127,6 +235,6 @@ export default function Asset_Web() {
           </div>
         </View>
       </View>
-    </View >
-  )
+    </View>
+  );
 }

@@ -1,7 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export default function Calendar_Web() {
-  return (
-    <div>calendar.web</div>
-  )
+  return <div>calendar.web</div>;
 }

@@ -1,7 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export default function Reports_Web() {
-  return (
-    <div>reports.web</div>
-  )
+  return <div>reports.web</div>;
 }

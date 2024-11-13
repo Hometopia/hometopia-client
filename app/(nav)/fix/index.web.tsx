@@ -1,7 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export default function Fix_Web() {
-  return (
-    <div>fix.web</div>
-  )
+  return <div>fix.web</div>;
 }

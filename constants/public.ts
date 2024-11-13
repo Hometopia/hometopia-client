@@ -1,1 +1,1 @@
-export const IMAGE_URL = "./assets/images";
+export const IMAGE_URL = "/assets/images";

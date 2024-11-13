@@ -1,13 +1,13 @@
-import { LucideIcon } from "lucide-react-native"
+import { LucideIcon } from "lucide-react-native";
 
 export type NavigationItemType = {
-  slug: string,
-  label: string,
-  title: string,
-  icon: LucideIcon,
-}
+  slug: string;
+  label: string;
+  title: string;
+  icon: LucideIcon;
+};
 
 export type TabItemType = {
-  slug: string,
-  label: string,
-}
+  slug: string;
+  label: string;
+};

@@ -1,7 +1,5 @@
-import React from 'react'
+import React from "react";
 
 export default function Categories_Web() {
-  return (
-    <div>categories.web</div>
-  )
+  return <div>categories.web</div>;
 }

@@ -198,16 +198,16 @@ module.exports = {
       },
       keyframes: {
         rotateScaleDrop: {
-          '0%': { transform: 'translateY(-10px) rotate(20deg)' },
-          '50%': { transform: 'rotate(0deg) scale(1.2)' },
-          '100%': { transform: ' scale(1)' },
+          "0%": { transform: "translateY(-10px) rotate(20deg)" },
+          "50%": { transform: "rotate(0deg) scale(1.2)" },
+          "100%": { transform: " scale(1)" },
         },
       },
       animation: {
-        rotateScaleDrop: 'rotateScaleDrop 1.2s ease forwards',
+        rotateScaleDrop: "rotateScaleDrop 1.2s ease forwards",
       },
       transformOrigin: {
-        'left-center': '0% 50%',
+        "left-center": "0% 50%",
       },
     },
   },
