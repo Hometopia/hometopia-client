@@ -11,9 +11,9 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   // const [loaded, setLoaded] = useState(false)
 
-  // useEffect(() => {
-  //   setLoaded(true)
-  // }, []);
+  useEffect(() => {
+    SplashScreen.hideAsync();
+  }, []);
 
   // if (!loaded) {
   //   return null;
@@ -21,7 +21,12 @@ export default function RootLayout() {
 
   return (
     <GlobalProvider>
-      <Stack screenOptions={{ headerShown: false }}></Stack>
+      <Stack
+        screenOptions={{ headerShown: false }}
+      >
+        <Stack.Screen name="onboarding" />
+        <Stack.Screen name="landing" />
+      </Stack>
     </GlobalProvider>
   );
 }

@@ -10,12 +10,10 @@ export default function Welcome() {
 
   useFocusEffect(
     useCallback(() => {
-      console.log("ưtf")
       if (isLogged) router.replace("/asset");
       else if (platform === "web") {
         router.replace("/landing");
       } else {
-        console.log("mobile, bitch")
         router.replace("/onboarding");
       }
 
