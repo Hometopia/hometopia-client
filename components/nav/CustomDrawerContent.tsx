@@ -26,7 +26,6 @@ export default function CustomDrawerContent(props: any) {
         <DrawerItemList {...props} />
       </DrawerContentScrollView>
       <View>
-        <Text>Footer</Text>
       </View>
     </View>
   );

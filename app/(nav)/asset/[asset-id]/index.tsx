@@ -1,7 +1,13 @@
-import { Href, Redirect, usePathname } from "expo-router";
-import React from "react";
-
+import { useRouter, useFocusEffect, usePathname, Href } from "expo-router";
+import { useCallback } from "react"
 export default function AssetDetails() {
-  const pathname = usePathname();
-  return <Redirect href={`${pathname}/general` as Href} />;
+  const pathname = usePathname()
+  const router = useRouter()
+
+  useFocusEffect(
+    useCallback(() => {
+      router.replace(`${pathname}/general` as Href)
+    }, [])
+  )
+  return null
 }

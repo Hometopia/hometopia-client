@@ -1,26 +1,8 @@
 import { VStack } from "@/components/ui/vstack";
 import { Text } from "@/components/ui/text";
-import {
-  BoltIcon,
-  BoxIcon,
-  CalendarCogIcon,
-  FileChartColumnIcon,
-  LayoutDashboardIcon,
-  PanelLeftClose,
-  PanelLeftCloseIcon,
-  PanelLeftOpenIcon,
-  TagIcon,
-  WrenchIcon,
-} from "lucide-react-native";
 import { ReactElement, useCallback, useEffect, useState } from "react";
 import { Href, useFocusEffect, usePathname, useRouter } from "expo-router";
 import { TabItemType } from "@/constants/types";
-import {
-  Avatar,
-  AvatarBadge,
-  AvatarFallbackText,
-  AvatarImage,
-} from "../ui/avatar";
 import { HStack } from "../ui/hstack";
 import { useGlobalContext } from "@/contexts/GlobalProvider";
 import { View } from "react-native";
@@ -34,10 +16,10 @@ enum TabItemState {
 
 export default function Tabs({
   data,
-  size = "pc",
+  onPress,
 }: {
-  data: TabItemType[];
-  size?: string;
+  data: TabItemType[]
+  onPress?: any
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -123,7 +105,7 @@ export default function Tabs({
   const { platform } = useGlobalContext();
 
   return (
-    <HStack className={`h-fit w-full`}>
+    <HStack className={``}>
       {data.map((i, index) => {
         if (platform === 'web') {
           return (
@@ -133,10 +115,10 @@ export default function Tabs({
               onMouseEnter={() => handleHover(i)}
               onMouseLeave={() => handleMouseLeave(i)}
               onClick={() => {
-                handleActive(i);
+                handleActive(i)
                 router.push(
                   `${pathname.substring(0, pathname.lastIndexOf("/"))}/${i.slug}` as Href<`${string}/${string}`>,
-                );
+                )
               }}>
               <Text
                 className={`text-md font-medium ${stateColor.at(state?.at(index)?.state as number)}`}
@@ -151,13 +133,14 @@ export default function Tabs({
             className={`flex items-center px-4 py-2 ${borderStateStyle.at(state?.at(index)?.state as number)}`}
             onPress={() => {
               handleActive(i);
-              router.push(
+              router.replace(
                 `${pathname.substring(0, pathname.lastIndexOf("/"))}/${i.slug}` as Href<`${string}/${string}`>,
               );
+              onPress(index)
             }}
           >
             <Text
-              className={`text-sm font-medium ${stateColor.at(state?.at(index)?.state as number)}`}
+              className={`text-lg font-medium ${stateColor.at(state?.at(index)?.state as number)}`}
             >
               {i.label}
             </Text>

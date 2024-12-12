@@ -12,13 +12,16 @@ export default function GlobalProvider({ children }) {
   const [user, setUser] = useState(null);
   const [isLogged, setIsLogged] = useState(false);
 
+  //styles
+  const primaryColor = "0 93 180"
+
   // useEffect(() => {
   //   setIsLogged(false);
   // }, []);
 
   return (
     <GlobalContext.Provider
-      value={{ loading, platform, isLogged, setIsLogged }}
+      value={{ loading, platform, isLogged, setIsLogged, primaryColor }}
     >
       <GluestackUIProvider mode="light">{children}</GluestackUIProvider>
     </GlobalContext.Provider>

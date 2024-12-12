@@ -30,21 +30,25 @@ export default function Callout(
   const styles = {
     blank: {
       pc: 'w-full flex flex-row justify-end items-center px-4 py-3 gap-4 rounded-xl bg-background-50 text-md',
-      mobile: 'w-full flex flex-row justify-end items-center px-2 py-3 gap-4 rounded-md bg-background-50 text-sm'
+      mobile: 'w-full flex flex-row justify-end items-end px-4 py-3 gap-2 rounded-md bg-background-50 text-sm'
     },
     full: {
       pc: 'w-full flex flex-row justify-start items-center px-4 py-3 gap-4 rounded-xl bg-background-50 text-md',
-      mobile: 'w-full flex flex-col justify-end items-end px-2 py-3 gap-4 rounded-md bg-background-50 text-sm'
+      mobile: 'w-full flex flex-col justify-end items-end px-4 py-3 gap-2 rounded-md bg-background-50 text-sm'
     }
   }
 
   if (blank) {
     return (
       <View className={(size === 'pc') ? styles.blank.pc : styles.blank.mobile}>
-        <Text className='text-inherit'>{(what === "maintenance") ? backupData.maintenance.blank : backupData.fix.blank}</Text>
+        <View className='shrink'>
+          <Text className='text-inherit text-typography-500'>
+            {(what === "maintenance") ? backupData.maintenance.blank : backupData.fix.blank}
+          </Text>
+        </View>
         <Button size='sm' action='primary'>
           <ButtonIcon as={CalendarDaysIcon} size='md' />
-          <ButtonText>Xếp lịch</ButtonText>
+          <ButtonText onPress={() => setBlank(prev => prev = false)}>Xếp lịch</ButtonText>
         </Button>
       </View>
     )
@@ -53,14 +57,18 @@ export default function Callout(
   else {
     return (
       <View className={(size === 'pc') ? styles.full.pc : styles.full.mobile}>
-        <Text className='text-inherit'>{(what === "maintenance") ? backupData.maintenance.full : backupData.fix.full}</Text>
+        <View className='w-full flex flex-row justify-start'>
+          <Text className='text-inherit text-typography-500'>
+            {(what === "maintenance") ? backupData.maintenance.full : backupData.fix.full}
+          </Text>
+        </View>
         <ButtonGroup className='flex flex-row'>
           <Button size='sm' variant='outline' action='primary'>
-            <ButtonIcon className='text-primary-500' as={CalendarDaysIcon} size='md' />
+            <ButtonIcon className='text-primary-400' as={CalendarDaysIcon} size='md' />
             <ButtonText>Xem</ButtonText>
           </Button>
           <Button size='sm' variant='outline' action='secondary'>
-            <ButtonText>Hủy bỏ</ButtonText>
+            <ButtonText onPress={() => setBlank(prev => prev = true)}>Hủy bỏ</ButtonText>
           </Button>
         </ButtonGroup>
       </View>

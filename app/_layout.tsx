@@ -1,7 +1,8 @@
 import "../global.css";
-import GlobalProvider from "@/contexts/GlobalProvider";
+import GlobalProvider, { useGlobalContext } from "@/contexts/GlobalProvider";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import "react-native-reanimated";
 
@@ -9,15 +10,11 @@ import "react-native-reanimated";
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  // const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     SplashScreen.hideAsync();
   }, []);
 
-  // if (!loaded) {
-  //   return null;
-  // }
 
   return (
     <GlobalProvider>

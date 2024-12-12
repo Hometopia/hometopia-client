@@ -33,10 +33,10 @@ export default function SimpleWidget({
   else
     return (
       <VStack
-        className={`${className} relative rounded-2xl justify-between`}
+        className={`${className} relative rounded-2xl justify-center items-center gap-2`}
       >
-        <Text className="text-sm text-typography-0 mt-2 ml-4">{label}</Text>
-        <Text className="w-full text-right justify-center px-4 text-3xl text-typography-0 mb-2 font-bold">
+        <Text className="text-md font-medium text-typography-0">{label}</Text>
+        <Text className="justify-center px-4 text-4xl text-typography-0 font-bold">
           {number}
         </Text>
         <Image

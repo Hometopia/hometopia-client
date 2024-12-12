@@ -106,7 +106,7 @@ export default function Asset_Web() {
     document.title = "Tài sản";
   }, []);
 
-  const [page, setPage] = useState(1);
+
 
   return (
     <View className="flex h-full flex-col gap-4 bg-white py-6 pl-6 pr-0">
@@ -231,7 +231,7 @@ export default function Asset_Web() {
                 ))}
               </TableBody>
             </Table>
-            <Pagination quantity={10} active={page} onChange={setPage} />
+            {/* <Pagination quantity={10} active={page} onChange={setPage} /> */}
           </div>
         </View>
       </View>
