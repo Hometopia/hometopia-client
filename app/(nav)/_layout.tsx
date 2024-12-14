@@ -62,23 +62,12 @@ const navData = [
   },
 ];
 
-const CustomHeaderTitle = ({ title }: { title: string }) => {
-  return (
-    <View className="shrink flex flex-row gap-2 items-center bg-slate-300">
-      <Text>{title}</Text>
-      <Image
-        className="h-[30px] w-[30px]"
-        source={require("@/assets/images/icon.png")}
-        alt="image"
-      />
-    </View>
-  )
-}
 
 export default function NavLayout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <Drawer
+        initialRouteName="dashboard"
         drawerContent={CustomDrawerContent}
         screenOptions={{
           unmountOnBlur: true,
@@ -94,11 +83,13 @@ export default function NavLayout() {
             display: "flex",
           },
           headerRight: () =>
-            <Image
-              className="h-[30px] w-[30px] mx-4"
-              source={require("@/assets/images/icon.png")}
-              alt="image"
-            />
+            <View className="flex flex-row justify-center w-[60px]">
+              <Image
+                className="h-[30px] w-[30px]"
+                source={require("@/assets/images/icon.png")}
+                alt="image"
+              />
+            </View>
         }}
       >
         {

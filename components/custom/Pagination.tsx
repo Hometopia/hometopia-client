@@ -4,6 +4,7 @@ import { useState } from "react";
 import { View } from "react-native";
 import { Pressable } from "../ui/pressable";
 import { rgbaColor } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
+import React from "react";
 
 const PageChangeButton = ({
   leftDirection = true,
@@ -198,7 +199,7 @@ export default function Pagination({
   onChange: any;
 }) {
   return (
-    <View className="flex flex-row gap-2 my-4">
+    <View className="flex flex-row gap-2">
       <PageChangeButton
         leftDirection={true}
         isDisabled={active === 1 ? true : false}

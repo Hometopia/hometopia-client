@@ -130,101 +130,88 @@ export default function Assets() {
   const [page, setPage] = useState(1)
   return (
     <SafeAreaView className="h-full bg-white">
-      <ScrollView className='flex flex-col pb-2 px-4'>
-        <View className="flex flex-col gap-4 mb-4">
-          <View className="flex flex-row gap-2">
-            <Button className="grow" size="lg" variant="outline" action="secondary">
-              <ButtonText>Nhập liệu</ButtonText>
-            </Button>
-            <Button className="grow" size="lg" variant="solid" action="primary">
-              <ButtonIcon as={BoxIcon} />
-              <ButtonText>Thêm tài sản</ButtonText>
-            </Button>
+      <ScrollView className='pb-2 px-4'>
+        <View className="flex flex-col gap-4">
+          <View className="flex flex-col gap-4">
+            <View className="flex flex-row gap-2">
+              <Button className="grow" size="lg" variant="outline" action="secondary">
+                <ButtonText>Nhập liệu</ButtonText>
+              </Button>
+              <Button className="grow" size="lg" variant="solid" action="primary">
+                <ButtonIcon as={BoxIcon} />
+                <ButtonText>Thêm tài sản</ButtonText>
+              </Button>
+            </View>
+            <SimpleWidget className="h-24" label="Số lượng" />
           </View>
-          <SimpleWidget className="h-24" label="Số lượng" />
-        </View>
-        <Input
-          className="mb-4"
-          variant="outline"
-          size="lg"
-          isDisabled={false}
-          isInvalid={false}
-          isReadOnly={false}
-        >
-          <InputSlot className="pl-3">
-            <InputIcon as={SearchIcon} />
-          </InputSlot>
-          <InputField placeholder="Tìm kiếm" />
-        </Input>
-        <View className="flex flex-row gap-4">
-          <Select className="grow">
-            <SelectTrigger variant="outline" size="lg">
-              <SelectInput placeholder="Danh mục" />
-              <SelectIcon className="mr-3" as={ChevronDownIcon} />
-            </SelectTrigger>
-            <SelectPortal>
-              <SelectBackdrop />
-              <SelectContent>
-                <SelectDragIndicatorWrapper>
-                  <SelectDragIndicator />
-                </SelectDragIndicatorWrapper>
-                <SelectItem label="UX Research" value="ux" />
-                <SelectItem label="Web Development" value="web" />
-                <SelectItem
-                  label="Cross Platform Development Process"
-                  value="Cross Platform Development Process"
-                />
-                <SelectItem label="UI Designing" value="ui" isDisabled={true} />
-                <SelectItem label="Backend Development" value="backend" />
-              </SelectContent>
-            </SelectPortal>
-          </Select>
-          <Select className="grow">
-            <SelectTrigger variant="outline" size="lg">
-              <SelectInput placeholder="Trạng thái" />
-              <SelectIcon className="mr-3" as={ChevronDownIcon} />
-            </SelectTrigger>
-            <SelectPortal>
-              <SelectBackdrop />
-              <SelectContent>
-                <SelectDragIndicatorWrapper>
-                  <SelectDragIndicator />
-                </SelectDragIndicatorWrapper>
-                <SelectItem label="UX Research" value="ux" />
-                <SelectItem label="Web Development" value="web" />
-                <SelectItem
-                  label="Cross Platform Development Process"
-                  value="Cross Platform Development Process"
-                />
-                <SelectItem label="UI Designing" value="ui" isDisabled={true} />
-                <SelectItem label="Backend Development" value="backend" />
-              </SelectContent>
-            </SelectPortal>
-          </Select>
-        </View>
+          <Input
+            variant="outline"
+            size="lg"
+            isDisabled={false}
+            isInvalid={false}
+            isReadOnly={false}
+          >
+            <InputSlot className="pl-3">
+              <InputIcon as={SearchIcon} />
+            </InputSlot>
+            <InputField placeholder="Tìm kiếm" />
+          </Input>
+          <View className="flex flex-row gap-4">
+            <Select className="grow">
+              <SelectTrigger variant="outline" size="lg">
+                <SelectInput placeholder="Danh mục" />
+                <SelectIcon className="mr-3" as={ChevronDownIcon} />
+              </SelectTrigger>
+              <SelectPortal>
+                <SelectBackdrop />
+                <SelectContent>
+                  <SelectDragIndicatorWrapper>
+                    <SelectDragIndicator />
+                  </SelectDragIndicatorWrapper>
+                  <SelectItem label="UX Research" value="ux" />
+                  <SelectItem label="Web Development" value="web" />
+                  <SelectItem
+                    label="Cross Platform Development Process"
+                    value="Cross Platform Development Process"
+                  />
+                  <SelectItem label="UI Designing" value="ui" isDisabled={true} />
+                  <SelectItem label="Backend Development" value="backend" />
+                </SelectContent>
+              </SelectPortal>
+            </Select>
+            <Select className="grow">
+              <SelectTrigger variant="outline" size="lg">
+                <SelectInput placeholder="Trạng thái" />
+                <SelectIcon className="mr-3" as={ChevronDownIcon} />
+              </SelectTrigger>
+              <SelectPortal>
+                <SelectBackdrop />
+                <SelectContent>
+                  <SelectDragIndicatorWrapper>
+                    <SelectDragIndicator />
+                  </SelectDragIndicatorWrapper>
+                  <SelectItem label="UX Research" value="ux" />
+                  <SelectItem label="Web Development" value="web" />
+                  <SelectItem
+                    label="Cross Platform Development Process"
+                    value="Cross Platform Development Process"
+                  />
+                  <SelectItem label="UI Designing" value="ui" isDisabled={true} />
+                  <SelectItem label="Backend Development" value="backend" />
+                </SelectContent>
+              </SelectPortal>
+            </Select>
+          </View>
 
-        <View className="flex flex-row justify-center">
-          <Pagination quantity={10} active={page} onChange={setPage} />
-        </View>
+          <View className="flex flex-row justify-center">
+            <Pagination quantity={10} active={page} onChange={setPage} />
+          </View>
 
-        <ScrollView horizontal={true} >
-          <View className="rounded-lg overflow-hidden">
-            <View className="flex flex-row w-[800px]">
-              <View className="flex flex-col w-16">
-                <View className='px-6 py-4 bg-background-50 h-14'>
-                  <Checkbox
-                    size="lg"
-                    isInvalid={false}
-                    isDisabled={false}
-                    value="s"
-                  >
-                    <CheckboxIndicator>
-                      <CheckboxIcon as={CheckIcon} />
-                    </CheckboxIndicator>
-                  </Checkbox>
-                </View>
-                {tableData.map((i, index) =>
-                  <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
+          <ScrollView horizontal={true} >
+            <View className="rounded-lg overflow-hidden">
+              <View className="flex flex-row w-[800px]">
+                <View className="flex flex-col w-16">
+                  <View className='px-6 py-4 bg-background-50 h-14'>
                     <Checkbox
                       size="lg"
                       isInvalid={false}
@@ -236,76 +223,90 @@ export default function Assets() {
                       </CheckboxIndicator>
                     </Checkbox>
                   </View>
-                )}
-              </View>
-              <View className="flex flex-col grow">
-                <View className='px-6 py-4 bg-background-50 h-14'>
-                  <Text className="text-md font-bold text-typography-900">
-                    Tên
-                  </Text>
+                  {tableData.map((i, index) =>
+                    <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
+                      <Checkbox
+                        size="lg"
+                        isInvalid={false}
+                        isDisabled={false}
+                        value="s"
+                      >
+                        <CheckboxIndicator>
+                          <CheckboxIcon as={CheckIcon} />
+                        </CheckboxIndicator>
+                      </Checkbox>
+                    </View>
+                  )}
                 </View>
-                {tableData.map((i, index) =>
-                  <Pressable
-                    key={index}
-                    className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100 gap-2'
-                    onPress={() => router.push(`/asset/${index}`)}
-                  >
-                    <Image
-                      className="h-[40px] w-[40px] rounded-md"
-                      source={require("@/assets/images/dreamlike.png")}
-                      alt="image"
-                    />
-                    <Text className="text-md font-normal text-typography-900">
-                      {i.name}
-                    </Text>
-                  </Pressable>
-                )}
-              </View>
-              <View className="flex flex-col grow">
-                <View className='px-6 py-4 bg-background-50 h-14'>
-                  <Text className="text-md font-bold text-typography-900">
-                    Danh mục
-                  </Text>
-                </View>
-                {tableData.map((i, index) =>
-                  <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
-                    <Text className="text-md font-normal text-typography-900">
-                      {i.category}
+                <View className="flex flex-col grow">
+                  <View className='px-6 py-4 bg-background-50 h-14'>
+                    <Text className="text-md font-bold text-typography-900">
+                      Tên
                     </Text>
                   </View>
-                )}
-              </View>
-              <View className="flex flex-col grow">
-                <View className='px-6 py-4 bg-background-50 h-14'>
-                  <Text className="text-md font-bold text-typography-900">
-                    Trạng thái
-                  </Text>
+                  {tableData.map((i, index) =>
+                    <Pressable
+                      key={index}
+                      className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100 gap-2'
+                      onPress={() => router.push(`/asset/${index}`)}
+                    >
+                      <Image
+                        className="h-[40px] w-[40px] rounded-md"
+                        source={require("@/assets/images/dreamlike.png")}
+                        alt="image"
+                      />
+                      <Text className="text-md font-normal text-typography-900">
+                        {i.name}
+                      </Text>
+                    </Pressable>
+                  )}
                 </View>
-                {tableData.map((i, index) =>
-                  <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
-                    <Text className="text-md font-normal text-typography-900">
-                      {i.state}
+                <View className="flex flex-col grow">
+                  <View className='px-6 py-4 bg-background-50 h-14'>
+                    <Text className="text-md font-bold text-typography-900">
+                      Danh mục
                     </Text>
                   </View>
-                )}
-              </View>
-              <View className="flex flex-col grow">
-                <View className='px-6 py-4 bg-background-50 h-14'>
-                  <Text className="text-md font-bold text-typography-900">
-                    Mô tả
-                  </Text>
+                  {tableData.map((i, index) =>
+                    <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
+                      <Text className="text-md font-normal text-typography-900">
+                        {i.category}
+                      </Text>
+                    </View>
+                  )}
                 </View>
-                {tableData.map((i, index) =>
-                  <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
-                    <Text className="text-md font-normal text-typography-900">
-                      {i.desc}
+                <View className="flex flex-col grow">
+                  <View className='px-6 py-4 bg-background-50 h-14'>
+                    <Text className="text-md font-bold text-typography-900">
+                      Trạng thái
                     </Text>
                   </View>
-                )}
+                  {tableData.map((i, index) =>
+                    <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
+                      <Text className="text-md font-normal text-typography-900">
+                        {i.state}
+                      </Text>
+                    </View>
+                  )}
+                </View>
+                <View className="flex flex-col grow">
+                  <View className='px-6 py-4 bg-background-50 h-14'>
+                    <Text className="text-md font-bold text-typography-900">
+                      Mô tả
+                    </Text>
+                  </View>
+                  {tableData.map((i, index) =>
+                    <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
+                      <Text className="text-md font-normal text-typography-900">
+                        {i.desc}
+                      </Text>
+                    </View>
+                  )}
+                </View>
               </View>
             </View>
-          </View>
-        </ScrollView>
+          </ScrollView>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
