@@ -1,5 +1,4 @@
 import * as SecureStore from 'expo-secure-store'
-import { LoginForm } from '@/api/AuthService'
 
 const ACCESS_KEY = "MY_ACCESS_TOKEN"
 const REFRESH_KEY = "MY_REFRESH_TOKEN"
@@ -42,6 +41,24 @@ const LoginSession = {
       console.error("Failed to get token with key: ", key);
     }
   },
+
+  deleteAllToken: async () => {
+    // access token
+    try {
+      await SecureStore.deleteItemAsync(tokenKeyStorage.ACCESS_KEY)
+    }
+    catch {
+      console.error("Failed to delete token with key: ", tokenKeyStorage.ACCESS_KEY);
+    }
+
+    // refresh token
+    try {
+      await SecureStore.deleteItemAsync(tokenKeyStorage.REFRESH_KEY)
+    }
+    catch {
+      console.error("Failed to delete token with key: ", tokenKeyStorage.ACCESS_KEY);
+    }
+  }
 }
 
 const RequiredAuthenticationStore = {

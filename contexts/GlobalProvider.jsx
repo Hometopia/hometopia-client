@@ -18,6 +18,7 @@ export default function GlobalProvider({ children }) {
 
   const updateLoginState = async () => {
     try {
+      setLoading(true)
       setIsLogged(await AuthService.isSignIn())
     }
     catch (error) {

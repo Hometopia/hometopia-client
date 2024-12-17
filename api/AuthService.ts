@@ -49,12 +49,20 @@ const AuthService = {
           }
           default: {
             console.log(res.statusText)
+            return false
           }
 
         }
-        return res.data;
+        return true
       })
-      .catch(error => console.error(error.message))
+      .catch(error => {
+        if (error.status !== 401)
+          console.error(error.response.data)
+        else {
+          return false
+        }
+
+      })
   },
   signUp: async (formData: RegisterForm): Promise<any> => {
     return await axios.post(
@@ -64,7 +72,7 @@ const AuthService = {
         "firstName": formData.firstName,
         "lastName": formData.lastName,
         "email": formData.email,
-        "password": formData.email,
+        "password": formData.password,
         "address": {
           "line": formData.address.line,
           "provinceId": formData.address.provinceId,
@@ -76,11 +84,7 @@ const AuthService = {
       .then((res) => {
         switch (res.status) {
           case 201: {  // created
-            // after sign up successfully, sign in
-            AuthService.signIn({
-              username: formData.username,
-              password: formData.password,
-            } as LoginForm)
+
             break
           }
           default: {
@@ -90,7 +94,11 @@ const AuthService = {
         }
         return res.data;
       })
-      .catch(error => console.error(error.message))
+      .catch(error => console.error(error.response.data))
+  },
+
+  signOut: () => {
+    LoginSession.deleteAllToken()
   },
 
   //poor api for token testing 
@@ -114,8 +122,15 @@ const AuthService = {
           }
         }
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        if (error.response.data.status === 401) {
+          return false
+        }
+        else {
+          console.error(error.response.data)
+        }
+      })
   }
 }
 
-export { LoginForm, AuthService }
+export { LoginForm, RegisterForm, AuthService }

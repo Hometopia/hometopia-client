@@ -2,9 +2,8 @@ import { VStack } from "@/components/ui/vstack";
 import { Text } from "@/components/ui/text";
 import { Link, useRouter } from "expo-router";
 import { verifyInstallation } from "nativewind";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Image } from "@/components/ui/image";
-import { View } from "react-native";
+import { SafeAreaView, View } from "react-native";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import LogoFull from "@/components/custom/LogoFull";
 import { AuthService, LoginForm } from "@/api/AuthService";
@@ -14,9 +13,9 @@ import { useGlobalContext } from "@/contexts/GlobalProvider";
 
 export default function OnBoarding() {
   const router = useRouter()
-  const { isLogged } = useGlobalContext()
+  const { updateLoginState } = useGlobalContext()
   return (
-    <SafeAreaView className="h-full bg-white">
+    <SafeAreaView style={{ paddingTop: 24 }} className="h-full bg-white">
       <VStack className="h-full items-center justify-start py-8">
         <LogoFull />
         <View className="grow flex flex-col gap-8  items-center justify-center px-8">
@@ -43,24 +42,21 @@ export default function OnBoarding() {
             variant="outline"
             action="primary"
             size="xl"
-            // onPress={() => router.navigate('/(auth)/sign-in')}
-            onPress={async () => await AuthService.signIn({
-              username: "qwvjbjqb@mg.com",
-              password: "292003"
-            } as LoginForm)}
+            onPress={() => router.navigate('/(auth)/sign-in')}
+          // onPress={async () => {
+          //   let login = await AuthService.signIn({
+          //     username: "qwvjbjqb@mg.com",
+          //     password: "292003",
+          //   } as LoginForm)
+
+          //   if (login) {
+          //     // updateLoginState()
+          //     router.navigate('/')
+          //   }
+          // }}
           >
             <ButtonText>Đăng nhập</ButtonText>
           </Button>
-          <Button
-            className="self-stretch"
-            variant="outline"
-            action="primary"
-            size="xl"
-            onPress={() => console.log(isLogged)}
-          >
-            <ButtonText>test</ButtonText>
-          </Button>
-
         </View>
       </VStack>
     </SafeAreaView >

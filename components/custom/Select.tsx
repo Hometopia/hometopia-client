@@ -2,7 +2,8 @@ import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { ChevronDownIcon, SearchIcon } from "lucide-react-native";
 import { VStack } from "@/components/ui/vstack";
 import { Text } from "@/components/ui/text";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+
 
 type SelectItemType = {
   label: string;
