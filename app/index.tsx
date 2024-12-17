@@ -1,24 +1,40 @@
-import { useFocusEffect, useRouter } from "expo-router";
-import { useCallback } from "react";
-import { Text } from "react-native";
+import { SplashScreen, useFocusEffect, useRouter } from "expo-router";
+import { useCallback, useEffect } from "react";
+import { Text, View } from "react-native";
 import { useGlobalContext } from "@/contexts/GlobalProvider";
+import { Spinner } from "@/components/ui/spinner";
+
 
 export default function Welcome() {
   const router = useRouter();
 
-  const { platform, isLogged } = useGlobalContext();
+  const { isLogged, loading, updateLoginState } = useGlobalContext();
+
+  useEffect(() => {
+    updateLoginState()
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      SplashScreen.hideAsync()
+    }
+  }, [loading])
 
   useFocusEffect(
     useCallback(() => {
-      if (isLogged) router.replace("/asset");
-      else if (platform === "web") {
-        router.replace("/landing");
-      } else {
-        router.replace("/onboarding");
+      if (!loading) {
+        if (isLogged)
+          router.replace("/asset")
+        else
+          router.replace("/onboarding");
       }
 
-    }, []),
+    }, [loading]),
   );
 
-  return <Text>Welcome! Now, you're stuck here</Text>;
+  return (
+    <View className="h-full bg-white flex justify-center items-center">
+      <Spinner size="large" className="text-primary-400" />
+    </View>
+  )
 }

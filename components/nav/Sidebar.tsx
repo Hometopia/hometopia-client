@@ -24,6 +24,7 @@ import {
 } from "../ui/avatar";
 import { HStack } from "../ui/hstack";
 import { Image } from "../ui/image";
+import React from "react";
 
 enum SidebarItemState {
   default = 0,

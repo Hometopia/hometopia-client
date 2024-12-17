@@ -7,10 +7,14 @@ import { Image } from "@/components/ui/image";
 import { View } from "react-native";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import LogoFull from "@/components/custom/LogoFull";
+import { AuthService, LoginForm } from "@/api/AuthService";
+import { tokenKeyStorage, LoginSession } from "@/api/SecureStore";
+import { useGlobalContext } from "@/contexts/GlobalProvider";
 
 
 export default function OnBoarding() {
   const router = useRouter()
+  const { isLogged } = useGlobalContext()
   return (
     <SafeAreaView className="h-full bg-white">
       <VStack className="h-full items-center justify-start py-8">
@@ -29,21 +33,36 @@ export default function OnBoarding() {
             variant="solid"
             action="primary"
             size="xl"
-            onPress={() => router.replace('/(auth)/sign-up')}
+            onPress={() => router.navigate('/(auth)/sign-up')}
           >
             <ButtonText>Đăng ký ngay</ButtonText>
+          </Button>
+          <Text className="text-lg">Đã có tài khoản</Text>
+          <Button
+            className="self-stretch"
+            variant="outline"
+            action="primary"
+            size="xl"
+            // onPress={() => router.navigate('/(auth)/sign-in')}
+            onPress={async () => await AuthService.signIn({
+              username: "qwvjbjqb@mg.com",
+              password: "292003"
+            } as LoginForm)}
+          >
+            <ButtonText>Đăng nhập</ButtonText>
           </Button>
           <Button
             className="self-stretch"
             variant="outline"
             action="primary"
             size="xl"
-            onPress={() => router.replace('/(nav)/categories')}
+            onPress={() => console.log(isLogged)}
           >
-            <ButtonText>Dô cái screen đang code nè</ButtonText>
+            <ButtonText>test</ButtonText>
           </Button>
+
         </View>
       </VStack>
-    </SafeAreaView>
+    </SafeAreaView >
   );
 }

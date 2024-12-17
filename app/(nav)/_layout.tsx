@@ -82,6 +82,7 @@ export default function NavLayout() {
             width: 300,
             display: "flex",
           },
+          headerTitleAlign: 'center',
           headerRight: () =>
             <View className="flex flex-row justify-center w-[60px]">
               <Image

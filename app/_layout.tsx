@@ -13,22 +13,13 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
 
   useEffect(() => {
-    //guess tailwind css availability time
-    setTimeout(() => {
-      SplashScreen.hideAsync();
-    }, 200)
 
-  }, []);
-
-
+  }, [])
   return (
     <GlobalProvider>
       <Stack
         screenOptions={{ headerShown: false }}
-      >
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="landing" />
-      </Stack>
+      />
     </GlobalProvider>
   );
 }
