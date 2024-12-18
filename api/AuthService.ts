@@ -44,7 +44,6 @@ const AuthService = {
           case 200: {
             LoginSession.saveTokenWithKey(tokenKeyStorage.ACCESS_KEY, res.data.access_token)
             LoginSession.saveTokenWithKey(tokenKeyStorage.REFRESH_KEY, res.data.refresh_token)
-            console.log("sign in successfully")
             break
           }
           default: {
@@ -129,6 +128,36 @@ const AuthService = {
         else {
           console.error(error.response.data)
         }
+      })
+  },
+
+  isEmailExisted: async (email: string): Promise<any> => {
+    return await axios.get(
+      `${BASE_URL}/users/check-email?email=${email}`
+    )
+      .then((res) => {
+
+      })
+  },
+
+  getTokenByRefreshToken: async (): Promise<any> => {
+    return await axios.post(
+      `${BASE_URL}/auth/token`,
+      {
+        client_id: process.env.EXPO_PUBLIC_CLIENT_ID || 'client-id',
+        client_secret: process.env.EXPO_PUBLIC_CLIENT_SECRET || 'client-secret',
+        refresh_token: LoginSession.getTokenWithKey(tokenKeyStorage.REFRESH_KEY),
+        grant_type: 'refresh_token'
+      }
+    )
+      .then((res) => {
+        LoginSession.saveTokenWithKey(tokenKeyStorage.ACCESS_KEY, res.data.access_token)
+        LoginSession.saveTokenWithKey(tokenKeyStorage.REFRESH_KEY, res.data.refresh_token)
+        return true
+      })
+      .catch((error) => {
+        console.error(error.response.data)
+        return false
       })
   }
 }

@@ -13,6 +13,7 @@ import { Modal, ModalBackdrop, ModalBody, ModalContent } from "@/components/ui/m
 import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-view";
 import { Image } from "@/components/ui/image";
 import { router, useLocalSearchParams } from "expo-router";
+import { HouseType } from "@/api/CategoryService";
 
 type CategoryTableCols = {
   name: string,
@@ -77,12 +78,7 @@ const tableData: CategoryTableCols[] = [
   },
 ];
 
-const HouseType = [
-  "HIGH_GRADE",
-  "MID_HIGH_GRADE",
-  "MID_GRADE",
-  "LOW_GRADE",
-]
+
 const HouseTypeName = [
   "Nhà cấp 1",
   "Nhà cấp 2",
