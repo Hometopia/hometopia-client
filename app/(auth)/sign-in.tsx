@@ -12,9 +12,10 @@ import { router } from "expo-router";
 import useFormControl from "@/hooks/useFormControl";
 import { isValidEmail, isValidPassword } from "@/helpers/validation";
 import useFormSubmit from "@/hooks/useFormSubmit";
-import { AuthService, LoginForm } from "@/api/AuthService";
+import { AuthService } from "@/api/AuthService";
 import { Toast, ToastDescription, ToastTitle, useToast } from "@/components/ui/toast";
 import { CloseIcon, Icon } from "@/components/ui/icon";
+import { LoginForm } from "@/api/types/request";
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false)

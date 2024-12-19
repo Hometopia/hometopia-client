@@ -1,23 +1,14 @@
 import { BASE_URL } from '@/constants/server';
 import axios from 'axios';
 import { LoginSession, tokenKeyStorage } from './SecureStore';
+import { CategoryType, CategoryUpdateType } from './types/request';
 const HouseType = [
   "HIGH_GRADE",
   "MID_HIGH_GRADE",
   "MID_GRADE",
   "LOW_GRADE",
 ]
-type CategoryType = {
-  name: string,
-  description: string,
-  subCategories: CategoryType[]
-}
-type CategoryUpdateType = {
-  name: string,
-  description: string,
-  parentId: string,
-  subCategoryIds: string[]
-}
+
 const CategoryService = {
   getSuggestedCategories: async (houseType: string): Promise<any> => {
     return await axios.get(
@@ -135,4 +126,4 @@ const CategoryService = {
   }
 }
 
-export { HouseType, CategoryService, CategoryType, CategoryUpdateType }
+export { HouseType, CategoryService }

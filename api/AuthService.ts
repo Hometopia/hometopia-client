@@ -1,25 +1,7 @@
 import { BASE_URL } from '@/constants/server';
 import axios from 'axios';
 import { LoginSession, tokenKeyStorage } from './SecureStore'
-
-type LoginForm = {
-  username: string, // username or email
-  password: string,
-}
-
-type RegisterForm = {
-  "username": string,
-  "firstName": string,
-  "lastName": string,
-  "email": string,
-  "password": string,
-  "address": {
-    "line": string,
-    "provinceId": number,
-    "districtId": number,
-    "wardId": number
-  }
-}
+import { LoginForm, RegisterForm } from './types/request';
 
 
 const AuthService = {
@@ -162,4 +144,4 @@ const AuthService = {
   }
 }
 
-export { LoginForm, RegisterForm, AuthService }
+export { AuthService }

@@ -28,7 +28,8 @@ import { Spinner } from '@/components/ui/spinner';
 import React, { useEffect } from 'react'
 import useFormControl from '@/hooks/useFormControl';
 import useFormSubmit from '@/hooks/useFormSubmit';
-import { AuthService, LoginForm, RegisterForm } from '@/api/AuthService';
+import { AuthService } from '@/api/AuthService';
+import { LoginForm, RegisterForm } from '@/api/types/request';
 
 type AddressItemType = { code: number, name: string }
 
