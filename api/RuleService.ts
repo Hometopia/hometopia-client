@@ -1,7 +1,8 @@
 import { BASE_URL } from '@/constants/server';
 import axios from 'axios';
-import { CategoryByUsefulLife, UsefulLifeType } from './types/request';
+import { UsefulLifeType } from './types/request';
 import { LoginSession, tokenKeyStorage } from './SecureStore';
+import { CategoryByUsefulLife } from '@/constants/data_enum';
 
 
 const RuleService = {

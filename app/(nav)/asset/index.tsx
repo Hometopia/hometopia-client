@@ -128,6 +128,9 @@ const tableData = [
 export default function Assets() {
   const router = useRouter()
   const [page, setPage] = useState(1)
+  const [pageNumber, setPageNumber] = useState(10)
+
+
   return (
     <SafeAreaView className="h-full bg-white">
       <ScrollView className='pb-2 px-4'>
@@ -158,7 +161,7 @@ export default function Assets() {
           </Input>
           <View className="flex flex-row gap-4">
             <Select className="grow">
-              <SelectTrigger variant="outline" size="lg">
+              <SelectTrigger variant="outline" size="lg" className="flex flex-row justify-between">
                 <SelectInput placeholder="Danh mục" />
                 <SelectIcon className="mr-3" as={ChevronDownIcon} />
               </SelectTrigger>
@@ -180,7 +183,7 @@ export default function Assets() {
               </SelectPortal>
             </Select>
             <Select className="grow">
-              <SelectTrigger variant="outline" size="lg">
+              <SelectTrigger variant="outline" size="lg" className="flex flex-row justify-between">
                 <SelectInput placeholder="Trạng thái" />
                 <SelectIcon className="mr-3" as={ChevronDownIcon} />
               </SelectTrigger>
@@ -204,7 +207,7 @@ export default function Assets() {
           </View>
 
           <View className="flex flex-row justify-center">
-            <Pagination quantity={10} active={page} onChange={setPage} />
+            <Pagination quantity={pageNumber} active={page} onChange={setPage} />
           </View>
 
           <ScrollView horizontal={true} >

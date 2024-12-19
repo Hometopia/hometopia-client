@@ -4,7 +4,13 @@ import { LoginSession, tokenKeyStorage } from './SecureStore';
 import { AssetType } from './types/request';
 
 const AssetService = {
-  getAssetList: async (page: number = 1, size: number = 10, categoryId?: string, name?: string): Promise<any> => {
+  getAssetList: async (
+    page: number = 1,
+    size: number = 10,
+    categoryId?: string,
+    status?: string,
+    name?: string,
+  ): Promise<any> => {
     let filter_param = `&filter=`
     filter_param += (!!name) ? `name=ilike=${name}` : `name=isnotnull=notnull`
     filter_param += ';'

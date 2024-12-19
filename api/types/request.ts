@@ -33,7 +33,7 @@ type CategoryUpdateType = {
 }
 //#endregion
 
-//#region Aset
+//#region Asset
 type AssetType = {
   name: string,
   description: string,
@@ -51,6 +51,7 @@ type AssetType = {
   categoryId: string
 }
 
+
 //#endregion
 
 //#region File
@@ -66,14 +67,7 @@ type FileInfoType = {
 
 //#region Rule
 //poooooor
-const CategoryByUsefulLife = [
-  "TV", "SOUND_SYSTEM", "PROJECTOR", "AIR_CONDITIONER", "LIGHTING",
-  "AIR_PURIFIER", "STOVE", "MICROWAVE", "OVEN", "REFRIGERATOR",
-  "WATER_PURIFIER", "RANGE_HOOD", "BED", "WARDROBE", "FAN",
-  "NIGHT_LIGHT", "SHOWER", "BATHTUB", "SINK", "WATER_HEATER",
-  "EXHAUST_FAN", "WASHING_MACHINE", "DRYER", "CLOTHES_RACK",
-  "IRON", "LAPTOP", "MOBILE_PHONE"
-]
+
 type UsefulLifeType = {
   category: string,
   usefulLife: number,
@@ -81,7 +75,7 @@ type UsefulLifeType = {
 //#endregion
 
 //#region Schedule
-const ScheduleTypes = ['MAINTENANCE', 'REPAIR']
+
 
 type ScheduleType = {
   title: string,
@@ -101,8 +95,6 @@ export {
   CategoryUpdateType,
   AssetType,
   FileInfoType,
-  CategoryByUsefulLife,
   UsefulLifeType,
-  ScheduleTypes,
-  ScheduleType
+  ScheduleType,
 }
