@@ -13,10 +13,22 @@ import { Button } from "../ui/button";
 import { AuthService } from "@/api/AuthService";
 import { Icon } from "../ui/icon";
 import { LogOutIcon } from "lucide-react-native";
+import { UserService } from "@/api/UserService";
 
 export default function CustomDrawerContent(props: any) {
   const router = useRouter();
-  const { top, bottom } = useSafeAreaInsets();
+  const { top, bottom } = useSafeAreaInsets()
+
+  const [userDisplayname, setUserDisplayname] = React.useState('username')
+
+  const fetchData = async () => {
+    const data = await UserService.getMyProfile()
+    setUserDisplayname(data.data.firstName + ' ' + data.data.lastName)
+  }
+  React.useEffect(() => {
+    fetchData()
+  }, [])
+
   return (
     <View style={{ flex: 1, paddingTop: top, paddingBottom: bottom }} >
       <DrawerContentScrollView {...props} className="h-full px-4">
@@ -27,8 +39,8 @@ export default function CustomDrawerContent(props: any) {
             alt="image"
           />
         </View>
-        <View className="flex flex-row justify-center py-2">
-          <Text className="text-lg text-primary-400">Username</Text>
+        <View className="flex flex-row justify-center py-2 bg-primary-50 rounded-xl">
+          <Text className="text-lg font-medium text-primary-400">{userDisplayname}</Text>
         </View>
         <DrawerItemList {...props} />
       </DrawerContentScrollView>
