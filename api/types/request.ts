@@ -37,7 +37,7 @@ type CategoryUpdateType = {
 type AssetType = {
   name: string,
   description: string,
-  images: FileInfoType[],
+  images: FileInfoType[] | null,
   purchaseDate: string,
   purchasePlace: string,
   purchasePrice: number,
@@ -45,7 +45,7 @@ type AssetType = {
   serialNumber: string,
   location: string,
   warrantyExpiryDate: string,
-  documents: FileInfoType[],
+  documents: FileInfoType[] | null,
   status: string,
   maintenanceCycle: any,
   categoryId: string

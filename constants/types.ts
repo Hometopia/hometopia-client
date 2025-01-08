@@ -11,3 +11,8 @@ export type TabItemType = {
   slug: string;
   label: string;
 };
+
+export type DepreciationTableItem = {
+  year: number;
+  value: number;
+}

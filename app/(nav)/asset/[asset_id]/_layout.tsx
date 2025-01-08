@@ -1,13 +1,16 @@
 import Tabs from "@/components/nav/Tabs";
 import { TabItemType } from "@/constants/types";
-import { Stack, useRouter } from "expo-router";
-import { useRef } from "react";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
+import { useEffect, useRef } from "react";
 import { ScrollView, View, SafeAreaView } from "react-native";
 import { useHeaderHeight } from '@react-navigation/elements';
 import { Icon } from "@/components/ui/icon";
 import { ChevronDownIcon, ChevronLeftIcon, CopyIcon, EditIcon, QrCodeIcon, TrashIcon } from "lucide-react-native";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu";
+import { useQuery } from "@tanstack/react-query";
+import { AssetService } from "@/api/AssetService";
+import { Spinner } from "@/components/ui/spinner";
 
 const tabData: TabItemType[] = [
   {
@@ -36,6 +39,8 @@ const tabData: TabItemType[] = [
   },
 ];
 export default function AssetDetailsLayout() {
+  const router = useRouter()
+  //scroll..
   const scrollViewRef = useRef<ScrollView>(null)
   const handlePress = (index: number) => {
     const targetWidth = 80; // Chiều rộng ước tính của mỗi tab (có thể dùng `onLayout` để tính chính xác hơn)
@@ -48,7 +53,18 @@ export default function AssetDetailsLayout() {
     });
   }
 
-  const router = useRouter()
+  //
+  const { asset_id } = useLocalSearchParams()
+
+  //
+  const assetQuery = useQuery({
+    queryKey: ['asset', asset_id],
+    queryFn: () => AssetService.getAsset(asset_id as string),
+  })
+
+  // useEffect(() => {
+  //   console.log(assetQuery.data)
+  // }, [assetQuery])
   return (
     <SafeAreaView className="h-full bg-white">
       <View className="bg-white h-[48px] px-4 pt-2 pb-4 flex flex-row justify-between">
@@ -68,7 +84,6 @@ export default function AssetDetailsLayout() {
           >
             <ButtonIcon as={QrCodeIcon} className="h-8 w-8 text-typography-700" />
           </Button>
-
           <Menu
             placement="top"
             offset={5}
@@ -100,8 +115,6 @@ export default function AssetDetailsLayout() {
               <MenuItemLabel size="lg">Xóa</MenuItemLabel>
             </MenuItem>
           </Menu>
-
-
         </View>
       </View>
 
@@ -115,11 +128,15 @@ export default function AssetDetailsLayout() {
         </ScrollView>
       </View>
 
-      <Stack screenOptions={{
-        headerShown: false,
-        animation: 'fade'
-      }}>
-      </Stack>
+      {assetQuery.isPending || assetQuery.isRefetching ?
+        <Spinner size='small' className="text-primary-400" />
+        :
+        <Stack screenOptions={{
+          headerShown: false,
+          animation: 'fade'
+        }} />
+      }
+
     </SafeAreaView>
   )
 }

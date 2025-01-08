@@ -1,0 +1,147 @@
+import { View, SafeAreaView, ScrollView, StyleSheet } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { Link, router, useLocalSearchParams } from 'expo-router'
+import { Button, ButtonIcon, ButtonText } from '@/components/ui/button'
+import { Text } from '@/components/ui/text'
+import { ScheduleResponseType } from '@/api/types/response'
+import { ArrowLeftIcon, ArrowRightIcon, CalendarCheckIcon, ChevronDownIcon, ChevronLeftIcon, EditIcon, TrashIcon } from 'lucide-react-native'
+import { Menu, MenuItem, MenuItemLabel } from '@/components/ui/menu'
+import { Icon } from '@/components/ui/icon'
+import { Box } from '@/components/ui/box'
+import { dateToYYYYMMDD, getTime, YYYYMMDDtoLocalDate } from '@/helpers/time'
+import { ScheduleTypeName } from '@/constants/data_enum'
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+import { extractLatLng } from '@/helpers/map'
+import { Table, TableBody, TableData, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { BR } from '@expo/html-elements'
+
+export default function ScheduleDetails() {
+  const { schedule_details, data } = useLocalSearchParams()
+  const [parseData, setParseData] = useState<ScheduleResponseType>(JSON.parse(data as string))
+  const [coordinator, setCoordinator] = useState(extractLatLng(JSON.parse(data as string).vendor.link))
+
+
+  // const 
+  return (
+    <SafeAreaView className="h-full bg-white">
+      <ScrollView className='pb-2 px-4' overScrollMode='never'>
+        <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-between">
+          <Button
+            variant="outline"
+            action="default"
+            className="border-outline-200 p-2"
+            onPress={() => router.back()}
+          >
+            <ButtonIcon as={ChevronLeftIcon} className="h-6 w-6 text-typography-700" />
+          </Button>
+          <Menu
+            className='p-2'
+            placement="top"
+            offset={5}
+            disabledKeys={['Settings']}
+            trigger={({ ...triggerProps }) => {
+              return (
+                <Button
+                  variant="outline"
+                  action="default"
+                  className="border-outline-200"
+                  {...triggerProps}
+                >
+                  <ButtonText className="text-typography-700 text-lg">Menu</ButtonText>
+                  <ButtonIcon as={ChevronDownIcon} className="h-5 w-5 text-typography-700" />
+                </Button>
+              );
+            }}
+          >
+            <MenuItem key="Edit" textValue="Edit">
+              <Icon as={EditIcon} size="md" className="mr-2" />
+              <MenuItemLabel size="lg">Chỉnh sửa</MenuItemLabel>
+            </MenuItem>
+            <MenuItem key="Delete" textValue="Delete">
+              <Icon as={TrashIcon} size="md" className="mr-2" />
+              <MenuItemLabel size="lg">Xóa</MenuItemLabel>
+            </MenuItem>
+          </Menu>
+        </View>
+        <View style={{ paddingTop: 8 }} className="flex flex-col gap-4">
+          <Box className='p-4 flex-row gap-2 justify-center items-center bg-primary-400/15 rounded-xl'>
+            <Icon as={CalendarCheckIcon} size='xl' className='text-primary-400' />
+            <Text className='text-lg text-primary-400 font-semibold'>
+              {YYYYMMDDtoLocalDate(dateToYYYYMMDD(new Date(parseData.start)))}
+            </Text>
+          </Box>
+          <Text className='text-2xl font-semibold mt-4'>{parseData.title}</Text>
+          <View className='px-4 py-1 rounded-full bg-warning-400/15 flex flex-row gap-2 items-center self-start'>
+            <Text className='text-md font-normal text-warning-400'>
+              {ScheduleTypeName[parseData.type as keyof typeof ScheduleTypeName]}
+            </Text>
+          </View>
+
+          <Box className='flex-row gap-2 p-4 bg-background-50/50 rounded-lg'>
+            <View className='flex flex-col gap-4'>
+              <Text className='text-lg font-medium text-success-300'>Bắt đầu:</Text>
+              <Text className='text-lg font-medium text-error-300'>Kết thúc:</Text>
+            </View>
+            <View className='flex flex-col gap-4'>
+              <Text className='text-lg'>{' ' + getTime(new Date(parseData.start))}</Text>
+              <Text className='text-lg'>{' ' + getTime(new Date(parseData.end))}</Text>
+            </View>
+          </Box>
+          <View className='flex flex-row justify-between'>
+            <View>
+              <Text className='text-lg font-bold'>Tên tài sản</Text>
+              <Text className='text-lg'>{parseData.asset.name}</Text>
+            </View>
+            <Button className='bg-primary-400/15'>
+              <ButtonIcon as={ArrowRightIcon} className='text-primary-400' />
+              <ButtonText className='text-primary-400'>Xem tài sản</ButtonText>
+            </Button>
+          </View>
+          <View className=''>
+            <Text className='text-lg font-bold'>Bên cung cấp dịch vụ</Text>
+            <View className='h-60 rounded-lg my-2'>
+              <MapView
+                provider={PROVIDER_GOOGLE}
+                style={StyleSheet.absoluteFillObject}
+                initialRegion={{
+                  latitude: coordinator.latitude,
+                  longitude: coordinator.longitude,
+                  latitudeDelta: 0.01,
+                  longitudeDelta: 0.01,
+                }}
+                scrollEnabled={false}
+                zoomEnabled={false}
+                rotateEnabled={false}
+                pitchEnabled={false}
+              >
+                <Marker
+                  coordinate={{ latitude: coordinator.latitude, longitude: coordinator.longitude }}
+                  title="LAPTOP MINH THUẬN"
+                  description="Vị trí này được lấy từ Google Maps"
+                />
+              </MapView>
+            </View>
+            <View className='flex flex-row py-2 gap-2'>
+              <View className='flex flex-col gap-4'>
+                <Text className='text-lg'>Tên:</Text>
+                <Text className='text-lg'>Website:</Text>
+                <Text className='text-lg'>Điện thoại:</Text>
+              </View>
+              <View className='flex flex-col gap-4'>
+                <Text className='text-lg'>{parseData.vendor.name}</Text>
+                <Link className='text-lg text-info-500 focus:text-info-500/50'
+                  href={parseData.vendor.website}>
+                  {parseData.vendor.website}
+                </Link>
+                <Text className='text-lg'>{parseData.vendor.phoneNumber}</Text>
+              </View>
+            </View>
+          </View>
+
+        </View>
+
+      </ScrollView>
+
+    </SafeAreaView>
+  )
+}

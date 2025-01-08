@@ -15,7 +15,7 @@ const UserService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.message))
+      .catch((error) => console.error(error.response.data))
   }
 }
 

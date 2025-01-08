@@ -109,7 +109,7 @@ const Pages = ({
     </View>
   );
 
-  if (quantity <= length + 1) {
+  if (quantity <= length + 2) {
     return (
       <>
         {Array.from({ length: quantity }, (_, index) => (

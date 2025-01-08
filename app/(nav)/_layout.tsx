@@ -16,14 +16,15 @@ import { Image } from "@/components/ui/image";
 import { IMAGE_URL } from "@/constants/public";
 import { Text } from "@/components/ui/text";
 import { BlurView } from "expo-blur";
+import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
-const navData = [
-  {
-    slug: "dashboard",
-    label: "Dashboard",
-    title: "Dashboard",
-    icon: LayoutDashboardIcon,
-  },
+const draweData = [
+  // {
+  //   slug: "dashboard",
+  //   label: "Dashboard",
+  //   title: "Dashboard",
+  //   icon: LayoutDashboardIcon,
+  // },
   {
     slug: "asset",
     label: "Tài sản",
@@ -62,6 +63,62 @@ const navData = [
   },
 ];
 
+const navigationHeaders = [
+  {
+    slug: "index",
+    title: "Danh sách tài sản",
+  },
+  {
+    slug: "categories",
+    title: "Danh mục",
+  },
+  {
+    slug: "fix",
+    title: "Sửa chữa",
+  },
+  {
+    slug: "maintenance",
+    title: "Bảo trì",
+  },
+  {
+    slug: "calendar",
+    title: "Lịch",
+  },
+  {
+    slug: "reports",
+    title: "Báo cáo",
+  },
+  {
+    slug: "create-asset",
+    title: "Tạo tài sản mới",
+  },
+  {
+    slug: "[asset_id]",
+    title: "Chi tiết tài sản",
+  },
+  {
+    slug: "[suggested]",
+    title: "Danh mục đề xuất",
+  },
+  {
+    slug: "[schedule_details]/index",
+    title: "Chi tiết lịch"
+  }
+]
+
+const getHeaderTitle = (route: any, item: any) => {
+
+  let routeName = getFocusedRouteNameFromRoute(route);
+
+  if (routeName === undefined) {
+    routeName = item.slug
+  }
+
+  // return routeName
+
+  return navigationHeaders.find((i) => i.slug === routeName?.toString())?.title || 'what';
+
+}
 
 export default function NavLayout() {
   return (
@@ -94,17 +151,17 @@ export default function NavLayout() {
         }}
       >
         {
-          navData.map((i) => (
+          draweData.map((i) => (
             <Drawer.Screen
               key={i.slug}
               name={i.slug}
-              options={{
+              options={({ route }) => ({
                 drawerLabel: i.label,
-                title: i.title,
+                title: getHeaderTitle(route, i),
                 drawerIcon: ({ size, color }) => (
                   <i.icon size={size} color={color} />
                 ),
-              }}
+              })}
             />
           ))
         }

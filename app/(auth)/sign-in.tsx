@@ -21,7 +21,8 @@ export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false)
 
   const emailControl = useFormControl("", (value): boolean => {
-    return isValidEmail(value)
+    // return isValidEmail(value)
+    return true
   })
   const passwordControl = useFormControl("", (value): boolean => {
     return isValidPassword(value)

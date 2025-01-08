@@ -2,21 +2,49 @@ import { BASE_URL } from '@/constants/server';
 import axios from 'axios';
 import { LoginSession, tokenKeyStorage } from './SecureStore';
 import { ScheduleType } from './types/request';
+import { dateToISOString } from '@/helpers/time';
 
 const ScheduleService = {
-  getListSchedule: async (type: string): Promise<any> => {
+  getListSchedule: async (all: boolean, type?: string): Promise<any> => {
+    const filter = type ? `&filter=type==${type}` : ``
     return await axios.get(
-      `${BASE_URL}/schedules?filter=type==${type}`,
+      `${BASE_URL}/schedules?all=true${filter}`,
       {
         headers: {
           Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,
         }
       }
     )
-      .then((res) => {
-        return res.data
-      })
-      .catch((error) => console.error(error.response.message))
+      .then((res) => res.data)
+      .catch((error) => console.error(error.response.data))
+  },
+
+  getScheduleHistory: async (asssetId: string, type: string, date: Date): Promise<any> => {
+    const tranfDate: string = dateToISOString(date)
+    return await axios.get(
+      `${BASE_URL}/schedules?all=true&filter=asset.id==${asssetId};type==${type};end=lt=${tranfDate}`,
+      {
+        headers: {
+          Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,
+        }
+      }
+    )
+      .then((res) => res.data)
+      .catch((error) => console.error(error.response.data))
+  },
+
+  getUpcomingSchedule: async (asssetId: string, type: string, date: Date): Promise<any> => {
+    const tranfDate: string = dateToISOString(date)
+    return await axios.get(
+      `${BASE_URL}/schedules?all=true&filter=asset.id==${asssetId};type==${type};start=gt=${tranfDate}`,
+      {
+        headers: {
+          Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,
+        }
+      }
+    )
+      .then((res) => res.data)
+      .catch((error) => console.error(error.response.data))
   },
 
   createSchedule: async (scheduleData: ScheduleType): Promise<any> => {
@@ -32,7 +60,7 @@ const ScheduleService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.message))
+      .catch((error) => console.error(error.response.data))
   },
 
   updateSchedule: async (scheduleData: ScheduleType): Promise<any> => {
@@ -48,7 +76,7 @@ const ScheduleService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.message))
+      .catch((error) => console.error(error.response.data))
   },
 
   deleteSchedule: async (scheduleId: string): Promise<any> => {
@@ -63,7 +91,7 @@ const ScheduleService = {
       .then((res) => {
         return true
       })
-      .catch((error) => console.error(error.response.message))
+      .catch((error) => console.error(error.response.data))
   },
 }
 

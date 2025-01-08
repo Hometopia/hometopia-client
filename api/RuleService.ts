@@ -7,11 +7,6 @@ import { CategoryByUsefulLife } from '@/constants/data_enum';
 
 const RuleService = {
   getUsefulLife: async (category: string): Promise<UsefulLifeType | undefined> => {
-    if (!CategoryByUsefulLife.includes(category)) {
-      console.error("Category is not included")
-      return
-    }
-
     return await axios.get(
       `${BASE_URL}/rule/useful-life?category=${category}`,
       {
@@ -24,10 +19,11 @@ const RuleService = {
         return res.data as UsefulLifeType
       })
       .catch((error) => {
-        console.error(error.response.message)
+        console.error(error.response.data)
         return undefined
       })
-  }
+  },
+
 }
 
 export { UsefulLifeType }

@@ -17,7 +17,7 @@ const CategoryService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.message))
+      .catch((error) => console.error(error.response.data))
   },
 
   getAllCategory: async (): Promise<any> => {
@@ -32,20 +32,24 @@ const CategoryService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.message))
+      .catch((error) => console.error(error.response.data))
   },
 
-  getCategoryList: async (page: number = 1, size: number = 10, parentId?: string, name?: string): Promise<any> => {
+  getCategoryList: async (
+    page: number = 1,
+    size: number = 10,
+    parentId?: string,
+    name?: string): Promise<any> => {
     let filter_param = `&filter=`
     filter_param += (!!parentId) ? `parent.id==${parentId}` : `parent=isnotnull=notnull`
     filter_param += ';'
     filter_param += (!!name) ? `name=ilike=${name}` : `name=isnotnull=notnull`
 
-    if (!parentId && !name)
-      filter_param = ''
-
+    // if (!parentId && !name)
+    //   filter_param = ''
+    // console.debug(`${BASE_URL}/categories?all=true${filter_param}`)
     return await axios.get(
-      `${BASE_URL}/categories?page=${page}&number=${size}${filter_param}`,
+      `${BASE_URL}/categories?all=true${filter_param}`,
       {
         headers: {
           Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,
@@ -55,7 +59,23 @@ const CategoryService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.message))
+      .catch((error) => console.error(error.response.data))
+  },
+
+  getParentList: async (): Promise<any> => {
+
+    return await axios.get(
+      `${BASE_URL}/categories?all=true&filter=parent=isnull=null;name=isnotnull=notnull`,
+      {
+        headers: {
+          Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,
+        }
+      }
+    )
+      .then((res) => {
+        return res.data
+      })
+      .catch((error) => console.error(error.response.data))
   },
 
   createListCategories: async (categories: CategoryType[]): Promise<any> => {
@@ -73,7 +93,7 @@ const CategoryService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.message))
+      .catch((error) => console.error(error.response.data))
   },
 
   updateCategory: async (id: string, updateData: CategoryUpdateType): Promise<any> => {
@@ -89,7 +109,7 @@ const CategoryService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.message))
+      .catch((error) => console.error(error.response.data))
   },
 
   deleteCategoryList: async (ids: string[]): Promise<any> => {
@@ -104,7 +124,7 @@ const CategoryService = {
       }
     )
       .then((res) => { return true })
-      .catch((error) => console.error(error.response.message))
+      .catch((error) => console.error(error.response.data))
   },
 
   deleteCategory: async (id: string): Promise<any> => {
@@ -117,7 +137,7 @@ const CategoryService = {
       }
     )
       .then((res) => { return true })
-      .catch((error) => console.error(error.response.message))
+      .catch((error) => console.error(error.response.data))
   }
 }
 

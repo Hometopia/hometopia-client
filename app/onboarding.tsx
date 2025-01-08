@@ -6,7 +6,7 @@ import { Image } from "@/components/ui/image";
 import { SafeAreaView, View } from "react-native";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import LogoFull from "@/components/custom/LogoFull";
-import { AuthService, LoginForm } from "@/api/AuthService";
+import { AuthService } from "@/api/AuthService";
 import { tokenKeyStorage, LoginSession } from "@/api/SecureStore";
 import { useGlobalContext } from "@/contexts/GlobalProvider";
 
