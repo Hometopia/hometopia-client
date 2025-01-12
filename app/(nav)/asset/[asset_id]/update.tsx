@@ -1,6 +1,6 @@
 import { View, SafeAreaView, ScrollView, findNodeHandle, TouchableOpacity, Text } from 'react-native'
 import React, { useRef, useState } from 'react'
-import { router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { Button, ButtonIcon, ButtonText } from '@/components/ui/button'
 import { ChevronDownIcon, ChevronLeftIcon, ChevronUpIcon, EditIcon, FileIcon, TrashIcon } from 'lucide-react-native'
 import { Accordion, AccordionContent, AccordionHeader, AccordionIcon, AccordionItem, AccordionTitleText, AccordionTrigger } from '@/components/ui/accordion'
@@ -9,9 +9,9 @@ import useFormSubmit from '@/hooks/useFormSubmit'
 import ControllableInput from '@/components/custom/ControllableInput'
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input'
 import CategoryPickerModal from '@/components/custom/CategoryPickerModal'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CategoryService } from '@/api/CategoryService'
-import { CategoryResponseType, FileUploadResponseType } from '@/api/types/response'
+import { CategoryResponseType, FileUploadResponseType, ResponseBaseType } from '@/api/types/response'
 import { Textarea, TextareaInput } from '@/components/ui/textarea'
 import { dateToYYYYMMDD, stringToDate } from '@/helpers/time'
 import DateTimePickerModal from "react-native-modal-datetime-picker";
@@ -19,6 +19,7 @@ import { currencyFormatter, deformatNumber, formatNumber } from '@/helpers/curre
 import { Popover, PopoverBackdrop, PopoverBody, PopoverContent } from '@/components/ui/popover'
 import { BrandService } from '@/api/BrandService'
 import VendorSearchModal from '@/components/custom/VendorSearchModal'
+import { FormControlLabel, FormControlLabelText } from '@/components/ui/form-control'
 import { Select, SelectBackdrop, SelectContent, SelectDragIndicator, SelectDragIndicatorWrapper, SelectIcon, SelectInput, SelectItem, SelectPortal, SelectTrigger } from '@/components/ui/select'
 import { AssetStatusList, AssetStatusListMapToDisplayText } from '@/constants/data_enum'
 import DatePicker from '@/components/custom/DatePicker'
@@ -33,6 +34,9 @@ import CommonToast from '@/components/feedback/CommonToast'
 import { useAsyncExec } from '@/hooks/useAsyncExec'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
+import Loading from '@/components/feedback/Loading'
+import { AssetControl } from '@/components/form/AssetControl'
+import { BASE_URL } from '@/constants/server'
 
 enum inputFieldNameList {
   name,
@@ -49,34 +53,38 @@ enum inputFieldNameList {
   doc
 }
 
-export default function CreateAsset() {
-
+export default function UpdateAsset() {
+  const { asset_id } = useLocalSearchParams()
+  const queryClient = useQueryClient()
+  const [assetQuery, setAssetQuery] = React.useState<ResponseBaseType | undefined>(queryClient.getQueryData(['asset', asset_id]))
   //#region Queries
-
-  const createAssetMutation = useMutation({
-    mutationKey: ['createAsset'],
-    mutationFn: async () => AssetService.createAsset({
-      name: nameControl.value,
-      description: descontrol.value,
-      images: [imgInfo || null],
-      purchaseDate: purchaseDateControl.value,
-      purchasePlace: purchasePlaceControl.value,
-      purchasePrice: Number(deformatNumber(purchasePriceControl.value)),
-      vendor: vendorControl.value,
-      serialNumber: serialNumberControl.value,
-      location: locationControl.value,
-      warrantyExpiryDate: warrantyExpiryDateControl.value,
-      documents: documentInfo || null,
-      status: statusControl.value,
-      maintenanceCycle: null,
-      categoryId: categoryControl.value
-    } as AssetType),
+  const updateAssetMutation = useMutation({
+    mutationKey: ['updateAsset'],
+    mutationFn: async () => AssetService.updateAsset(
+      asset_id as string,
+      {
+        name: assetCtrl.nameControl.value,
+        description: assetCtrl.descontrol.value,
+        images: [assetCtrl.imgInfo || null],
+        purchaseDate: assetCtrl.purchaseDateControl.value,
+        purchasePlace: assetCtrl.purchasePlaceControl.value,
+        purchasePrice: Number(deformatNumber(assetCtrl.purchasePriceControl.value)),
+        vendor: assetCtrl.vendorControl.value,
+        serialNumber: assetCtrl.serialNumberControl.value,
+        location: assetCtrl.locationControl.value,
+        warrantyExpiryDate: assetCtrl.warrantyExpiryDateControl.value,
+        documents: assetCtrl.docInfo || null,
+        status: assetCtrl.statusControl.value,
+        maintenanceCycle: null,
+        categoryId: assetCtrl.categoryControl.value
+      } as AssetType),
     onSuccess: (res) => {
       if (res) {
         switch (res.status) {
           case 201:
           case 200: {
             successToast.handleToast()
+            queryClient.refetchQueries({ queryKey: ['asset', asset_id] })
             router.back()
             return
           }
@@ -106,19 +114,19 @@ export default function CreateAsset() {
           case 207:
             {
               if (imgPicked)
-                setImgInfo(res.data.items[0].data as FileInfoType)
+                assetCtrl.setImgInfo(res.data.items[0].data as FileInfoType)
               if (selectedFiles && imgPicked) {
                 const [img, ...rest] = res.data.items
-                setdocumentInfo(rest.map((i: any) => i.data))
+                assetCtrl.setDocInfo(rest.map((i: any) => i.data))
               }
               else if (selectedFiles) {
-                setdocumentInfo(res.data.items.map((i: any) => i.data))
+                assetCtrl.setDocInfo(res.data.items.map((i: any) => i.data))
               }
               setIsFileUpload(true)
               break
             }
           default:
-            console.error('from file upload success mutate', res)
+            console.error('from file upload success mutate', res.request)
         }
       }
     },
@@ -126,6 +134,7 @@ export default function CreateAsset() {
   })
 
   //#endregion
+
   //#region Scroll behaviour
   const scrollViewRef = useRef<ScrollView>(null);
   const elementsRef = useRef<any[]>([]);
@@ -159,14 +168,14 @@ export default function CreateAsset() {
   const toast = useToast()
   const successToast = CommonToast({
     toast: toast,
-    title: "Tạo tài sản thành công",
-    description: "Tài sản đã được tạo thành công",
+    title: "Chỉnh sửa tài sản thành công",
+    description: "",
     variant: "success"
   })
   const errorToast = CommonToast({
     toast: toast,
-    title: "Tạo tài sản thất bại",
-    description: "Tài sản chưa được tạo",
+    title: "Chỉnh sửa tài sản thất bại",
+    description: "",
     variant: "error"
   })
   //#endregion
@@ -181,77 +190,37 @@ export default function CreateAsset() {
   //#region Form control
 
   //overview
-  const nameControl = useFormControl("", (value): boolean => {
-    return value !== ""
-  })
-  const categoryControl = useFormControl("", (value): boolean => {
-    return value !== ""
-  })
-  const descontrol = useFormControl("", (value): boolean => {
-    return true
-  })
-  const [imgInfo, setImgInfo] = useState<FileInfoType>()
-  //
-  const purchaseDateControl = useFormControl("", (value): boolean => {
-    return value !== ""
-  })
-  const purchasePlaceControl = useFormControl("", (value): boolean => {
-    return value !== ""
-  })
-  const purchasePriceControl = useFormControl("", (value): boolean => {
-    return value !== ""
-  })
-  const vendorControl = useFormControl("", (value): boolean => {
-    return value !== ""
-  })
-  const serialNumberControl = useFormControl("", (value): boolean => {
-    return value !== ""
-  })
-  //
-  const statusControl = useFormControl(AssetStatusList[0], (value): boolean => {
-    return value !== ""
-  })
-  const locationControl = useFormControl("", (value): boolean => {
-    return value !== ""
-  })
-  //
-  const warrantyExpiryDateControl = useFormControl("", (value): boolean => {
-    return value !== ""
-  })
-  const documentControl = useFormControl("", (value): boolean => {
-    return true
-  })
-  const [documentInfo, setdocumentInfo] = useState([])
+  const assetCtrl = AssetControl(assetQuery?.data)
 
   const [isFileUpload, setIsFileUpload] = useState<boolean>(false)
 
   const validateAll = () => {
-    nameControl.validate()
-    categoryControl.validate()
-    descontrol.validate()
-    purchaseDateControl.validate()
-    purchasePlaceControl.validate()
-    purchasePriceControl.validate()
-    vendorControl.validate()
-    serialNumberControl.validate()
-    statusControl.validate()
-    locationControl.validate()
-    warrantyExpiryDateControl.validate()
+    assetCtrl.nameControl.validate()
+    assetCtrl.categoryControl.validate()
+    assetCtrl.descontrol.validate()
+    assetCtrl.purchaseDateControl.validate()
+    assetCtrl.purchasePlaceControl.validate()
+    assetCtrl.purchasePriceControl.validate()
+    assetCtrl.vendorControl.validate()
+    assetCtrl.serialNumberControl.validate()
+    assetCtrl.statusControl.validate()
+    assetCtrl.locationControl.validate()
+    assetCtrl.warrantyExpiryDateControl.validate()
   }
 
   const goToNextStep = async () => {
     const validArray = [
-      nameControl.isValid,
-      categoryControl.isValid,
-      descontrol.isValid,
-      purchaseDateControl.isValid,
-      purchasePlaceControl.isValid,
-      purchasePriceControl.isValid,
-      vendorControl.isValid,
-      serialNumberControl.isValid,
-      statusControl.isValid,
-      locationControl.isValid,
-      warrantyExpiryDateControl.isValid,
+      assetCtrl.nameControl.isValid,
+      assetCtrl.categoryControl.isValid,
+      assetCtrl.descontrol.isValid,
+      assetCtrl.purchaseDateControl.isValid,
+      assetCtrl.purchasePlaceControl.isValid,
+      assetCtrl.purchasePriceControl.isValid,
+      assetCtrl.vendorControl.isValid,
+      assetCtrl.serialNumberControl.isValid,
+      assetCtrl.statusControl.isValid,
+      assetCtrl.locationControl.isValid,
+      assetCtrl.warrantyExpiryDateControl.isValid,
     ]
 
     for (var i: number = 0; i < validArray.length; i++) {
@@ -274,10 +243,10 @@ export default function CreateAsset() {
       }
     }
     else {
-      createAssetMutation.mutate()
+      updateAssetMutation.mutate()
     }
   }
-  useAsyncExec({ condition: isFileUpload, callback: createAssetMutation.mutate })
+  useAsyncExec({ condition: isFileUpload, callback: updateAssetMutation.mutate })
   const { handleSubmit } = useFormSubmit(validateAll, goToNextStep)
 
   //#endregion
@@ -289,15 +258,15 @@ export default function CreateAsset() {
     queryFn: CategoryService.getAllCategory,
   })
   const getCategoryName = (): string => {
-    return categoryFullList.data?.data.items.find((i: CategoryResponseType) => i.id === categoryControl.value)?.name
+    return categoryFullList.data?.data.items.find((i: CategoryResponseType) => i.id === assetCtrl.categoryControl.value)?.name
   }
   //#endregion
 
   //#region vendor Popover
   const [isSuggestedVendorOpen, setIsSuggestedVendorOpen] = React.useState(false)
   const suggestedVendorQuery = useQuery({
-    queryKey: ['suggestedVendor', vendorControl.value],
-    queryFn: () => BrandService.getSuggestedListBrand(vendorControl.value.toLowerCase()),
+    queryKey: ['suggestedVendor', assetCtrl.vendorControl.value],
+    queryFn: () => BrandService.getSuggestedListBrand(assetCtrl.vendorControl.value.toLowerCase()),
     enabled: isSuggestedVendorOpen
   })
   //#endregion
@@ -308,7 +277,7 @@ export default function CreateAsset() {
       key: 'overview',
       label: 'Tổng quan',
       items: [
-        <ControllableInput key={1} control={nameControl} label="Tên tài sản" errorText='Tên tài sản không được để trống'
+        <ControllableInput key={1} control={assetCtrl.nameControl} label="Tên tài sản" errorText='Tên tài sản không được để trống'
           input={
             <Input
               className="text-center"
@@ -317,18 +286,18 @@ export default function CreateAsset() {
               <InputField
                 type="text"
                 placeholder="Nhập tên tài sản"
-                value={nameControl.value}
-                onChangeText={nameControl.onChange} />
+                value={assetCtrl.nameControl.value}
+                onChangeText={assetCtrl.nameControl.onChange} />
             </Input>}
         />,
-        <ControllableInput key={2} control={categoryControl} label="Danh mục" errorText='Danh mục không được để trống'
+        <ControllableInput key={2} control={assetCtrl.categoryControl} label="Danh mục" errorText='Danh mục không được để trống'
           input={
             <>
               <CategoryPickerModal
                 showModal={categoryModalShow}
                 setShowModal={setCategoryModalShow}
                 data={categoryFullList.data?.data.items as CategoryResponseType[]}
-                pickFn={categoryControl.onChange}
+                pickFn={assetCtrl.categoryControl.onChange}
               />
               <Input
                 isReadOnly={true}
@@ -345,23 +314,23 @@ export default function CreateAsset() {
             </>
           }
         />,
-        <ControllableInput key={3} control={descontrol} label="Mô tả" errorText='' isRequired={false}
+        <ControllableInput key={3} control={assetCtrl.descontrol} label="Mô tả" errorText='' isRequired={false}
           input={
             <Textarea size='lg' ref={(el) => (elementsRef.current[inputFieldNameList.desc] = el)}>
               <TextareaInput
                 placeholder="Thêm mô tả cho tài sản này"
-                value={descontrol.value}
-                onChangeText={descontrol.onChange}
+                value={assetCtrl.descontrol.value}
+                onChangeText={assetCtrl.descontrol.onChange}
               />
             </Textarea>
           }
         />,
         <View key={4} className='flex flex-col gap-2'>
-          <Text className="text-md text-typography-500">
+          <Text className="text-md text-typography-500 font-semibold">
             Hình ảnh
           </Text>
           <View className='flex flex-col gap-4'>
-            {imgPicked &&
+            {imgPicked ?
               <View className='flex flex-col items-center'>
                 <Image
                   // className="w-[12rem] h-[12rem]"
@@ -369,20 +338,41 @@ export default function CreateAsset() {
                   source={{ uri: imgPicked.uri }}
                   alt="asset img"
                 />
-                <Text>{imgPicked.name}</Text>
-              </View>}
-            <Button
-              className="px-3 w-full"
-              variant='solid'
-              action='primary'
+              </View>
+              :
+              assetCtrl.imgInfo !== null &&
+              <View className='flex flex-col items-center'>
+                <Image
+                  // className="w-[12rem] h-[12rem]"
+                  size='2xl'
+                  source={{ uri: `${BASE_URL}/files?fileName=${assetCtrl.imgInfo.fileName}` }}
+                  alt="asset img"
+                />
+                {/* <Text>{assetCtrl.imgInfo.originalFileName}</Text> */}
+              </View>
+            }
+            <Button className="px-3 w-full" variant='solid' action='primary'
               onPress={async () => {
                 const pickedFile = await FileUploader.pickImage()
                 if (pickedFile) {
                   setImgPicked(pickedFile)
                 }
               }} >
-              <ButtonText>{imgPicked ? 'Thay ảnh' : 'Thêm hình ảnh'}</ButtonText>
+              <ButtonText>
+                {imgPicked || assetCtrl.imgInfo !== null ? 'Thay ảnh' : 'Thêm hình ảnh'}
+              </ButtonText>
             </Button>
+            {
+              (imgPicked) &&
+              <Button className="px-3 w-full" variant='outline' action='primary'
+                onPress={async () => {
+                  setImgPicked(undefined)
+                }} >
+                <ButtonText>
+                  Hủy thay đổi
+                </ButtonText>
+              </Button>
+            }
           </View>
         </View>
       ],
@@ -391,18 +381,18 @@ export default function CreateAsset() {
       key: 'purchase',
       label: 'Thông tin mua hàng',
       items: [
-        <ControllableInput key={0} control={purchaseDateControl} label="Ngày mua hàng" errorText='Ngày mua không thể trống'
+        <ControllableInput key={0} control={assetCtrl.purchaseDateControl} label="Ngày mua hàng" errorText='Ngày mua không thể trống'
           input={
             <View ref={(el) => (elementsRef.current[inputFieldNameList.purDate] = el)}>
               <DatePicker
-                value={purchaseDateControl.value}
-                onChange={purchaseDateControl.onChange}
+                value={assetCtrl.purchaseDateControl.value}
+                onChange={assetCtrl.purchaseDateControl.onChange}
                 placeholder='Chọn ngày mua hàng'
               />
             </View>
           }
         />,
-        <ControllableInput key={1} control={purchasePlaceControl} label="Nơi mua hàng" errorText='Nơi mua không thể trống'
+        <ControllableInput key={1} control={assetCtrl.purchasePlaceControl} label="Nơi mua hàng" errorText='Nơi mua không thể trống'
           input={
             <Input
               className="text-center"
@@ -412,22 +402,22 @@ export default function CreateAsset() {
               <InputField
                 type="text"
                 placeholder="Nhập nơi mua"
-                value={purchasePlaceControl.value}
-                onChangeText={purchasePlaceControl.onChange} />
+                value={assetCtrl.purchasePlaceControl.value}
+                onChangeText={assetCtrl.purchasePlaceControl.onChange} />
             </Input>
           }
         />,
-        <ControllableInput key={2} control={purchasePriceControl} label="Giá mua" errorText='Giá mua không thể trống'
+        <ControllableInput key={2} control={assetCtrl.purchasePriceControl} label="Giá mua" errorText='Giá mua không thể trống'
           input={
             <Input className="text-center" size="lg" ref={(el) => (elementsRef.current[inputFieldNameList.purPrice] = el)}>
               <InputField
                 type="text"
                 inputMode="numeric"
                 placeholder="Nhập giá mua. Đợn vị hiện là VND"
-                value={purchasePriceControl.value}
+                value={assetCtrl.purchasePriceControl.value}
                 onChangeText={(v) => {
                   const formatValue = formatNumber(v)
-                  purchasePriceControl.onChange(formatValue)
+                  assetCtrl.purchasePriceControl.onChange(formatValue)
                 }} />
               <InputSlot >
                 <Text className='px-4'>₫</Text>
@@ -435,16 +425,16 @@ export default function CreateAsset() {
             </Input>
           }
         />,
-        <ControllableInput key={3} control={vendorControl} label="Nhà cung cấp" errorText='Nhà cung cấp không thể trống'
+        <ControllableInput key={3} control={assetCtrl.vendorControl} label="Nhà cung cấp" errorText='Nhà cung cấp không thể trống'
           input={
             <>
               <VendorSearchModal
                 showModal={isSuggestedVendorOpen}
                 setShowModal={setIsSuggestedVendorOpen}
                 data={suggestedVendorQuery.data?.data.items}
-                pickFn={vendorControl.onChange}
-                seachValue={vendorControl.value}
-                searchChange={vendorControl.onChange}
+                pickFn={assetCtrl.vendorControl.onChange}
+                seachValue={assetCtrl.vendorControl.value}
+                searchChange={assetCtrl.vendorControl.onChange}
               />
               <Input
                 isReadOnly
@@ -456,14 +446,14 @@ export default function CreateAsset() {
                 <InputField
                   type="text"
                   placeholder="Nhập tên nhà cung cấp"
-                  value={vendorControl.value}
-                  onChangeText={vendorControl.onChange} />
+                  value={assetCtrl.vendorControl.value}
+                  onChangeText={assetCtrl.vendorControl.onChange} />
               </Input>
             </>
 
           }
         />,
-        <ControllableInput key={4} control={serialNumberControl} label="Số serial" errorText='Số serial không thể trống'
+        <ControllableInput key={4} control={assetCtrl.serialNumberControl} label="Số serial" errorText='Số serial không thể trống'
           input={
             <Input
               className="text-center"
@@ -473,8 +463,8 @@ export default function CreateAsset() {
               <InputField
                 type="text"
                 placeholder="Nhập số serial"
-                value={serialNumberControl.value}
-                onChangeText={serialNumberControl.onChange} />
+                value={assetCtrl.serialNumberControl.value}
+                onChangeText={assetCtrl.serialNumberControl.onChange} />
             </Input>
           }
         />,
@@ -484,13 +474,13 @@ export default function CreateAsset() {
       key: 'use',
       label: 'Thông tin sử dụng',
       items: [
-        <ControllableInput key={1} control={statusControl} label="Trạng thái sử dụng" errorText=''
+        <ControllableInput key={1} control={assetCtrl.statusControl} label="Trạng thái sử dụng" errorText=''
           input={
             <Select
-              selectedValue={statusControl.value}
+              selectedValue={assetCtrl.statusControl.value}
               initialLabel={AssetStatusListMapToDisplayText[AssetStatusList[0] as keyof typeof AssetStatusListMapToDisplayText]}
               defaultValue={AssetStatusList[0]}
-              onValueChange={(v) => statusControl.onChange(v)}
+              onValueChange={(v) => assetCtrl.statusControl.onChange(v)}
               ref={(el) => (elementsRef.current[inputFieldNameList.status] = el)}
             >
               <SelectTrigger variant="outline" size="lg" className="flex flex-row justify-between">
@@ -515,7 +505,7 @@ export default function CreateAsset() {
             </Select>
           }
         />,
-        <ControllableInput key={2} control={locationControl} label="Vị trí" errorText='Vị trí không thể trống'
+        <ControllableInput key={2} control={assetCtrl.locationControl} label="Vị trí" errorText='Vị trí không thể trống'
           input={
             <Input
               className="text-center"
@@ -525,8 +515,8 @@ export default function CreateAsset() {
               <InputField
                 type="text"
                 placeholder="Nhập vị trí"
-                value={locationControl.value}
-                onChangeText={locationControl.onChange} />
+                value={assetCtrl.locationControl.value}
+                onChangeText={assetCtrl.locationControl.onChange} />
             </Input>
           }
         />,
@@ -536,124 +526,135 @@ export default function CreateAsset() {
       key: 'warranty',
       label: 'Bảo hành',
       items: [
-        <ControllableInput key={1} control={warrantyExpiryDateControl} label="Ngày kết thúc bảo hành" errorText='Ngày kết thúc không thể trống'
+        <ControllableInput key={1} control={assetCtrl.warrantyExpiryDateControl} label="Ngày kết thúc bảo hành" errorText='Ngày kết thúc không thể trống'
           input={
             <View ref={(el) => (elementsRef.current[inputFieldNameList.warranDate] = el)}>
               <DatePicker
-                value={warrantyExpiryDateControl.value}
-                onChange={warrantyExpiryDateControl.onChange}
+                value={assetCtrl.warrantyExpiryDateControl.value}
+                onChange={assetCtrl.warrantyExpiryDateControl.onChange}
                 placeholder='Chọn ngày kết thúc'
               />
             </View>
           }
         />,
-        <ControllableInput key={2} control={documentControl} label="Thẻ bảo hành , hóa đơn" errorText=''
-          input={
-            <View className='flex flex-col rounded-xl overflow-hidden'>
-              <View className="flex flex-row">
-                <View className="flex flex-col grow">
-                  <View className='px-6 py-4 bg-background-50 h-14'>
-                    <Text className="text-md font-bold text-typography-900">
-                      Tên
-                    </Text>
-                  </View>
-                  {selectedFiles &&
-                    selectedFiles.map((i, index) => (
-                      <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100 text-wrap' >
-                        <View className="flex-1">
-                          <Text className="text-md font-normal text-typography-900 ">
-                            {i.name}
-                          </Text>
-                        </View>
-                      </View>
-                    ))
-                  }
+        <View key={2} className='flex flex-col gap-2'>
+          <Text className="text-md text-typography-500 font-semibold">Thẻ bảo hành/ Hóa đơn</Text>
+          <View className='flex flex-col rounded-xl overflow-hidden' >
+            <View className="flex flex-row">
+              <View className="flex flex-col grow">
+                <View className='px-6 py-4 bg-background-50 h-14'>
+                  <Text className="text-md font-bold text-typography-900">
+                    Tên
+                  </Text>
                 </View>
-                <View className="flex flex-col grow">
-                  <View className='px-6 py-4 bg-background-50 h-14'>
-                    <Text className="text-md font-bold text-typography-900">
-                      Mô tả
-                    </Text>
-                  </View>
-                  {selectedFiles &&
-                    selectedFiles.map((i, index) => (
-                      <View key={index} className='px-6 py-4 h-24 flex flex-row gap-4 items-center border-b border-outline-100'>
-                        <Button
-                          className="px-3"
-                          variant='outline'
-                          action='primary'
-                          onPress={async () => {
-                            const pickedFile = await FileUploader.pickFile()
-                            if (pickedFile) {
-                              setSelectedFiles(prev => {
-                                const updatedFiles = [...prev]
-                                updatedFiles[index] = pickedFile
-                                return updatedFiles
-                              })
-                            }
-                          }}
-                        >
-                          <ButtonIcon as={EditIcon} className="text-primary-400" />
-                        </Button>
-                        <Button
-                          className="px-3"
-                          variant='outline'
-                          action='negative'
-                          onPress={() => {
-                            if (selectedFiles.length > 1)
-                              setSelectedFiles(prev => prev.splice(index, 1))
-                            else
-                              setSelectedFiles([])
-                          }}
-                        >
-                          <ButtonIcon as={TrashIcon} className="text-error-400">
-                          </ButtonIcon>
-                        </Button>
+                {assetCtrl.docInfo &&
+                  assetCtrl.docInfo.map((i, index) => (
+                    <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100 text-wrap' >
+                      <View className="flex-1">
+                        <Text className="text-md font-normal text-typography-900 ">
+                          {i.originalFileName}
+                        </Text>
                       </View>
-                    ))}
-                </View>
+                    </View>
+                  ))
+                }
+                {selectedFiles &&
+                  selectedFiles.map((i, index) => (
+                    <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100 text-wrap' >
+                      <View className="flex-1">
+                        <Text className="text-md font-normal text-typography-900 ">
+                          {i.name}
+                        </Text>
+                      </View>
+                    </View>
+                  ))
+                }
               </View>
-              <Button
-                className='w-full bg-primary-50'
-                variant='solid'
-                size='lg'
-                onPress={async () => {
-                  const pickedFile = await FileUploader.pickFile()
-                  if (pickedFile)
-                    setSelectedFiles((prev) => [...prev, pickedFile])
-                }}
-              >
-                <ButtonText className='text-primary-400'>Thêm</ButtonText>
-                <ButtonIcon className='text-primary-400' as={FileIcon} />
-              </Button>
+              <View className="flex flex-col grow">
+                <View className='px-6 py-4 bg-background-50 h-14'>
+                  <Text className="text-md font-bold text-typography-900">
+                    Chỉnh sửa
+                  </Text>
+                </View>
+                {selectedFiles &&
+                  selectedFiles.map((i, index) => (
+                    <View key={index} className='px-6 py-4 h-24 flex flex-row gap-4 items-center border-b border-outline-100'>
+                      <Button
+                        className="px-3"
+                        variant='outline'
+                        action='primary'
+                        onPress={async () => {
+                          const pickedFile = await FileUploader.pickFile()
+                          if (pickedFile) {
+                            setSelectedFiles(prev => {
+                              const updatedFiles = [...prev]
+                              updatedFiles[index] = pickedFile
+                              return updatedFiles
+                            })
+                          }
+                        }}
+                      >
+                        <ButtonIcon as={EditIcon} className="text-primary-400" />
+                      </Button>
+                      <Button
+                        className="px-3"
+                        variant='outline'
+                        action='negative'
+                        onPress={() => {
+                          if (selectedFiles.length > 1)
+                            setSelectedFiles(prev => prev.splice(index, 1))
+                          else
+                            setSelectedFiles([])
+                        }}
+                      >
+                        <ButtonIcon as={TrashIcon} className="text-error-400">
+                        </ButtonIcon>
+                      </Button>
+                    </View>
+                  ))}
+              </View>
             </View>
-          }
-        />,
+            <Button
+              className='w-full bg-primary-50'
+              variant='solid'
+              size='lg'
+              onPress={async () => {
+                const pickedFile = await FileUploader.pickFile()
+                if (pickedFile)
+                  setSelectedFiles((prev) => [...prev, pickedFile])
+              }}
+            >
+              <ButtonText className='text-primary-400'>Thêm</ButtonText>
+              <ButtonIcon className='text-primary-400' as={FileIcon} />
+            </Button>
+          </View>
+        </View>
+
+        ,
       ],
     },
   ]
   return (
     <SafeAreaView className="h-full bg-white relative">
-      {filesUploadMutation.isPending || createAssetMutation.isPending &&
-        <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }} className='absolute z-50 top-0 left-0 w-full h-full flex justify-center items-center'>
-          <Spinner size="large" className="text-primary-400" />
-          <Text className='text-typography-800 text-md'>
-            {filesUploadMutation.isPending && 'Đang tải file lên'}
-            {createAssetMutation.isPending && 'Đang tạo...'}
-          </Text>
-        </View>
+      {(filesUploadMutation.isPending || updateAssetMutation.isPending) &&
+        <Loading texts={[
+          {
+            condition: filesUploadMutation.isPending,
+            text: 'Đang tải file lên'
+          },
+          {
+            condition: updateAssetMutation.isPending,
+            text: 'Đang lưu...'
+          }
+        ]} />
       }
       <ScrollView ref={scrollViewRef} overScrollMode='never'>
         <View className='px-4 pb-4 flex flex-col '>
-          <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-between">
-            <Button
-              variant="outline"
-              action="default"
-              className="border-outline-200 p-2"
-              onPress={() => router.back()}
-            >
+          <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-start gap-4 items-center">
+            <Button variant="outline" action="default" className="border-outline-200 p-2" onPress={() => router.back()}>
               <ButtonIcon as={ChevronLeftIcon} className="h-6 w-6 text-typography-700" />
             </Button>
+            <Text className='text-lg'>Chỉnh sửa</Text>
           </View>
           <View style={{ paddingTop: 8 }} className="flex flex-col gap-4">
             <Accordion

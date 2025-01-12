@@ -41,7 +41,7 @@ export default function Schedule({ data, selected, touchFn }: SchedulePropsType)
       >
         <Card className='bg-white shadow-xl'>
           <View className='flex flex-col gap-2'>
-            <View className='flex flex-col gap-2'>
+            <View className='flex flex-col gap-2 items-start'>
               <Text className='text-2xl font-semibold pb-2'>{item.title}</Text>
               <View className='px-4 py-1 rounded-full bg-primary-400/15 flex flex-row gap-2 items-center self-start'>
                 <Icon as={ClockIcon} size='md' className='text-primary-400' />

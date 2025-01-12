@@ -26,7 +26,7 @@ export default function Welcome() {
         if (isLogged)
           router.replace("/asset")
         else
-          router.replace("/onboarding");
+          router.replace("/onboarding")
       }
 
     }, [loading]),

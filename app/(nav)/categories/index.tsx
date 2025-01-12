@@ -1,11 +1,11 @@
 import { View, SafeAreaView, ScrollView } from "react-native";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
-import { CheckIcon, ChevronDownIcon, SearchIcon, TagIcon } from "lucide-react-native";
+import { CheckIcon, ChevronDownIcon, SearchIcon, TagIcon, TrashIcon } from "lucide-react-native";
 import SimpleWidget from "@/components/widget/SimpleWidget";
-import { AddIcon } from "@/components/ui/icon";
+import { AddIcon, Icon } from "@/components/ui/icon";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Select, SelectBackdrop, SelectContent, SelectDragIndicator, SelectDragIndicatorWrapper, SelectIcon, SelectInput, SelectItem, SelectPortal, SelectTrigger } from "@/components/ui/select";
-import { Checkbox, CheckboxIcon, CheckboxIndicator } from "@/components/ui/checkbox";
+import { Checkbox, CheckboxGroup, CheckboxIcon, CheckboxIndicator } from "@/components/ui/checkbox";
 import { Text } from "@/components/ui/text";
 import Pagination from "@/components/custom/Pagination";
 import React, { useCallback } from "react";
@@ -14,10 +14,15 @@ import { ReactNativeZoomableView } from "@openspacelabs/react-native-zoomable-vi
 import { Image } from "@/components/ui/image";
 import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { HouseType, HouseTypeName } from "@/constants/data_enum";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { CategoryService } from "@/api/CategoryService";
 import { CategoryResponseType } from "@/api/types/response";
 import Loading from "@/components/feedback/Loading";
+import ConfirmModal from "@/components/custom/ConfirmModal";
+import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu";
+import { Spinner } from "@/components/ui/spinner";
+import { useToast } from "@/components/ui/toast";
+import CommonToast from "@/components/feedback/CommonToast";
 
 
 
@@ -36,6 +41,22 @@ export default function Categories() {
   // // this's actually for search, but it's included in filter param
   const [name, setName] = React.useState<string>('')
   const [searchInputValue, setSearchInputValue] = React.useState<string>('')
+  //useState for checkbox
+  const [check, setCheck] = React.useState<string[]>([])
+  //fbs
+  const toast = useToast()
+  const deleteSuccessToast = CommonToast({
+    toast: toast,
+    title: 'Xoá thành công',
+    description: '',
+    variant: 'success'
+  })
+  const deleteErrorToast = CommonToast({
+    toast: toast,
+    title: 'Xóa thất bại',
+    description: '',
+    variant: 'error'
+  })
   //queries
   const categoryFullList = useQuery({
     queryKey: ['categoryFullList'],
@@ -58,7 +79,22 @@ export default function Categories() {
     queryFn: () => CategoryService.getParentList(),
     enabled: (categoryListQuery.isFetched)
   })
-
+  const deleteCategoryList = useMutation({
+    mutationFn: (ids: string[]) => CategoryService.deleteCategoryList(ids),
+    onSuccess: (res) => {
+      categoryListQuery.refetch()
+      setCheck([])
+    },
+    onError: (err) => deleteErrorToast.handleToast()
+  })
+  // modals
+  const DeleteCategoryModal = ConfirmModal({
+    title: "Xác nhận xóa",
+    desc: 'Xác nhận xóa các tài sản đã chọn. Hành động này không thể hoàn tác.',
+    confirmFn: () => {
+      deleteCategoryList.mutate(check)
+    }
+  })
   const [showModal, setShowModal] = React.useState(false)
   const HouseClassifiModal = () => (
     <Modal
@@ -158,7 +194,7 @@ export default function Categories() {
                 />
 
               </View>
-              {/* <Input
+              <Input
                 variant="outline"
                 size="lg"
               >
@@ -173,8 +209,10 @@ export default function Categories() {
                   onSubmitEditing={() => setName(searchInputValue)}
                   returnKeyType="search"
                 />
-              </Input> */}
+              </Input>
               <Select
+                selectedValue={parent}
+                onValueChange={(v) => setParent(v)}
               >
                 <SelectTrigger className="flex flex-row justify-between" variant="outline" size="lg">
                   <SelectInput placeholder="Danh mục cha" />
@@ -198,7 +236,48 @@ export default function Categories() {
                   </SelectContent>
                 </SelectPortal>
               </Select>
+              <View className="flex flex-row justify-end">
+                <DeleteCategoryModal.modal />
+                <Menu
+                  placement="top"
+                  offset={5}
+                  disabledKeys={['Settings']}
+                  trigger={({ ...triggerProps }) => {
+                    return (
+                      <Button
+                        variant="outline"
+                        action="default"
+                        className="border-outline-200"
+                        {...triggerProps}
 
+                      >
+                        <ButtonText className="text-typography-700 text-lg">Menu</ButtonText>
+                        <ButtonIcon as={ChevronDownIcon} className="h-5 w-5 text-typography-700" />
+                      </Button>
+                    );
+                  }}
+                >
+                  <MenuItem key="Delete" textValue="Delete"
+                    onPress={() => {
+                      if (check.length) {
+                        DeleteCategoryModal.setShowModal(true)
+                      }
+                    }}>
+                    <Icon as={TrashIcon} size="md" className="mr-2" />
+                    <MenuItemLabel size="lg">Xóa</MenuItemLabel>
+                  </MenuItem>
+                </Menu>
+              </View>
+              <View className="flex flex-row justify-center">
+                {categoryListQuery.isPending ?
+                  <Spinner size='small' className="text-primary-400" />
+                  :
+                  categoryListQuery.data.data?.totalPages ?
+                    <Pagination quantity={categoryListQuery.data.data?.totalPages || 0} active={page} onChange={setPage} />
+                    :
+                    <View></View>
+                }
+              </View>
               <ScrollView horizontal={true} overScrollMode="never">
                 <View className="rounded-lg overflow-hidden">
                   <View className="flex flex-row w-[800px]">
@@ -206,29 +285,40 @@ export default function Categories() {
                       <View className='px-6 py-4 bg-background-50 h-14'>
                         <Checkbox
                           size="lg"
-                          isInvalid={false}
-                          isDisabled={false}
-                          value="s"
+                          value="all"
+                          onChange={(isSelected: boolean) => {
+                            if (isSelected) {
+                              setCheck(categoryListQuery.data?.data ? categoryListQuery.data?.data?.items.map((i: any) => i.id) : [])
+                            }
+                            else {
+                              setCheck([])
+                            }
+                          }}
                         >
                           <CheckboxIndicator>
                             <CheckboxIcon as={CheckIcon} />
                           </CheckboxIndicator>
                         </Checkbox>
                       </View>
-                      {categoryListQuery.data?.data?.items.map((i: CategoryResponseType, index: number) =>
-                        <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
-                          <Checkbox
-                            size="lg"
-                            isInvalid={false}
-                            isDisabled={false}
-                            value="s"
-                          >
-                            <CheckboxIndicator>
-                              <CheckboxIcon as={CheckIcon} />
-                            </CheckboxIndicator>
-                          </Checkbox>
-                        </View>
-                      )}
+                      <CheckboxGroup
+                        value={check}
+                        onChange={(keys) => {
+                          setCheck(keys)
+                        }}
+                      >
+                        {categoryListQuery.data?.data?.items.map((i: CategoryResponseType, index: number) =>
+                          <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
+                            <Checkbox
+                              size="lg"
+                              value={i.id}
+                            >
+                              <CheckboxIndicator>
+                                <CheckboxIcon as={CheckIcon} />
+                              </CheckboxIndicator>
+                            </Checkbox>
+                          </View>
+                        )}
+                      </CheckboxGroup>
                     </View>
                     <View className="flex flex-col grow">
                       <View className='px-6 py-4 bg-background-50 h-14'>

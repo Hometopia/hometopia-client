@@ -49,7 +49,7 @@ const CategoryService = {
     //   filter_param = ''
     // console.debug(`${BASE_URL}/categories?all=true${filter_param}`)
     return await axios.get(
-      `${BASE_URL}/categories?all=true${filter_param}`,
+      `${BASE_URL}/categories?page=${page}&size=${size}${filter_param}`,
       {
         headers: {
           Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,

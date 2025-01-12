@@ -23,6 +23,7 @@ type RegisterForm = {
 type CategoryType = {
   name: string,
   description: string,
+  parentId: string,
   subCategories: CategoryType[]
 }
 type CategoryUpdateType = {

@@ -57,7 +57,7 @@ export default function AssetDepreciation() {
   return (
     <SafeAreaView className='h-full bg-white'>
       {assetQuery?.data &&
-        <ScrollView className="flex flex-col my-4 px-4 gap-4 ">
+        <ScrollView className="flex flex-col my-4 px-4 gap-4 " overScrollMode='never'>
           <AssetInfoDisplay
             head="Giá trị hiện tại"
             data={`${table ? table[table.length - 1].value : 'Đang tải...'}`}
@@ -83,8 +83,8 @@ export default function AssetDepreciation() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {table.map(i =>
-                <TableRow>
+              {table.map((i, index) =>
+                <TableRow key={index}>
                   <TableData>{currencyFormatter().format(i.value)}</TableData>
                   <TableData>{i.year}</TableData>
                 </TableRow>

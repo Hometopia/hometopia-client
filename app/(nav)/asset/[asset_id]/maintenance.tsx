@@ -2,6 +2,7 @@ import { AssetService } from "@/api/AssetService";
 import { ScheduleService } from "@/api/ScheduleService";
 import { AssetResponseType, ResponseBaseType, ScheduleResponseType } from "@/api/types/response";
 import Callout from "@/components/custom/Callout";
+import { CustomTable, TableCol } from "@/components/custom/CustomTable";
 import Loading from "@/components/feedback/Loading";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
@@ -14,7 +15,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocalSearchParams } from "expo-router";
 import { ClockIcon, EditIcon, TrashIcon } from "lucide-react-native";
 import React from "react";
-import { SafeAreaView, ScrollView, View } from "react-native";
+import { Alert, SafeAreaView, ScrollView, View } from "react-native";
 
 const data = (assetData: AssetResponseType) => [
   {
@@ -40,8 +41,58 @@ export default function AssetMaintenance() {
 
   const historyQuery = useQuery({
     queryKey: ['schedule-history', ScheduleType.MAINTENANCE, asset_id],
-    queryFn: () => ScheduleService.getScheduleHistory(asset_id as string, ScheduleType.MAINTENANCE, new Date())
+    queryFn: () =>
+      ScheduleService.getScheduleHistory(
+        asset_id as string,
+        ScheduleType.MAINTENANCE,
+        new Date())
   })
+  // const maintenanceQuery = useQuery({
+  //   queryKey: ['maintenance-cycle', asset_id],
+  //   queryFn: () => 
+  // })
+
+  const EmptyTable = ({ heads }: { heads: string[] }) => (
+    <CustomTable width={900}>
+      {heads.map(i => <TableCol key={i} head={i} type='text' data={[]} />)}
+    </CustomTable>
+  )
+  const HistoryTable = ({ data }: { data: ScheduleResponseType[] }) => (
+    <CustomTable width={900}>
+      <TableCol head="Ngày" type='text'
+        data={data.map(i => YYYYMMDDtoLocalDate(dateToYYYYMMDD(new Date(i.start))))} />
+      <TableCol head="Bên cung cấp dịch vụ" type='text'
+        data={data.map(i => i.vendor.name)} />
+      <TableCol head="Thời gian bảo trì" type='text'
+        data={data.map(i => `${getTime(new Date(i.start))} - ${getTime(new Date(i.end))}`)} />
+      <TableCol head="Chi phí" type='text'
+        data={data.map(i => currencyFormatter().format(i.cost))} />
+      <TableCol head="Minh chứng" type='element'
+        data={data.map(i => (
+          <Button key={i.id} variant='solid' action='primary'>
+            <ButtonText>Xem</ButtonText>
+          </Button>
+        ))} />
+      <TableCol head="]" type='element'
+        data={data.map(i => (
+          <View key={i.id} className="flex flex-row gap-4">
+            <Button
+              className="px-3"
+              variant='outline'
+              action='primary'>
+              <ButtonIcon as={EditIcon} className="text-primary-400" />
+            </Button>
+            <Button
+              className="px-3"
+              variant='outline'
+              action='negative'>
+              <ButtonIcon as={TrashIcon} className="text-error-400">
+              </ButtonIcon>
+            </Button>
+          </View>
+        ))} />
+    </CustomTable>
+  )
   return (
     <SafeAreaView className='h-full bg-white'>
       {assetQuery?.data === undefined ?
@@ -54,7 +105,7 @@ export default function AssetMaintenance() {
         :
         <ScrollView className="my-4 px-4">
           <View className="flex flex-col gap-4">
-            <Callout what="maintenance" size='mobile' />
+            <Callout what="maintenance" size='mobile' scheduleFn={() => { }} />
             <View className="flex flex-col gap-2">
               {data(assetQuery.data).map((i) => (
                 <View key={i.head}>
@@ -76,116 +127,23 @@ export default function AssetMaintenance() {
                     text: 'Đang tải...'
                   }]} />
                 :
-                <ScrollView horizontal={true} >
-                  <View className="rounded-lg overflow-hidden">
-                    <View className="flex flex-row w-[900px]">
-                      <View className="flex flex-col grow">
-                        <View className='px-6 py-4 bg-background-50 h-14'>
-                          <Text className="text-md font-bold text-typography-900">
-                            Ngày
-                          </Text>
-                        </View>
-                        {historyQuery.data.data.items.map((i: ScheduleResponseType, index: number) =>
-                          <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
-                            <Text className="text-md font-normal text-typography-900">
-                              {YYYYMMDDtoLocalDate(dateToYYYYMMDD(new Date(i.start)))}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-                      <View className="flex flex-col grow">
-                        <View className='px-6 py-4 bg-background-50 h-14'>
-                          <Text className="text-md font-bold text-typography-900">
-                            Bên cung cấp dịch vụ
-                          </Text>
-                        </View>
-                        {historyQuery.data.data.items.map((i: ScheduleResponseType, index: number) =>
-                          <View
-                            key={index}
-                            className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100 gap-2'
-                          >
-                            <Text className="text-md font-normal text-typography-900">
-                              {i.vendor.name}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-                      <View className="flex flex-col grow">
-                        <View className='px-6 py-4 bg-background-50 h-14'>
-                          <Text className="text-md font-bold text-typography-900">
-                            Thời gian bảo trì
-                          </Text>
-                        </View>
-                        {historyQuery.data.data.items.map((i: ScheduleResponseType, index: number) =>
-                          <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
-                            <Text className="text-md font-normal text-typography-900">
-                              {getTime(new Date(i.start))} - {getTime(new Date(i.end))}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-                      <View className="flex flex-col grow">
-                        <View className='px-6 py-4 bg-background-50 h-14'>
-                          <Text className="text-md font-bold text-typography-900">
-                            Chi phí
-                          </Text>
-                        </View>
-                        {historyQuery.data.data.items.map((i: ScheduleResponseType, index: number) =>
-                          <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
-                            <Text className="text-md font-normal text-typography-900">
-                              {currencyFormatter().format(i.cost)}
-                            </Text>
-                          </View>
-                        )}
-                      </View>
-                      <View className="flex flex-col grow">
-                        <View className='px-6 py-4 bg-background-50 h-14'>
-                          <Text className="text-md font-bold text-typography-900">
-                            Minh chứng
-                          </Text>
-                        </View>
-                        {historyQuery.data.data.items.map((i: ScheduleResponseType, index: number) =>
-                          <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
-                            <Button
-                              variant='solid'
-                              action='primary'>
-                              <ButtonText>
-                                Xem
-                              </ButtonText>
-                            </Button>
-                          </View>
-                        )}
-                      </View>
-                      <View className="flex flex-col grow">
-                        <View className='px-6 py-4 bg-background-50 h-14'>
-                        </View>
-                        {historyQuery.data.data.items.map((i: ScheduleResponseType, index: number) =>
-                          <View key={index} className='px-6 py-4 h-24 flex flex-row gap-4 items-center border-b border-outline-100'>
-                            <Button
-                              className="px-3"
-                              variant='outline'
-                              action='primary'>
-                              <ButtonIcon as={EditIcon} className="text-primary-400" />
-                            </Button>
-                            <Button
-                              className="px-3"
-                              variant='outline'
-                              action='negative'>
-                              <ButtonIcon as={TrashIcon} className="text-error-400">
-                              </ButtonIcon>
-                            </Button>
-                          </View>
-                        )}
-                      </View>
-                    </View>
-                  </View>
-                </ScrollView>
+                historyQuery.data === 'error' ?
+                  <EmptyTable heads={[
+                    "Ngày",
+                    "Bên cung cấp dịch vụ",
+                    "Thời gian bảo trì",
+                    "Chi phí",
+                    "Minh chứng",
+                    ""
+                  ]} />
+                  :
+                  <HistoryTable data={historyQuery.data.data.items} />
               }
             </View>
 
           </View>
         </ScrollView>
       }
-    </SafeAreaView>
+    </SafeAreaView >
   )
 }

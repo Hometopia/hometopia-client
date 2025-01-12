@@ -19,13 +19,15 @@ export default function Callout(
     what,
     size = "pc",
     data,
+    scheduleFn,
   }: {
     what: string,
     size?: string,
-    data?: any
+    data?: any[],
+    scheduleFn: () => void
   }
 ) {
-  const [blank, setBlank] = useState(true)
+  const [blank, setBlank] = useState(data?.length ? false : true)
 
   const styles = {
     blank: {
@@ -46,9 +48,9 @@ export default function Callout(
             {(what === "maintenance") ? backupData.maintenance.blank : backupData.fix.blank}
           </Text>
         </View>
-        <Button size='sm' action='primary'>
+        <Button size='sm' action='primary' onPress={scheduleFn}>
           <ButtonIcon as={CalendarDaysIcon} size='md' />
-          <ButtonText onPress={() => setBlank(prev => prev = false)}>Xếp lịch</ButtonText>
+          <ButtonText >Xếp lịch</ButtonText>
         </Button>
       </View>
     )

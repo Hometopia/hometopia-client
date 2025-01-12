@@ -10,21 +10,30 @@ import { DocumentPickerAsset } from "expo-document-picker";
 import { FileService } from "@/api/FileService";
 import { FileInfoType } from "@/api/types/request";
 import CommonToast from "../feedback/CommonToast";
+import { Text } from "../ui/text";
 
 type ImageUploaderProps = {
   className?: string,
   uri: string,
+  placeholder: boolean,
   uploadFn: Function,
 }
 
 export default function ImageUploader({
-  className, uri, uploadFn
+  className, uri, uploadFn, placeholder
 }: ImageUploaderProps) {
   const [active, setActive] = useState(false)
   const [pickedFile, setPickedFile] = useState<DocumentPickerAsset | undefined>(undefined)
   const [imgUri, setImgUri] = useState(uri)
   const FileUploader = useFileUploader()
 
+  const handlePickFile = async () => {
+    const pickedFile = await FileUploader.pickImage()
+    if (pickedFile) {
+      setPickedFile(pickedFile)
+      setImgUri(pickedFile.uri)
+    }
+  }
   return (
     <Pressable
       className={`${className ? className : 'w-[240px] h-[240px]'} relative overflow-hidden rounded-xl`}
@@ -40,13 +49,7 @@ export default function ImageUploader({
       >
         {!pickedFile && <Button
           className="w-fit"
-          onPress={async () => {
-            const pickedFile = await FileUploader.pickImage()
-            if (pickedFile) {
-              setPickedFile(pickedFile)
-              setImgUri(pickedFile.uri)
-            }
-          }}
+          onPress={handlePickFile}
         >
           <ButtonText>Tải lên</ButtonText>
         </Button>}
@@ -62,12 +65,12 @@ export default function ImageUploader({
           </Button>
           <Button
             className="bg-white "
+            onPress={handlePickFile}
           >
             <ButtonText className="text-typography-800">Thay đổi</ButtonText>
           </Button>
           <Button
-            variant="outline"
-            className="border-white"
+            className="border border-white bg-white/40"
             onPress={() => {
               setImgUri(uri)
               setPickedFile(undefined)
@@ -78,11 +81,18 @@ export default function ImageUploader({
           </Button>
         </View>}
       </View>
-      <Image
-        className="h-full w-full"
-        source={{ uri: imgUri }}
-        alt="asset-img"
-      />
+      {!placeholder || pickedFile !== undefined ?
+        <Image
+          className="h-full w-full"
+          source={{ uri: imgUri }}
+          alt="asset-img"
+        />
+        :
+        <View className="h-full w-full flex justify-center items-center bg-slate-50">
+          <Text className="text-typography-600">Chưa có ảnh</Text>
+        </View>
+      }
+
     </Pressable>
   )
 }

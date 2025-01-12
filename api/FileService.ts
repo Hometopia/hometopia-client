@@ -12,10 +12,7 @@ const FileService = {
       `${BASE_URL}/files?fileName=${fileName}`,
     )
       .then((res) => {
-        // const convertToBase64 = Base64.encodeBytes(res.data)
-        const binary = new Uint8Array(res.data)
-        console.log('resbin', binary)
-        return res.data.blob()
+        return res.data
       })
       .catch((error) => {
         // console.error(error.response.data)
@@ -36,7 +33,7 @@ const FileService = {
       formData.append('files', tranfFile as any);
 
     });
-    console.log('formData', formData)
+    // console.warn('formData', formData)
     return await axios.post(
       `${BASE_URL}/files`,
       formData,

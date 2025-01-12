@@ -6,13 +6,34 @@ import { Platform } from "react-native";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useReactQueryDevTools } from '@dev-plugins/react-query';
 import { AuthService } from "@/api/AuthService";
+import { useToast } from "@/components/ui/toast";
 
 const GlobalContext = createContext()
-const queryClient = new QueryClient()
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      onError: (error) => {
+        handleGlobalError(error)
+      },
+    },
+    mutations: {
+      onError: (error) => {
+        handleGlobalError(error)
+      },
+    },
+  },
+})
+
+const handleGlobalError = (error) => {
+  if (error instanceof Error) {
+    console.log(error)
+  } else {
+    console.log('Unknown error: ', error)
+  }
+}
 
 export const useGlobalContext = () => useContext(GlobalContext)
-
-
 
 export default function GlobalProvider({ children }) {
 
@@ -34,6 +55,7 @@ export default function GlobalProvider({ children }) {
   const platform = Platform.OS
   const [isLogged, setIsLogged] = useState(null)
   useReactQueryDevTools(queryClient)
+  const toast = useToast()
 
   return (
     <GlobalContext.Provider

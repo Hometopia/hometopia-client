@@ -32,7 +32,7 @@ export default function OnBoarding() {
             variant="solid"
             action="primary"
             size="xl"
-            onPress={() => router.navigate('/(auth)/sign-up')}
+            onPress={() => router.replace('/(auth)/sign-up')}
           >
             <ButtonText>Đăng ký ngay</ButtonText>
           </Button>
@@ -42,7 +42,7 @@ export default function OnBoarding() {
             variant="outline"
             action="primary"
             size="xl"
-            onPress={() => router.navigate('/(auth)/sign-in')}
+            onPress={() => router.replace('/(auth)/sign-in')}
           // onPress={async () => {
           //   let login = await AuthService.signIn({
           //     username: "qwvjbjqb@mg.com",

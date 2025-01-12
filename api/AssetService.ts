@@ -83,7 +83,7 @@ const AssetService = {
 
   deleteListAsset: async (assetIds: string[]): Promise<any> => {
     return await axios.delete(
-      `${BASE_URL}/assets/${assetIds.join(',')}`,
+      `${BASE_URL}/assets?ids=${assetIds.join(',')}`,
       {
         headers: {
           Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,

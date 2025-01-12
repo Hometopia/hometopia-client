@@ -23,7 +23,22 @@ const RuleService = {
         return undefined
       })
   },
+  getMaintenanceLifecycle: async (category: string): Promise<any> => {
+    return await axios.get(
+      `${BASE_URL}/rule/maintenance-cycle?category=${category}`,
+      {
+        headers: {
+          Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,
+        }
+      }
+    )
+      .then((res) => res.data)
+      .catch((error) => {
+        console.error(error.response.data)
+        return undefined
+      })
+  }
 
 }
 
-export { UsefulLifeType }
+export { RuleService }

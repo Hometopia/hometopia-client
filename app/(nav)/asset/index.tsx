@@ -1,6 +1,6 @@
 
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
-import { Checkbox, CheckboxIcon, CheckboxIndicator } from "@/components/ui/checkbox";
+import { Checkbox, CheckboxGroup, CheckboxIcon, CheckboxIndicator } from "@/components/ui/checkbox";
 import { Table, TableBody, TableData, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import SimpleWidget from "@/components/widget/SimpleWidget";
 import { IMAGE_URL } from "@/constants/public";
@@ -8,7 +8,7 @@ import { Href, useFocusEffect, useRouter } from "expo-router";
 import { SafeAreaView, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
-import { BoxIcon, CheckIcon, ChevronDownIcon, ChevronLeftIcon, LaughIcon, SearchIcon, Smile } from "lucide-react-native";
+import { BoxIcon, CheckIcon, ChevronDownIcon, ChevronLeftIcon, LaughIcon, SearchIcon, Smile, TrashIcon } from "lucide-react-native";
 import { Pressable } from "@/components/ui/pressable";
 import { Box } from "@/components/ui/box";
 import { HStack } from "@/components/ui/hstack";
@@ -18,7 +18,7 @@ import Pagination from "@/components/custom/Pagination";
 import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { useHeaderHeight } from '@react-navigation/elements';
 import { Select, SelectBackdrop, SelectContent, SelectDragIndicator, SelectDragIndicatorWrapper, SelectIcon, SelectInput, SelectItem, SelectPortal, SelectTrigger } from "@/components/ui/select";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { AssetService } from "@/api/AssetService";
 import { Spinner } from "@/components/ui/spinner";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,6 +31,11 @@ import UpcomingFeaturePopover from "@/components/custom/UpcomingFeaturePopover";
 import { FileService } from "@/api/FileService";
 import { BASE_URL } from "@/constants/server";
 import { Icon } from "@/components/ui/icon";
+import { Menu, MenuItem, MenuItemLabel } from "@/components/ui/menu";
+import { useToast } from "@/components/ui/toast";
+import CommonToast from "@/components/feedback/CommonToast";
+import ConfirmModal from "@/components/custom/ConfirmModal";
+import Loading from "@/components/feedback/Loading";
 
 export default function Assets() {
   useFocusEffect(useCallback(() => {
@@ -44,8 +49,6 @@ export default function Assets() {
 
   const [data, setData] = useState<AssetListResponseType>()
 
-  const [check, setCheck] = useState()
-
   //useStates for pagination
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(10)
@@ -55,6 +58,32 @@ export default function Assets() {
   const [status, setStatus] = useState<string>('')
   // // this's actually for search, but it's included in filter param
   const [name, setName] = useState<string>('')
+  const [searchInputValue, setSearchInputValue] = useState<string>('')
+  //useState for checkbox
+  const [check, setCheck] = useState<string[]>([])
+
+  //fb
+  const toast = useToast()
+  const deleteSuccessToast = CommonToast({
+    toast: toast,
+    title: 'Xoá thành công',
+    description: '',
+    variant: 'success'
+  })
+  const deleteErrorToast = CommonToast({
+    toast: toast,
+    title: 'Xóa thất bại',
+    description: '',
+    variant: 'error'
+  })
+  // modals
+  const DeleteAssetModal = ConfirmModal({
+    title: "Xác nhận xóa",
+    desc: 'Xác nhận xóa các tài sản đã chọn. Hành động này không thể hoàn tác.',
+    confirmFn: () => {
+      deleteAssetList.mutate(check)
+    }
+  })
   //queries
   const assetListQuery = useQuery({
     queryKey: [
@@ -73,6 +102,15 @@ export default function Assets() {
     queryFn: CategoryService.getAllCategory,
   })
 
+  const deleteAssetList = useMutation({
+    mutationFn: (ids: string[]) => AssetService.deleteListAsset(ids),
+    onSuccess: (res) => {
+      assetListQuery.refetch()
+      setCheck([])
+    },
+    onError: (err) => { deleteErrorToast.handleToast() }
+  })
+
   useEffect(() => {
     if (assetListQuery.isFetched) {
       setData(assetListQuery.data.data)
@@ -85,7 +123,11 @@ export default function Assets() {
   }
 
   return (
-    <SafeAreaView className="h-full bg-white">
+    <SafeAreaView className="h-full bg-white relative">
+      {deleteAssetList.isPending && <Loading texts={[{
+        condition: true,
+        text: 'Đang xóa...'
+      }]} />}
       <ScrollView className='pb-2 px-4' overScrollMode='never'>
         <View style={{ paddingTop: 8 }} className="flex flex-col gap-4">
           <View className="flex flex-col gap-4">
@@ -113,14 +155,18 @@ export default function Assets() {
           <Input
             variant="outline"
             size="lg"
-            isDisabled={false}
-            isInvalid={false}
-            isReadOnly={false}
           >
             <InputSlot className="pl-3">
               <InputIcon as={SearchIcon} />
             </InputSlot>
-            <InputField placeholder="Tìm kiếm" />
+            <InputField
+              type='text'
+              placeholder="Tìm kiếm"
+              value={searchInputValue}
+              onChangeText={setSearchInputValue}
+              onSubmitEditing={() => setName(searchInputValue)}
+              returnKeyType="search"
+            />
           </Input>
           <View className="flex flex-col gap-4">
             <CategoryPickerModal
@@ -170,6 +216,51 @@ export default function Assets() {
               </SelectPortal>
             </Select>
           </View>
+          <View className="flex flex-row justify-end">
+            {/* <Input className="w-16" variant="outline" size="lg">
+              <InputField
+                inputMode='numeric'
+                value={pageSize.toString()}
+                onChangeText={(v) => {
+                  if(Number(v) < 1){
+                    
+                  }
+                }}
+                onSubmitEditing={() => setName(searchInputValue)}
+                returnKeyType='done'
+              />
+            </Input> */}
+            <DeleteAssetModal.modal />
+            <Menu
+              placement="top"
+              offset={5}
+              disabledKeys={['Settings']}
+              trigger={({ ...triggerProps }) => {
+                return (
+                  <Button
+                    variant="outline"
+                    action="default"
+                    className="border-outline-200"
+                    {...triggerProps}
+
+                  >
+                    <ButtonText className="text-typography-700 text-lg">Menu</ButtonText>
+                    <ButtonIcon as={ChevronDownIcon} className="h-5 w-5 text-typography-700" />
+                  </Button>
+                );
+              }}
+            >
+              <MenuItem key="Delete" textValue="Delete"
+                onPress={() => {
+                  if (check.length) {
+                    DeleteAssetModal.setShowModal(true)
+                  }
+                }}>
+                <Icon as={TrashIcon} size="md" className="mr-2" />
+                <MenuItemLabel size="lg">Xóa</MenuItemLabel>
+              </MenuItem>
+            </Menu>
+          </View>
           <View className="flex flex-row justify-center">
             {assetListQuery.isPending ?
               <Spinner size='small' className="text-primary-400" />
@@ -204,29 +295,40 @@ export default function Assets() {
                       <View className='px-6 py-4 bg-background-50 h-14'>
                         <Checkbox
                           size="lg"
-                          isInvalid={false}
-                          isDisabled={false}
-                          value="s"
+                          value="all"
+                          onChange={(isSelected: boolean) => {
+                            if (isSelected) {
+                              setCheck(data ? data?.items.map(i => i.id) : [])
+                            }
+                            else {
+                              setCheck([])
+                            }
+                          }}
                         >
                           <CheckboxIndicator>
                             <CheckboxIcon as={CheckIcon} />
                           </CheckboxIndicator>
                         </Checkbox>
                       </View>
-                      {data?.items.map((i, index) =>
-                        <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
-                          <Checkbox
-                            size="lg"
-                            isInvalid={false}
-                            isDisabled={false}
-                            value={i.id}
-                          >
-                            <CheckboxIndicator>
-                              <CheckboxIcon as={CheckIcon} />
-                            </CheckboxIndicator>
-                          </Checkbox>
-                        </View>
-                      )}
+                      <CheckboxGroup
+                        value={check}
+                        onChange={(keys) => {
+                          setCheck(keys)
+                        }}
+                      >
+                        {data?.items.map((i, index) =>
+                          <View key={index} className='px-6 py-4 h-24 flex flex-row items-center border-b border-outline-100'>
+                            <Checkbox
+                              size="lg"
+                              value={i.id}
+                            >
+                              <CheckboxIndicator>
+                                <CheckboxIcon as={CheckIcon} />
+                              </CheckboxIndicator>
+                            </Checkbox>
+                          </View>
+                        )}
+                      </CheckboxGroup>
                     </View>
                     <View className="flex flex-col grow">
                       <View className='px-6 py-4 bg-background-50 h-14'>

@@ -30,7 +30,10 @@ const ScheduleService = {
       }
     )
       .then((res) => res.data)
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        console.log(error.response.data)
+        return 'error'
+      })
   },
 
   getUpcomingSchedule: async (asssetId: string, type: string, date: Date): Promise<any> => {

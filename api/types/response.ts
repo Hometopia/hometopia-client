@@ -14,6 +14,27 @@ type PageResponseType<T> = {
   totalPages: number,
   items: T[]
 }
+type AddressParticalType = {
+  code: number,
+  name: string
+}
+type AddressType = {
+  line: string,
+  province: AddressParticalType,
+  district: AddressParticalType,
+  ward: AddressParticalType
+}
+
+//#region user profile
+type UserProfileResponseType = {
+  id: string,
+  username: string,
+  email: string,
+  firstName: string,
+  lastName: string,
+  address: AddressType
+}
+//#endregion
 
 //#region Asset
 type AssetListResponseType = {
@@ -127,6 +148,8 @@ type ScheduleResponseType = {
 export {
   ResponseBaseType,
   PageResponseType,
+  AddressType,
+  UserProfileResponseType,
   AssetListResponseType,
   AssetResponseType,
   CategoryInAssetResponseType,

@@ -3,10 +3,10 @@ import { View, Text, SafeAreaView, ScrollView } from 'react-native'
 import React, { useEffect } from 'react'
 import ImageUploader from '@/components/custom/ImageUploader'
 import { Accordion, AccordionContent, AccordionHeader, AccordionIcon, AccordionItem, AccordionTitleText, AccordionTrigger } from '@/components/ui/accordion'
-import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react-native'
+import { ChevronDownIcon, ChevronUpIcon, EditIcon, TrashIcon } from 'lucide-react-native'
 import { Table, TableBody, TableData, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useLocalSearchParams } from 'expo-router'
+import { Link, useLocalSearchParams } from 'expo-router'
 import { AssetResponseType, ResponseBaseType } from '@/api/types/response'
 import { currencyFormatter } from '@/helpers/currency'
 import { ISOtoLocal, YYYYMMDDtoLocalDate } from '@/helpers/time'
@@ -22,6 +22,8 @@ import CommonToast from '@/components/feedback/CommonToast'
 import { DocumentPickerAsset } from 'expo-document-picker'
 import { useToast } from '@/components/ui/toast'
 import { dateToYYYYMMDD } from '@/helpers/time';
+import { Button, ButtonIcon, ButtonText } from '@/components/ui/button'
+import useFileSystem from '@/hooks/useFileSystem'
 
 const truthData = (asset: AssetResponseType) => [
   {
@@ -66,6 +68,8 @@ export default function AssetGeneral() {
 
   const [assetQuery, setAssetQuery] = React.useState<ResponseBaseType | undefined>(queryClient.getQueryData(['asset', asset_id]))
   const [isFileUpload, setIsFileUpload] = React.useState<boolean>(false)
+
+  const { openFile } = useFileSystem()
   //#region feedback
   const toast = useToast()
   const successToast = CommonToast({
@@ -138,12 +142,13 @@ export default function AssetGeneral() {
           </Text>
         </View>
         :
-        <ScrollView className="flex flex-col my-4 px-4 gap-4 ">
+        <ScrollView className="flex flex-col my-4 px-4 gap-4 " overScrollMode='never'>
           <View className='flex flex-row justify-center mb-4'>
             {(assetQuery?.data === undefined || filesUploadMutation.isPending) ?
               <Spinner size="large" className="text-primary-400" />
               :
               <ImageUploader
+                placeholder={assetQuery?.data.images[0] === null}
                 uri={`${BASE_URL}/files?fileName=${assetQuery?.data.images[0]?.fileName}`}
                 uploadFn={async (img: DocumentPickerAsset) => {
                   const res = await filesUploadMutation.mutateAsync([img])
@@ -244,20 +249,21 @@ export default function AssetGeneral() {
                     <TableHeader>
                       <TableRow className="bg-background-100">
                         <TableHead>Tài liệu</TableHead>
-                        <TableHead>Chỉnh sửa</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow>
-                        <TableData>file.doc</TableData>
-                        <TableData>edit</TableData>
-                      </TableRow>
+                      {assetQuery.data.documents &&
+                        assetQuery.data.documents.map((i: FileInfoType, index: number) => (
+                          <TableRow key={index}>
+                            <TableData onPress={() => {
+                              // openFile(`${BASE_URL}/files?fileName=${i.fileName}`, i.fileName)
+                            }}>
+                              <Text className='leading-6 text-info-400'>{i.fileName}</Text>
+                            </TableData>
+                          </TableRow>
+                        ))
+                      }
                     </TableBody>
-                    <TableFooter>
-                      <TableRow>
-                        <TableData className='bg-background-50'>Theem</TableData>
-                      </TableRow>
-                    </TableFooter>
                   </Table>
                 </View>
               </AccordionContent>

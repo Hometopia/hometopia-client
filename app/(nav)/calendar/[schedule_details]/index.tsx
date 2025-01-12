@@ -1,6 +1,6 @@
 import { View, SafeAreaView, ScrollView, StyleSheet } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { Link, router, useLocalSearchParams } from 'expo-router'
+import { Href, Link, router, useLocalSearchParams } from 'expo-router'
 import { Button, ButtonIcon, ButtonText } from '@/components/ui/button'
 import { Text } from '@/components/ui/text'
 import { ScheduleResponseType } from '@/api/types/response'
@@ -63,21 +63,21 @@ export default function ScheduleDetails() {
             </MenuItem>
           </Menu>
         </View>
-        <View style={{ paddingTop: 8 }} className="flex flex-col gap-4">
-          <Box className='p-4 flex-row gap-2 justify-center items-center bg-primary-400/15 rounded-xl'>
+        <View style={{ paddingTop: 8 }} className="flex flex-col gap-4 items-start">
+          <Box className='p-4 flex-row gap-2 justify-center items-center bg-primary-400/15 rounded-xl self-stretch'>
             <Icon as={CalendarCheckIcon} size='xl' className='text-primary-400' />
             <Text className='text-lg text-primary-400 font-semibold'>
               {YYYYMMDDtoLocalDate(dateToYYYYMMDD(new Date(parseData.start)))}
             </Text>
           </Box>
-          <Text className='text-2xl font-semibold mt-4'>{parseData.title}</Text>
+          <Text className='text-2xl font-semibold mt-4 '>{parseData.title}</Text>
           <View className='px-4 py-1 rounded-full bg-warning-400/15 flex flex-row gap-2 items-center self-start'>
             <Text className='text-md font-normal text-warning-400'>
               {ScheduleTypeName[parseData.type as keyof typeof ScheduleTypeName]}
             </Text>
           </View>
 
-          <Box className='flex-row gap-2 p-4 bg-background-50/50 rounded-lg'>
+          <Box className='flex-row gap-2 p-4 bg-background-50/50 rounded-lg self-stretch'>
             <View className='flex flex-col gap-4'>
               <Text className='text-lg font-medium text-success-300'>Bắt đầu:</Text>
               <Text className='text-lg font-medium text-error-300'>Kết thúc:</Text>
@@ -87,17 +87,18 @@ export default function ScheduleDetails() {
               <Text className='text-lg'>{' ' + getTime(new Date(parseData.end))}</Text>
             </View>
           </Box>
-          <View className='flex flex-row justify-between'>
+          <View className='flex flex-row justify-between self-stretch'>
             <View>
               <Text className='text-lg font-bold'>Tên tài sản</Text>
               <Text className='text-lg'>{parseData.asset.name}</Text>
             </View>
-            <Button className='bg-primary-400/15'>
+            <Button className='bg-primary-400/15' onPress={() =>
+              router.navigate(`/(nav)/asset/${parseData.asset.id}`)}>
               <ButtonIcon as={ArrowRightIcon} className='text-primary-400' />
               <ButtonText className='text-primary-400'>Xem tài sản</ButtonText>
             </Button>
           </View>
-          <View className=''>
+          <View className='self-stretch'>
             <Text className='text-lg font-bold'>Bên cung cấp dịch vụ</Text>
             <View className='h-60 rounded-lg my-2'>
               <MapView
@@ -130,7 +131,7 @@ export default function ScheduleDetails() {
               <View className='flex flex-col gap-4'>
                 <Text className='text-lg'>{parseData.vendor.name}</Text>
                 <Link className='text-lg text-info-500 focus:text-info-500/50'
-                  href={parseData.vendor.website}>
+                  href={parseData.vendor.website as Href}>
                   {parseData.vendor.website}
                 </Link>
                 <Text className='text-lg'>{parseData.vendor.phoneNumber}</Text>
