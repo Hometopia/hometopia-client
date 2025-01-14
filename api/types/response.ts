@@ -1,5 +1,5 @@
 import { AssetStatusList } from '@/constants/data_enum'
-import { FileInfoType } from './request'
+import { FileInfoType, VendorType } from './common'
 
 type ResponseBaseType = {
   status: number,
@@ -122,6 +122,8 @@ type FileUploadResponseType = {
   }]
 }
 //#endregion
+
+
 //#region schedule
 
 type ScheduleResponseType = {
@@ -129,13 +131,7 @@ type ScheduleResponseType = {
   title: string,
   start: string,
   end: string,
-  vendor: {
-    link: string,
-    name: string,
-    address: string,
-    website: string,
-    phoneNumber: string
-  },
+  vendor: VendorType,
   cost: number,
   documents: FileInfoType[],
   type: string,
@@ -158,5 +154,5 @@ export {
   FileUploadResponseType,
   AssetLifecycleResponseType,
   AssetLifecycleType,
-  ScheduleResponseType
+  ScheduleResponseType,
 }

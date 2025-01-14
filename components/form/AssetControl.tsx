@@ -1,9 +1,9 @@
 import { View, Text } from 'react-native'
 import React, { useState } from 'react'
 import useFormControl from '@/hooks/useFormControl'
-import { FileInfoType } from '@/api/types/request'
 import { AssetResponseType } from '@/api/types/response'
 import { formatNumber } from '@/helpers/currency'
+import { FileInfoType } from '@/api/types/common'
 
 export function AssetControl(data: AssetResponseType) {
 

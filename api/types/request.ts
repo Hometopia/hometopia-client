@@ -1,3 +1,5 @@
+import { FileInfoType, VendorType } from "./common"
+
 //#region Auth
 type LoginForm = {
   username: string, // username or email
@@ -56,14 +58,7 @@ type AssetType = {
 //#endregion
 
 //#region File
-type FileInfoType = {
-  originalFileName: string,
-  fileName: string,
-  fileExtension: string,
-  mimeType: string,
-  bucket: string,
-  path: string,
-}
+
 //#endregion
 
 //#region Rule
@@ -82,7 +77,7 @@ type ScheduleType = {
   title: string,
   start: string,
   end: string,
-  vendor: string,
+  vendor: VendorType,
   cost: number,
   documents: FileInfoType[],
   type: string,
@@ -95,7 +90,6 @@ export {
   CategoryType,
   CategoryUpdateType,
   AssetType,
-  FileInfoType,
   UsefulLifeType,
   ScheduleType,
 }

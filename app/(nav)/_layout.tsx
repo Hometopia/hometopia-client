@@ -21,6 +21,7 @@ import { useQuery } from "@tanstack/react-query";
 import { UserService } from "@/api/UserService";
 import Loading from "@/components/feedback/Loading";
 import { UserProfileResponseType } from "@/api/types/response";
+import { useNavigation } from "expo-router";
 
 const draweData = [
   // {
@@ -139,6 +140,7 @@ export default function NavLayout() {
     staleTime: Infinity,
     gcTime: Infinity
   })
+  const _navigation = useNavigation()
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       {userProfile.isPending ?
@@ -189,6 +191,15 @@ export default function NavLayout() {
                   drawerIcon: ({ size, color }) => (
                     <i.icon size={size} color={color} />
                   ),
+                })}
+                listeners={({ navigation }) => ({
+                  drawerItemPress: (e) => {
+                    e.preventDefault()
+                    _navigation.reset({
+                      index: 0,
+                      routes: [{ name: i.slug }] as never
+                    })
+                  },
                 })}
               />
             ))

@@ -26,13 +26,14 @@ import useFileUploader from '@/hooks/useFileUploader'
 import * as DocumentPicker from 'expo-document-picker'
 import useFileSystem from '@/hooks/useFileSystem'
 import { AssetService } from '@/api/AssetService'
-import { AssetType, FileInfoType } from '@/api/types/request'
+import { AssetType } from '@/api/types/request'
 import { Image } from '@/components/ui/image'
 import { FileService } from '@/api/FileService'
 import CommonToast from '@/components/feedback/CommonToast'
 import { useAsyncExec } from '@/hooks/useAsyncExec'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
+import { FileInfoType } from '@/api/types/common'
 
 enum inputFieldNameList {
   name,
@@ -301,7 +302,6 @@ export default function CreateAsset() {
     enabled: isSuggestedVendorOpen
   })
   //#endregion
-
 
   const accorddionItems = [
     {

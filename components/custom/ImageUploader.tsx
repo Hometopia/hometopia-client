@@ -8,7 +8,6 @@ import { Pressable } from "../ui/pressable";
 import useFileUploader from "@/hooks/useFileUploader";
 import { DocumentPickerAsset } from "expo-document-picker";
 import { FileService } from "@/api/FileService";
-import { FileInfoType } from "@/api/types/request";
 import CommonToast from "../feedback/CommonToast";
 import { Text } from "../ui/text";
 

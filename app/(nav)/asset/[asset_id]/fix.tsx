@@ -122,7 +122,17 @@ export default function AssetFix() {
                     asset_id: asset_id,
                     type: ScheduleType.REPAIR
                   }
-                })} />
+                })}
+                lookFn={() => {
+                  router.push({
+                    pathname: '/(nav)/calendar/[schedule_details]',
+                    params: {
+                      schedule_details: upcomingQuery.data.data.items[0].id,
+                      data: JSON.stringify(upcomingQuery.data.data.items[0])
+                    }
+                  })
+                }}
+              />
             }
 
             <View className="flex flex-col gap-2">

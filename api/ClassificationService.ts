@@ -6,7 +6,8 @@ import { LoginSession, tokenKeyStorage } from './SecureStore';
 const ClassificationService = {
   getPredictCategoryByImg: async (fileName: string): Promise<any> => {
     return await axios.post(
-      `${BASE_URL}/classification/predict`,
+      // `${BASE_URL}/classification/predict`,
+      `http://193.203.161.141:5000/predict`,
       { url: `${BASE_URL}/files?fileName=${fileName}` },
       {
         headers: {

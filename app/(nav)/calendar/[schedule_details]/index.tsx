@@ -63,7 +63,7 @@ export default function ScheduleDetails() {
             </MenuItem>
           </Menu>
         </View>
-        <View style={{ paddingTop: 8 }} className="flex flex-col gap-4 items-start">
+        <View style={{ paddingTop: 8 }} className="mb-4 flex flex-col gap-4 items-start">
           <Box className='p-4 flex-row gap-2 justify-center items-center bg-primary-400/15 rounded-xl self-stretch'>
             <Icon as={CalendarCheckIcon} size='xl' className='text-primary-400' />
             <Text className='text-lg text-primary-400 font-semibold'>
@@ -122,27 +122,27 @@ export default function ScheduleDetails() {
                 />
               </MapView>
             </View>
-            <View className='flex flex-row py-2 gap-2'>
-              <View className='flex flex-col gap-4'>
-                <Text className='text-lg'>Tên:</Text>
-                <Text className='text-lg'>Website:</Text>
-                <Text className='text-lg'>Điện thoại:</Text>
-              </View>
-              <View className='flex flex-col gap-4'>
+            <View className='flex flex-col py-2 gap-4'>
+              <View className='flex flex-col'>
+                <Text className='text-lg font-bold'>Tên:</Text>
                 <Text className='text-lg'>{parseData.vendor.name}</Text>
+              </View>
+              <View className='flex flex-col'>
+                <Text className='text-lg font-bold'>Website:</Text>
                 <Link className='text-lg text-info-500 focus:text-info-500/50'
                   href={parseData.vendor.website as Href}>
                   {parseData.vendor.website}
                 </Link>
+              </View>
+              <View className='flex flex-col'>
+                <Text className='text-lg font-bold'>Điện thoại:</Text>
                 <Text className='text-lg'>{parseData.vendor.phoneNumber}</Text>
               </View>
             </View>
           </View>
 
         </View>
-
       </ScrollView>
-
     </SafeAreaView>
   )
 }

@@ -2,6 +2,8 @@ import { View, Text } from 'react-native'
 import { Button, ButtonGroup, ButtonIcon, ButtonText } from '../ui/button'
 import { Calendar, CalendarDaysIcon } from 'lucide-react-native'
 import { useState } from 'react'
+import { ScheduleResponseType } from '@/api/types/response'
+import { dateToYYYYMMDD } from '@/helpers/time'
 
 
 const backupData = {
@@ -14,17 +16,32 @@ const backupData = {
     full: "Sửa chữa sẽ bắt đầu vào ngày 20/11/2024. Còn 1 tháng nữa. "
   }
 }
+
+const ScheduleData = (scheduleData: ScheduleResponseType) => {
+  return {
+    maintenance: {
+      blank: "Tài sản này chưa được lên lịch bảo trì.",
+      full: `Bảo trì sẽ bắt đầu vào ngày ${dateToYYYYMMDD(new Date(scheduleData.start))}.`
+    },
+    fix: {
+      blank: "Nếu tài sản này có vẻ như đang hỏng, lên lịch sửa chữa ngay",
+      full: `Sửa chữa sẽ bắt đầu vào ngày ${dateToYYYYMMDD(new Date(scheduleData.start))}.`
+    }
+  }
+}
 export default function Callout(
   {
     what,
     size = "pc",
     data,
     scheduleFn,
+    lookFn,
   }: {
     what: string,
     size?: string,
-    data?: any[],
-    scheduleFn: () => void
+    data: ScheduleResponseType[],
+    scheduleFn: () => void,
+    lookFn: () => void
   }
 ) {
   const [blank, setBlank] = useState(data?.length ? false : true)
@@ -60,18 +77,23 @@ export default function Callout(
     return (
       <View className={(size === 'pc') ? styles.full.pc : styles.full.mobile}>
         <View className='w-full flex flex-row justify-start'>
-          <Text className='text-inherit text-typography-500'>
-            {(what === "maintenance") ? backupData.maintenance.full : backupData.fix.full}
-          </Text>
+          {data &&
+            <Text className='text-inherit text-typography-500'>
+              {(what === "maintenance") ? ScheduleData(data[0]).maintenance.full
+                :
+                ScheduleData(data[0]).fix.full}
+            </Text>
+          }
+
         </View>
         <ButtonGroup className='flex flex-row'>
-          <Button size='sm' variant='outline' action='primary'>
+          <Button size='sm' variant='outline' action='primary' onPress={lookFn}>
             <ButtonIcon className='text-primary-400' as={CalendarDaysIcon} size='md' />
             <ButtonText>Xem</ButtonText>
           </Button>
-          <Button size='sm' variant='outline' action='secondary'>
+          {/* <Button size='sm' variant='outline' action='secondary'>
             <ButtonText onPress={() => setBlank(prev => prev = true)}>Hủy bỏ</ButtonText>
-          </Button>
+          </Button> */}
         </ButtonGroup>
       </View>
     )

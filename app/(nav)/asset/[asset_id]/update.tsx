@@ -27,7 +27,7 @@ import useFileUploader from '@/hooks/useFileUploader'
 import * as DocumentPicker from 'expo-document-picker'
 import useFileSystem from '@/hooks/useFileSystem'
 import { AssetService } from '@/api/AssetService'
-import { AssetType, FileInfoType } from '@/api/types/request'
+import { AssetType } from '@/api/types/request'
 import { Image } from '@/components/ui/image'
 import { FileService } from '@/api/FileService'
 import CommonToast from '@/components/feedback/CommonToast'
@@ -37,6 +37,7 @@ import { useToast } from '@/components/ui/toast'
 import Loading from '@/components/feedback/Loading'
 import { AssetControl } from '@/components/form/AssetControl'
 import { BASE_URL } from '@/constants/server'
+import { FileInfoType } from '@/api/types/common'
 
 enum inputFieldNameList {
   name,
@@ -478,8 +479,7 @@ export default function UpdateAsset() {
           input={
             <Select
               selectedValue={assetCtrl.statusControl.value}
-              initialLabel={AssetStatusListMapToDisplayText[AssetStatusList[0] as keyof typeof AssetStatusListMapToDisplayText]}
-              defaultValue={AssetStatusList[0]}
+              initialLabel={AssetStatusListMapToDisplayText[assetCtrl.statusControl.value as keyof typeof AssetStatusListMapToDisplayText]}
               onValueChange={(v) => assetCtrl.statusControl.onChange(v)}
               ref={(el) => (elementsRef.current[inputFieldNameList.status] = el)}
             >

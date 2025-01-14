@@ -17,13 +17,14 @@ import { FileService } from '@/api/FileService'
 import { Spinner } from '@/components/ui/spinner'
 import { BASE_URL } from '@/constants/server'
 import { AssetService } from '@/api/AssetService'
-import { AssetType, FileInfoType } from '@/api/types/request'
+import { AssetType } from '@/api/types/request'
 import CommonToast from '@/components/feedback/CommonToast'
 import { DocumentPickerAsset } from 'expo-document-picker'
 import { useToast } from '@/components/ui/toast'
 import { dateToYYYYMMDD } from '@/helpers/time';
 import { Button, ButtonIcon, ButtonText } from '@/components/ui/button'
 import useFileSystem from '@/hooks/useFileSystem'
+import { FileInfoType } from '@/api/types/common'
 
 const truthData = (asset: AssetResponseType) => [
   {

@@ -163,7 +163,10 @@ export default function CreateCategory() {
                   <Text className='text-typography-600'>Không chọn nếu tạo danh mục cha</Text>
                   <Select
                     selectedValue={parentControl.value}
-                    onValueChange={(v) => parentControl.onChange(v)}
+                    onValueChange={(v) => {
+                      parentControl.onChange(v)
+                      console.log(parentControl.value)
+                    }}
                   >
                     <SelectTrigger className="flex flex-row justify-between" variant="outline" size="lg">
                       <SelectInput placeholder="Danh mục cha" />

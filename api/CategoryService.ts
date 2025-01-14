@@ -79,6 +79,7 @@ const CategoryService = {
   },
 
   createListCategories: async (categories: CategoryType[]): Promise<any> => {
+    console.log(categories)
     return await axios.post(
       `${BASE_URL}/categories`,
       {

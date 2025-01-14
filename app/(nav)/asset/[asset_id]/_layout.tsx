@@ -1,6 +1,6 @@
 import Tabs from "@/components/nav/Tabs";
 import { TabItemType } from "@/constants/types";
-import { Stack, useLocalSearchParams, usePathname, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useNavigation, usePathname, useRouter } from "expo-router";
 import { useEffect, useRef } from "react";
 import { ScrollView, View, SafeAreaView } from "react-native";
 import { useHeaderHeight } from '@react-navigation/elements';
@@ -12,6 +12,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AssetService } from "@/api/AssetService";
 import { Spinner } from "@/components/ui/spinner";
 import Loading from "@/components/feedback/Loading";
+import BackButton from "@/components/custom/BackButton";
 
 const tabData: TabItemType[] = [
   {
@@ -42,6 +43,7 @@ const tabData: TabItemType[] = [
 export default function AssetDetailsLayout() {
   const router = useRouter()
   const pathName = usePathname()
+  const navigation = useNavigation()
   //scroll..
   const scrollViewRef = useRef<ScrollView>(null)
   const handlePress = (index: number) => {
@@ -71,14 +73,11 @@ export default function AssetDetailsLayout() {
     <SafeAreaView className="h-full bg-white">
       {!pathName.endsWith('update') &&
         <View className="bg-white h-[48px] px-4 pt-2 pb-4 flex flex-row justify-between items-center">
-          <Button
-            variant="outline"
-            action="default"
-            className="border-outline-200 p-2"
-            onPress={() => router.replace('/(nav)/asset')}
-          >
-            <ButtonIcon as={ChevronLeftIcon} className="h-6 w-6 text-typography-700" />
-          </Button>
+          <BackButton backFn={() => {
+            console.log(navigation.getState())
+            // router.dismiss()
+            router.back()
+          }} />
           <View className="flex flex-row gap-4">
             <Button
               variant="outline"

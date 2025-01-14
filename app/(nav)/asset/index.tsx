@@ -4,7 +4,7 @@ import { Checkbox, CheckboxGroup, CheckboxIcon, CheckboxIndicator } from "@/comp
 import { Table, TableBody, TableData, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import SimpleWidget from "@/components/widget/SimpleWidget";
 import { IMAGE_URL } from "@/constants/public";
-import { Href, useFocusEffect, useRouter } from "expo-router";
+import { Href, useFocusEffect, useNavigation, useRouter } from "expo-router";
 import { SafeAreaView, ScrollView, View } from "react-native";
 import { Text } from "@/components/ui/text";
 import { Image } from "@/components/ui/image";
@@ -121,7 +121,7 @@ export default function Assets() {
   const getCategoryName = (): string => {
     return categoryFullList.data?.data.items.find((i: CategoryResponseType) => i.id === category)?.name
   }
-
+  const navigation = useNavigation()
   return (
     <SafeAreaView className="h-full bg-white relative">
       {deleteAssetList.isPending && <Loading texts={[{

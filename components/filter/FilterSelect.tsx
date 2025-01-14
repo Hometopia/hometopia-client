@@ -3,6 +3,7 @@ import { ChevronDownIcon, SearchIcon } from "lucide-react-native";
 import { VStack } from "@/components/ui/vstack";
 import { Text } from "@/components/ui/text";
 import { useEffect, useRef, useState } from "react";
+import { View } from "react-native";
 
 type SelectItemType = {
   label: string;
@@ -183,7 +184,7 @@ export function FilterSelect({
           parentRect={containerRef?.current?.getBoundingClientRect()}
         />
       ) : (
-        <></>
+        <View></View>
       )}
     </div>
   );
