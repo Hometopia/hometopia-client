@@ -178,7 +178,7 @@ export default function NavLayout() {
               <View className="flex flex-row justify-center w-[60px]">
                 <Image
                   className="h-[30px] w-[30px]"
-                  source={require("@/assets/images/icon.png")}
+                  source={require("../../../assets/images/icon.png")}
                   alt="image"
                 />
               </View>

@@ -28,7 +28,7 @@ export default function SimpleWidget({
       }
       <Image
         className="absolute w-full h-full top-0 left-0 -z-10 rounded-2xl"
-        source={require('@/assets/images/illustration/holo-1.png')}
+        source={require('../../../assets/images/illustration/holo-1.png')}
         alt="holo-1"
       />
     </VStack>

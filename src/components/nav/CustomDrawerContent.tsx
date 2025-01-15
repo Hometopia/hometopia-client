@@ -31,7 +31,7 @@ export default function CustomDrawerContent({
         <View className="mb-4 px-2 flex flex-row justify-between items-center">
           <Image
             className="h-[30px] w-[120px]"
-            source={require("@/assets/images/logo-full.png")}
+            source={require("../../../assets/images/logo-full.png")}
             alt="image"
           />
           <TouchableOpacity className="rounded-full border border-typography-200 p-3"

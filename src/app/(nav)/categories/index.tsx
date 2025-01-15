@@ -114,7 +114,7 @@ export default function Categories() {
         >
           <Image
             className="w-[30rem] h-[14rem]"
-            source={require("@/assets/images/housing-classification.png")}
+            source={require("../../../../assets/images/housing-classification.png")}
             alt="onboarding-img"
           />
         </ReactNativeZoomableView>

@@ -1,4 +1,4 @@
-import "../global.css";
+import "../../global.css";
 import GlobalProvider, { useGlobalContext } from "@/contexts/GlobalProvider";
 import { Stack, useFocusEffect } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
@@ -12,9 +12,6 @@ SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
 
-  useEffect(() => {
-
-  }, [])
   return (
     <GlobalProvider>
       <Stack
