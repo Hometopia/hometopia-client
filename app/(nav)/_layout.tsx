@@ -23,13 +23,13 @@ import Loading from "@/components/feedback/Loading";
 import { UserProfileResponseType } from "@/api/types/response";
 import { useNavigation } from "expo-router";
 
-const draweData = [
-  // {
-  //   slug: "dashboard",
-  //   label: "Dashboard",
-  //   title: "Dashboard",
-  //   icon: LayoutDashboardIcon,
-  // },
+const drawerData = [
+  {
+    slug: "dashboard",
+    label: "Dashboard",
+    title: "Dashboard",
+    icon: LayoutDashboardIcon,
+  },
   {
     slug: "asset",
     label: "Tài sản",
@@ -69,6 +69,10 @@ const draweData = [
 ];
 
 const navigationHeaders = [
+  {
+    slug: "dashboard",
+    title: "Dashboard",
+  },
   {
     slug: "index",
     title: "Danh sách tài sản",
@@ -181,7 +185,7 @@ export default function NavLayout() {
           }}
         >
           {
-            draweData.map((i) => (
+            drawerData.map((i) => (
               <Drawer.Screen
                 key={i.slug}
                 name={i.slug}
@@ -206,7 +210,6 @@ export default function NavLayout() {
           }
         </Drawer >
       }
-
     </GestureHandlerRootView >
   );
 }

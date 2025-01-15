@@ -7,9 +7,14 @@ import { removeSpecialCharacters } from '@/helpers/string';
 import { LoginSession, tokenKeyStorage } from './SecureStore';
 
 const NotificationService = {
-  getListNotification: async (page: number = 1, size: number = 15): Promise<any> => {
+  getListNotification: async (
+    page: number = 1,
+    size: number = 15,
+    isRead?: boolean
+  ): Promise<any> => {
+    const filter = isRead !== undefined ? `` : `&filter=isRead==${isRead}`
     return await axios.get(
-      `${BASE_URL}/notifications?page=${page}&size=${size}`,
+      `${BASE_URL}/notifications?page=${page}&size=${size}${filter}`,
       {
         headers: {
           Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,

@@ -37,7 +37,7 @@ export default function Callout(
     scheduleFn,
     lookFn,
   }: {
-    what: string,
+    what: 'maintenance' | 'fix',
     size?: string,
     data: ScheduleResponseType[],
     scheduleFn: () => void,

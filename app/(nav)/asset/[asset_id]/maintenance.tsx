@@ -7,12 +7,13 @@ import Loading from "@/components/feedback/Loading";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
 import { Pressable } from "@/components/ui/pressable";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { ScheduleType } from "@/constants/data_enum";
 import { currencyFormatter } from "@/helpers/currency";
 import { calcDuration, dateToISOString, dateToYYYYMMDD, getTime, YYYYMMDDtoLocalDate } from "@/helpers/time";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { ClockIcon, EditIcon, TrashIcon } from "lucide-react-native";
 import React from "react";
 import { Alert, SafeAreaView, ScrollView, View } from "react-native";
@@ -46,6 +47,15 @@ export default function AssetMaintenance() {
         asset_id as string,
         ScheduleType.MAINTENANCE,
         new Date())
+  })
+  const upcomingQuery = useQuery({
+    queryKey: ['schedule-upcoming', ScheduleType.MAINTENANCE, asset_id],
+    queryFn: () =>
+      ScheduleService.getUpcomingSchedule(
+        asset_id as string,
+        ScheduleType.MAINTENANCE,
+        new Date()
+      )
   })
   // const maintenanceQuery = useQuery({
   //   queryKey: ['maintenance-cycle', asset_id],
@@ -105,7 +115,29 @@ export default function AssetMaintenance() {
         :
         <ScrollView className="my-4 px-4">
           <View className="flex flex-col gap-4">
-            <Callout what="maintenance" size='mobile' scheduleFn={() => { }} />
+            {upcomingQuery.isPending ?
+              <Skeleton className="h-10 w-full" variant='rounded' />
+              :
+              <Callout what="maintenance" size='mobile' data={upcomingQuery.data.data.items}
+                scheduleFn={() => router.push({
+                  pathname: `/(nav)/calendar/create-schedule`,
+                  params: {
+                    asset_id: asset_id,
+                    type: ScheduleType.MAINTENANCE
+                  }
+                })}
+                lookFn={() => {
+                  router.push({
+                    pathname: '/(nav)/calendar/[schedule_details]',
+                    params: {
+                      schedule_details: upcomingQuery.data.data.items[0].id,
+                      data: JSON.stringify(upcomingQuery.data.data.items[0])
+                    }
+                  })
+                }}
+              />
+            }
+
             <View className="flex flex-col gap-2">
               {data(assetQuery.data).map((i) => (
                 <View key={i.head}>

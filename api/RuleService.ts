@@ -16,7 +16,7 @@ const RuleService = {
       }
     )
       .then((res) => {
-        return res.data as UsefulLifeType
+        return res.data.data as UsefulLifeType
       })
       .catch((error) => {
         console.error(error.response.data)

@@ -355,10 +355,11 @@ export default function CreateSchedule() {
         <ScrollView className='px-4' overScrollMode='never'>
           <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-between">
             <BackButton backFn={() => {
-              router.back()
+              // router.back()
+              router.navigate('/(nav)/calendar/' as Href)
             }} />
           </View>
-          <View className='flex flex-col gap-4 mt-4 mb-8'>
+          <View className='flex flex-col gap-4 py-4'>
             {Title}
             {Location}
             {Vendors}

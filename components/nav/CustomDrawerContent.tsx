@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Button } from "../ui/button";
 import { AuthService } from "@/api/AuthService";
 import { Icon } from "../ui/icon";
-import { LogOutIcon } from "lucide-react-native";
+import { BellIcon, LogOutIcon } from "lucide-react-native";
 import { UserService } from "@/api/UserService";
 import { UserProfileResponseType } from "@/api/types/response";
 
@@ -26,16 +26,21 @@ export default function CustomDrawerContent({
   const { top, bottom } = useSafeAreaInsets()
 
   return (
-    <View style={{ flex: 1, paddingTop: top, paddingBottom: bottom }} >
+    <View style={{ flex: 1 }} >
       <DrawerContentScrollView {...props} className="h-full px-4">
-        <View className="mb-4 px-2">
+        <View className="mb-4 px-2 flex flex-row justify-between items-center">
           <Image
             className="h-[30px] w-[120px]"
             source={require("@/assets/images/logo-full.png")}
             alt="image"
           />
+          <TouchableOpacity className="rounded-full border border-typography-200 p-3"
+            onPress={() => router.push('/notification')}
+          >
+            <Icon as={BellIcon} className="text-typography-600" size="xl" />
+          </TouchableOpacity>
         </View>
-        <View className="flex flex-row justify-center py-2 bg-primary-50 rounded-xl">
+        <View className="flex flex-row justify-center py-2 my-2 bg-primary-50 rounded-xl" >
           <Text className="text-lg font-medium text-primary-400">{user.firstName + ' ' + user.lastName}</Text>
         </View>
         <DrawerItemList {...props} />

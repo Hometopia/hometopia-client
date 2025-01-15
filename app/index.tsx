@@ -23,6 +23,9 @@ export default function Welcome() {
   useFocusEffect(
     useCallback(() => {
       if (!loading) {
+        //test
+        // router.replace("/test")
+        //
         if (isLogged)
           router.replace("/asset")
         else

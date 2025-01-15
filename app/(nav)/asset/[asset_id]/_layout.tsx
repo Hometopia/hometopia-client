@@ -74,7 +74,6 @@ export default function AssetDetailsLayout() {
       {!pathName.endsWith('update') &&
         <View className="bg-white h-[48px] px-4 pt-2 pb-4 flex flex-row justify-between items-center">
           <BackButton backFn={() => {
-            console.log(navigation.getState())
             // router.dismiss()
             router.back()
           }} />

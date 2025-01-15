@@ -10,6 +10,8 @@ import { calcCurrentValue, getDepreciationTable } from '@/helpers/linear-depreci
 import AssetInfoDisplay from '@/components/custom/AssetInfoDisplay'
 import { ClassificationService } from '@/api/ClassificationService'
 import { DepreciationTableItem } from "@/constants/types"
+import { RuleService } from '@/api/RuleService'
+import Loading from '@/components/feedback/Loading'
 
 export default function AssetDepreciation() {
   const { asset_id } = useLocalSearchParams()
@@ -17,42 +19,39 @@ export default function AssetDepreciation() {
 
   const [assetQuery, setAssetQuery] = React.useState<ResponseBaseType | undefined>(queryClient.getQueryData(['asset', asset_id]))
   const [table, setTable] = React.useState<DepreciationTableItem[] | undefined>(undefined)
-  const usefulLifeQuery = useQuery({
-    queryKey: ['useful-life', assetQuery?.data?.images[0].fileName],
+  const predictCategoryQuery = useQuery({
+    queryKey: ['predict-category', assetQuery?.data?.images[0].fileName],
     queryFn: async () => {
       const res = await ClassificationService.getPredictCategoryByImg(assetQuery?.data?.images[0].fileName as string)
-      if (res.status === 200) {
-        return res
-      }
-      else if (res.status === 503) {
-        return {
-          data: 'Service đang bảo trì'
-        }
-      }
-      else {
-        return {
-          data: 'Không thể tính thời gian khấu hao với ảnh này.'
-        }
+      return {
+        prediction: res.prediction
       }
     },
     enabled: !!assetQuery?.data
   })
-  React.useEffect(() => {
-    if (assetQuery) {
-      if (assetQuery.data) {
-        if (usefulLifeQuery.data?.data === 'Service đang bảo trì' ||
-          usefulLifeQuery.data?.data === 'Không thể tính thời gian khấu hao với ảnh này.') {
-          setTable(undefined)
-        }
-        else {
-          setTable(getDepreciationTable(
-            assetQuery.data?.purchasePrice,
-            calcYearAmount(new Date(), assetQuery.data?.purchaseDate)
-          ) || undefined)
-        }
-      }
-    }
-  }, [assetQuery])
+
+  const usefulLifeQuery = useQuery({
+    queryKey: ['useful-life', asset_id],
+    queryFn: () => RuleService.getUsefulLife(predictCategoryQuery.data?.prediction),
+    enabled: predictCategoryQuery.isFetched
+  })
+  // React.useEffect(() => {
+  //   if (assetQuery) {
+  //     if (assetQuery.data) {
+  //       if (usefulLifeQuery.data === undefined) {
+  //         setTable(undefined)
+  //       }
+  //       else {
+  //         setTable(getDepreciationTable(
+  //           assetQuery.data?.purchasePrice,
+  //           usefulLifeQuery.data.usefulLife,
+  //           calcYearAmount(new Date(), assetQuery?.data.purchaseDate)
+  //           // calcYearAmount(new Date(), assetQuery.data?.purchaseDate)
+  //         ) || undefined)
+  //       }
+  //     }
+  //   }
+  // }, [assetQuery])
 
   return (
     <SafeAreaView className='h-full bg-white'>
@@ -60,7 +59,17 @@ export default function AssetDepreciation() {
         <ScrollView className="flex flex-col my-4 px-4 gap-4 " overScrollMode='never'>
           <AssetInfoDisplay
             head="Giá trị hiện tại"
-            data={`${table ? table[table.length - 1].value : 'Đang tải...'}`}
+            data={`${predictCategoryQuery.isPending || usefulLifeQuery.isPending ?
+              'Đang tải...'
+              :
+              currencyFormatter().format(
+                calcCurrentValue(
+                  assetQuery.data?.purchasePrice,
+                  usefulLifeQuery.data?.usefulLife || 0,
+                  calcYearAmount(new Date(), assetQuery?.data.purchaseDate)
+                )
+              )
+              }`}
             opts='em'
           />
           <AssetInfoDisplay
@@ -73,9 +82,9 @@ export default function AssetDepreciation() {
           <AssetInfoDisplay
             head="Thời gian khấu hao"
             // data=''
-            data={`${usefulLifeQuery.isPending ? new String('Đang tải...') : usefulLifeQuery.data.data}`}
+            data={`${usefulLifeQuery.isPending ? new String('Đang tải...') : usefulLifeQuery.data?.usefulLife}`}
           />
-          {table && <Table className='w-full rounded-lg overflow-hidden'>
+          <Table className='w-full rounded-lg overflow-hidden'>
             <TableHeader>
               <TableRow className="bg-background-100">
                 <TableHead>Giá trị</TableHead>
@@ -83,15 +92,24 @@ export default function AssetDepreciation() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {table.map((i, index) =>
-                <TableRow key={index}>
-                  <TableData>{currencyFormatter().format(i.value)}</TableData>
-                  <TableData>{i.year}</TableData>
-                </TableRow>
-              )}
+              {predictCategoryQuery.isPending || usefulLifeQuery.isPending ?
+                <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
+                :
+                getDepreciationTable(
+                  assetQuery.data?.purchasePrice,
+                  usefulLifeQuery.data?.usefulLife || 0,
+                  calcYearAmount(new Date(), assetQuery?.data.purchaseDate)
+                  // calcYearAmount(new Date(), assetQuery.data?.purchaseDate)
+                ).map((i, index) =>
+                  <TableRow key={index}>
+                    <TableData>{currencyFormatter().format(i.value)}</TableData>
+                    <TableData>{i.year}</TableData>
+                  </TableRow>
+                )
+              }
 
             </TableBody>
-          </Table>}
+          </Table>
 
         </ScrollView>
       }

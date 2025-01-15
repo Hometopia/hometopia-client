@@ -14,3 +14,14 @@ export type VendorType = {
   website: string,
   phoneNumber: string
 }
+
+export type NotificationType = {
+  id: string,
+  title: string,
+  message: string,
+  isRead: boolean,
+  hyperLink: {
+    id: string,
+    entity: string
+  }
+}
