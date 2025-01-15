@@ -8,7 +8,7 @@ import { Spinner } from "@/components/ui/spinner";
 export default function Welcome() {
   const router = useRouter();
 
-  const { isLogged, loading, updateLoginState } = useGlobalContext();
+  const { isLogged, loading, updateLoginState } = useGlobalContext()
 
   useEffect(() => {
     updateLoginState()

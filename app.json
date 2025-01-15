@@ -22,7 +22,13 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.READ_CALENDAR",
+        "android.permission.WRITE_CALENDAR",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -47,6 +53,15 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "264cd411-3d49-4760-bcde-95579cb4d40f"
+      }
+    },
+    "owner": "hometopia"
   }
 }
