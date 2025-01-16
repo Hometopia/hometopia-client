@@ -3,7 +3,7 @@ import React from 'react'
 import { Box } from '../ui/box'
 import { adjustHexAlpha, getColorByIndex } from '@/helpers/linear-interpolation-color'
 
-const { startColor, endColor } = { startColor: '#1A91D9', endColor: "#D91A5D" }
+const { startColor, endColor } = { startColor: '#00DC63', endColor: "#D9371A" }
 export default function StatusBadge({
   length,
   index,

@@ -68,7 +68,7 @@ export default function Schedule({ data, selected, touchFn }: SchedulePropsType)
 
   const renderEmptyDate = () => {
     return (
-      <View className='flex h-4 pt-8'>
+      <View className='flex h-40 pt-8'>
         <Text>Trống</Text>
       </View>
     )

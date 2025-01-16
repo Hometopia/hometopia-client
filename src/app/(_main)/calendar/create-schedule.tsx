@@ -35,7 +35,7 @@ enum inputFieldNameList {
 
 export default function CreateSchedule() {
   const { asset_id, type } = useLocalSearchParams()
-  const { location } = useGlobalContext()
+  const values = useGlobalContext()
 
   const [page, setPage] = useState(1)
   const [size, setSize] = useState(10)
@@ -50,11 +50,11 @@ export default function CreateSchedule() {
   })
 
   const vendorsQuery = useQuery({
-    queryKey: ['vendors', asset_id, location.coords.latitude, location.coords.longitude],
+    queryKey: ['vendors', asset_id, values.location?.coords.latitude, values.location?.coords.longitude],
     queryFn: () => VendorService.getListVendor(
       page, size,
       predictCategoryQuery.data.prediction,
-      location.coords.latitude, location.coords.longitude
+      values.location?.coords.latitude || 10, values.location?.coords.longitude || 10
     ),
     enabled: predictCategoryQuery.isFetched,
     initialData: []
@@ -190,8 +190,8 @@ export default function CreateSchedule() {
           provider={PROVIDER_GOOGLE}
           style={StyleSheet.absoluteFillObject}
           initialRegion={{
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
+            latitude: values.location?.coords.latitude || 10,
+            longitude: values.location?.coords.longitude || 10,
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           }}
@@ -201,7 +201,10 @@ export default function CreateSchedule() {
           pitchEnabled={false}
         >
           <Marker
-            coordinate={{ latitude: location.coords.latitude, longitude: location.coords.longitude }}
+            coordinate={{
+              latitude: values.location?.coords.latitude || 10,
+              longitude: values.location?.coords.longitude || 10
+            }}
             description="Vị trí này được lấy từ Google Maps"
           />
         </MapView>
@@ -355,8 +358,7 @@ export default function CreateSchedule() {
         <ScrollView className='px-4' overScrollMode='never'>
           <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-between">
             <BackButton backFn={() => {
-              // router.back()
-              router.navigate('/(nav)/calendar/' as Href)
+              router.navigate('/(_main)/calendar/' as Href)
             }} />
           </View>
           <View className='flex flex-col gap-4 py-4'>

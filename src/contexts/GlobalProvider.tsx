@@ -8,35 +8,27 @@ import { useReactQueryDevTools } from '@dev-plugins/react-query';
 import { AuthService } from "@/api/AuthService";
 import { useToast } from "@/components/ui/toast";
 import * as Location from 'expo-location'
+import QueryProvider from "./QueryProvider";
 
-const GlobalContext = createContext()
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      onError: (error) => {
-        handleGlobalError(error)
-      },
-    },
-    mutations: {
-      onError: (error) => {
-        handleGlobalError(error)
-      },
-    },
-  },
-})
-
-const handleGlobalError = (error) => {
-  if (error instanceof Error) {
-    console.log(error)
-  } else {
-    console.log('Unknown error: ', error)
-  }
+interface ContextProps {
+  loading: boolean,
+  isLogged: boolean | null,
+  updateLoginState: () => void,
+  location: Location.LocationObject | null,
+  locationErrorMsg: string | null,
+  getCurrentLocation: () => void
 }
-
+const GlobalContext = createContext<ContextProps>({
+  loading: false,
+  isLogged: null,
+  updateLoginState: () => { },
+  location: null,
+  locationErrorMsg: null,
+  getCurrentLocation: () => { }
+})
 export const useGlobalContext = () => useContext(GlobalContext)
 
-export default function GlobalProvider({ children }) {
+export default function GlobalProvider({ children }: { children: React.ReactNode }) {
 
   const updateLoginState = async () => {
     try {
@@ -52,13 +44,12 @@ export default function GlobalProvider({ children }) {
 
   }
 
-  const [loading, setLoading] = useState(true)
-  const platform = Platform.OS
-  const [isLogged, setIsLogged] = useState(null)
-  useReactQueryDevTools(queryClient)
+  const [loading, setLoading] = useState<boolean>(true)
+  const [isLogged, setIsLogged] = useState<boolean | null>(null)
+
   //location
-  const [location, setLocation] = useState(null)
-  const [locationErrorMsg, setLocationErrorMsg] = useState(null)
+  const [location, setLocation] = useState<Location.LocationObject | null>(null)
+  const [locationErrorMsg, setLocationErrorMsg] = useState<string | null>(null)
   async function getCurrentLocation() {
 
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -77,15 +68,15 @@ export default function GlobalProvider({ children }) {
   return (
     <GlobalContext.Provider
       value={{
-        loading, platform,
+        loading,
         isLogged, updateLoginState,
         location, locationErrorMsg, getCurrentLocation
-      }}
+      } as ContextProps}
     >
       <GluestackUIProvider mode="light">
-        <QueryClientProvider client={queryClient}>
+        <QueryProvider>
           {children}
-        </QueryClientProvider>
+        </QueryProvider>
       </GluestackUIProvider>
     </GlobalContext.Provider>
   );

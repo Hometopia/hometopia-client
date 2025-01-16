@@ -7,11 +7,13 @@ import { Button, ButtonIcon, ButtonText } from '../ui/button'
 
 export default function CategoryPickerModal(
   {
+    type = 'normal',
     showModal,
     setShowModal,
     data,
-    pickFn
+    pickFn,
   }: {
+    type?: 'parent' | 'normal'
     showModal: boolean,
     setShowModal: Function,
     data?: CategoryResponseType[],
@@ -27,7 +29,12 @@ export default function CategoryPickerModal(
   }, [data])
 
   const handleParentCategoryPicked = (id: string) => {
-    setChildren(data?.filter(i => (i.parent !== null && i.parent.id === id)))
+    if (type === 'normal')
+      setChildren(data?.filter(i => (i.parent !== null && i.parent.id === id)))
+    else {
+      pickFn(id)
+      setShowModal(false)
+    }
   }
 
 

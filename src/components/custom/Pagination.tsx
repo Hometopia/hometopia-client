@@ -191,10 +191,12 @@ const Pages = ({
 };
 export default function Pagination({
   quantity,
+  length = 5,
   active,
   onChange,
 }: {
   quantity: number;
+  length?: number;
   active: number;
   onChange: any;
 }) {
@@ -205,7 +207,7 @@ export default function Pagination({
         isDisabled={active === 1 ? true : false}
         onChange={() => onChange(active - 1)}
       />
-      <Pages quantity={quantity} active={active} onChange={onChange} />
+      <Pages quantity={quantity} active={active} onChange={onChange} length={length - 2} />
       <PageChangeButton
         leftDirection={false}
         isDisabled={active === quantity ? true : false}

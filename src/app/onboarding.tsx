@@ -1,6 +1,6 @@
 import { VStack } from "@/components/ui/vstack";
 import { Text } from "@/components/ui/text";
-import { Href, Link, useRouter } from "expo-router";
+import { Href, Link, router, useRouter } from "expo-router";
 import { verifyInstallation } from "nativewind";
 import { Image } from "@/components/ui/image";
 import { SafeAreaView, View } from "react-native";
@@ -12,8 +12,6 @@ import { useGlobalContext } from "@/contexts/GlobalProvider";
 
 
 export default function OnBoarding() {
-  const router = useRouter()
-  const { updateLoginState } = useGlobalContext()
   return (
     <SafeAreaView style={{ paddingTop: 24 }} className="h-full bg-white">
       <VStack className="h-full items-center justify-start py-8">
@@ -28,9 +26,16 @@ export default function OnBoarding() {
             Khám phá ứng dụng truyệt vời dành cho ngôi nhà của bạn
           </Text>
           <View className="flex flex-col gap-4 self-stretch items-center">
-            <Button size="xl" className="self-stretch" onPress={() => router.replace('/(_main)/dashboard' as Href)}>
-              <ButtonText>Bắt đầu mà không cần tài khoản</ButtonText>
+            <Button
+              size="xl"
+              className="self-stretch"
+              onPress={() => router.replace('/(auth)/sign-up' as Href)}
+            >
+              <ButtonText>Đăng ký</ButtonText>
             </Button>
+            {/* <Button size="xl" className="self-stretch" onPress={() => router.replace('/(_main)/dashboard' as Href)}>
+              <ButtonText>Bắt đầu mà không cần tài khoản</ButtonText>
+            </Button> */}
             <Text className="text-lg">Đã có tài khoản</Text>
             <Button
               className="self-stretch"

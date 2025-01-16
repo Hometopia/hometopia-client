@@ -93,7 +93,7 @@ export default function ScheduleDetails() {
               <Text className='text-lg'>{parseData.asset.name}</Text>
             </View>
             <Button className='bg-primary-400/15' onPress={() =>
-              router.navigate(`/(nav)/asset/${parseData.asset.id}`)}>
+              router.navigate(`/(_main)/asset/${parseData.asset.id}`)}>
               <ButtonIcon as={ArrowRightIcon} className='text-primary-400' />
               <ButtonText className='text-primary-400'>Xem tài sản</ButtonText>
             </Button>

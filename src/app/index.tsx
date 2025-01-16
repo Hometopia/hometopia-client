@@ -6,11 +6,11 @@ import { Spinner } from "@/components/ui/spinner";
 
 
 export default function Welcome() {
-  // const { isLogged, loading, updateLoginState } = useGlobalContext()
+  const values = useGlobalContext()
 
-  // useEffect(() => {
-  //   updateLoginState()
-  // }, []);
+  useEffect(() => {
+    values.updateLoginState()
+  }, []);
 
   useEffect(() => {
     // if (!loading) {
@@ -18,25 +18,16 @@ export default function Welcome() {
     // }
   }, [])
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     if (!loading) {
-  //       //test
-  //       // router.replace("/test")
-  //       //
-  //       if (isLogged)
-  //         router.replace("/asset")
-  //       else
-  //         router.replace("/onboarding")
-  //     }
-
-  //   }, [loading]),
-  // );
-
   useFocusEffect(
     useCallback(() => {
-      router.replace("/onboarding")
-    }, []),
+      if (!values.loading) {
+        if (values.isLogged)
+          router.replace("/asset")
+        else
+          router.replace("/onboarding")
+      }
+
+    }, [values.loading]),
   );
 
   return (

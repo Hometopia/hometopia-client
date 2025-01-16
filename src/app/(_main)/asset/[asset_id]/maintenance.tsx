@@ -1,63 +1,74 @@
+import { AssetService } from "@/api/AssetService";
 import { ScheduleService } from "@/api/ScheduleService";
-import { AssetResponseType, ResponseBaseType, ScheduleResponseType, UserProfileResponseType } from "@/api/types/response";
+import { AssetResponseType, ResponseBaseType, ScheduleResponseType } from "@/api/types/response";
 import Callout from "@/components/custom/Callout";
 import { CustomTable, TableCol } from "@/components/custom/CustomTable";
 import Loading from "@/components/feedback/Loading";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
+import { Pressable } from "@/components/ui/pressable";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { ScheduleType } from "@/constants/data_enum";
-import { parseAdress } from "@/helpers/address";
 import { currencyFormatter } from "@/helpers/currency";
-import { dateToYYYYMMDD, getTime, YYYYMMDDtoLocalDate } from "@/helpers/time";
+import { calcDuration, dateToISOString, dateToYYYYMMDD, getTime, YYYYMMDDtoLocalDate } from "@/helpers/time";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { ClockIcon, EditIcon, TrashIcon } from "lucide-react-native";
 import React from "react";
-import { SafeAreaView, ScrollView, View } from "react-native";
+import { Alert, SafeAreaView, ScrollView, View } from "react-native";
+const totalOf = (arr: number[]) => {
+  var total = 0
+  arr.forEach(i => {
+    total += i
+  })
 
-
-type infoFieldType = {
-  head: string,
-  data: string,
-  desc?: string,
-  editable: boolean,
+  return total
 }
-const data = (assetData: AssetResponseType, user: UserProfileResponseType) => [
+const data = (assetData: AssetResponseType, history: ScheduleResponseType[]) => [
   {
-    head: 'Danh mục',
-    data: `${assetData.category.parent.name} > ${assetData.category.name}`,
+    head: 'Số lần bảo trì',
+    data: history.length,
   },
   {
-    head: 'Địa chỉ',
-    data: parseAdress(user.address),
+    head: 'Tổng tiền đã tiêu để bảo trì sản này',
+    data: currencyFormatter().format(totalOf(history.map((i: ScheduleResponseType) => i.cost))),
     editable: true
+  },
+
+  {
+    head: 'Chu kỳ bảo trì',
+    data: assetData.maintenanceCycle !== null ? `${assetData.maintenanceCycle} năm` : 'Không có'
   },
 ]
 
-export default function AssetFix() {
+export default function AssetMaintenance() {
   const { asset_id } = useLocalSearchParams()
   const queryClient = useQueryClient()
+
   const [assetQuery, setAssetQuery] = React.useState<ResponseBaseType | undefined>(queryClient.getQueryData(['asset', asset_id]))
+
   const historyQuery = useQuery({
-    queryKey: ['schedule-history', ScheduleType.REPAIR, asset_id],
+    queryKey: ['schedule-history', ScheduleType.MAINTENANCE, asset_id],
     queryFn: () =>
       ScheduleService.getScheduleHistory(
         asset_id as string,
-        ScheduleType.REPAIR,
+        ScheduleType.MAINTENANCE,
         new Date())
   })
   const upcomingQuery = useQuery({
-    queryKey: ['schedule-upcoming', ScheduleType.REPAIR, asset_id],
+    queryKey: ['schedule-upcoming', ScheduleType.MAINTENANCE, asset_id],
     queryFn: () =>
       ScheduleService.getUpcomingSchedule(
         asset_id as string,
-        ScheduleType.REPAIR,
+        ScheduleType.MAINTENANCE,
         new Date()
       )
   })
-  const userProfile: ResponseBaseType | undefined = queryClient.getQueryData(['user'])
+  // const maintenanceQuery = useQuery({
+  //   queryKey: ['maintenance-cycle', asset_id],
+  //   queryFn: () => 
+  // })
 
   const EmptyTable = ({ heads }: { heads: string[] }) => (
     <CustomTable width={900}>
@@ -102,12 +113,12 @@ export default function AssetFix() {
   )
   return (
     <SafeAreaView className='h-full bg-white'>
-      {assetQuery?.data === undefined || userProfile?.data === undefined ?
+      {assetQuery?.data === undefined ?
         <Loading texts={[
           {
             condition: true,
             text: 'Đang tải...'
-          },
+          }
         ]} />
         :
         <ScrollView className="my-4 px-4">
@@ -115,17 +126,17 @@ export default function AssetFix() {
             {upcomingQuery.isPending ?
               <Skeleton className="h-10 w-full" variant='rounded' />
               :
-              <Callout what="fix" size='mobile' data={upcomingQuery.data.data.items}
+              <Callout what="maintenance" size='mobile' data={upcomingQuery.data.data.items}
                 scheduleFn={() => router.push({
-                  pathname: `/(nav)/calendar/create-schedule`,
+                  pathname: `/(_main)/calendar/create-schedule`,
                   params: {
                     asset_id: asset_id,
-                    type: ScheduleType.REPAIR
+                    type: ScheduleType.MAINTENANCE
                   }
                 })}
                 lookFn={() => {
                   router.push({
-                    pathname: '/(nav)/calendar/[schedule_details]',
+                    pathname: '/(_main)/calendar/[schedule_details]',
                     params: {
                       schedule_details: upcomingQuery.data.data.items[0].id,
                       data: JSON.stringify(upcomingQuery.data.data.items[0])
@@ -136,35 +147,18 @@ export default function AssetFix() {
             }
 
             <View className="flex flex-col gap-2">
-              {data(assetQuery.data, userProfile.data).map((i) => {
-                if (i.editable)
-                  return (
-                    <View key={i.head} className="flex flex-row gap-2 items-center">
-                      <View className="shrink">
-                        <Text className="p-0 pb-1 text-base font-medium text-typography-400 align-top">{i.head}:</Text>
-                        <Text className="p-0 text-lg text-typography-900">{i.data}</Text>
-                      </View>
-                      <Button
-                        className="px-3"
-                        variant="outline"
-                        action="primary"
-                      >
-                        <ButtonIcon as={EditIcon} className="text-primary-400" />
-                      </Button>
-                    </View>
-                  )
-                return (
-                  <View key={i.head}>
-                    <Text className="p-0 pb-1 text-base font-medium text-typography-400 align-top">{i.head}:</Text>
-                    <Text className="p-0 text-lg text-typography-900">{i.data}</Text>
-                  </View>
-                )
-              })}
+              {historyQuery.isFetched && data(assetQuery.data, historyQuery.data.data.items).map((i) => (
+                <View key={i.head}>
+                  <Text className="p-0 pb-1 text-base font-medium text-typography-400 align-top">{i.head}:</Text>
+                  <Text className="p-0 text-lg text-typography-900">{i.data}</Text>
+                  {/* {i.desc && <Text className="text-base italic text-typography-900">{i.desc}</Text>} */}
+                </View>
+              ))}
             </View>
             <View className="flex flex-col gap-2">
               <View className="flex flex-row gap-2 items-center">
                 <Icon as={ClockIcon} className="h-4 w-4 text-typography-700" />
-                <Text className="text-base font-bold text-typography-700">Lịch sử sửa chữa</Text>
+                <Text className="text-base font-bold text-typography-700">Lịch sử bảo trì</Text>
               </View>
               {historyQuery.isPending ?
                 <Loading
@@ -186,9 +180,10 @@ export default function AssetFix() {
                   <HistoryTable data={historyQuery.data.data.items} />
               }
             </View>
+
           </View>
         </ScrollView>
       }
-    </SafeAreaView>
+    </SafeAreaView >
   )
 }

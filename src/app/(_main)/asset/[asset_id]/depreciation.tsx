@@ -35,23 +35,6 @@ export default function AssetDepreciation() {
     queryFn: () => RuleService.getUsefulLife(predictCategoryQuery.data?.prediction),
     enabled: predictCategoryQuery.isFetched
   })
-  // React.useEffect(() => {
-  //   if (assetQuery) {
-  //     if (assetQuery.data) {
-  //       if (usefulLifeQuery.data === undefined) {
-  //         setTable(undefined)
-  //       }
-  //       else {
-  //         setTable(getDepreciationTable(
-  //           assetQuery.data?.purchasePrice,
-  //           usefulLifeQuery.data.usefulLife,
-  //           calcYearAmount(new Date(), assetQuery?.data.purchaseDate)
-  //           // calcYearAmount(new Date(), assetQuery.data?.purchaseDate)
-  //         ) || undefined)
-  //       }
-  //     }
-  //   }
-  // }, [assetQuery])
 
   return (
     <SafeAreaView className='h-full bg-white'>

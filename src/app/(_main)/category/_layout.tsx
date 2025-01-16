@@ -4,6 +4,11 @@ import { Stack } from 'expo-router'
 
 export default function CategoryLayout() {
   return (
-    <Stack />
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: 'flip',
+      }}
+    />
   )
 }

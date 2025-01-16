@@ -1,10 +1,11 @@
-import { View, Text } from 'react-native'
+import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
-import { Tabs } from 'expo-router'
-import { BoxIcon, CalendarCogIcon, FileChartColumnIcon, LayoutDashboardIcon, TagIcon, WrenchIcon } from 'lucide-react-native';
+import { router, Tabs, useNavigation } from 'expo-router'
+import { BellIcon, BoxIcon, CalendarCogIcon, FileChartColumnIcon, LayoutDashboardIcon, TagIcon, WrenchIcon } from 'lucide-react-native';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { primaryColor } from '@/constants/color';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image } from '@/components/ui/image';
+import { Icon } from '@/components/ui/icon';
 
 const tabsData = [
   {
@@ -40,12 +41,12 @@ const tabsData = [
 ]
 const navigationHeaders = [
   {
-    slug: "index",
+    slug: "dashboard",
     title: "Dashboard",
   },
   {
     slug: "asset",
-    title: "Danh sách tài sản",
+    title: "Tài sản",
   },
   {
     slug: "category",
@@ -56,8 +57,8 @@ const navigationHeaders = [
     title: "Lịch",
   },
   {
-    slug: "reports",
-    title: "Báo cáo",
+    slug: "setting",
+    title: "Cài đặt",
   },
   {
     slug: "create-asset",
@@ -85,10 +86,10 @@ const navigationHeaders = [
   }
 ]
 const getHeaderTitle = (route: any, item: any) => {
+  // console.log(route)
+  let routeName = getFocusedRouteNameFromRoute(route)
 
-  let routeName = getFocusedRouteNameFromRoute(route);
-
-  if (routeName === undefined) {
+  if (routeName === undefined || routeName === 'index') {
     routeName = item.slug
   }
 
@@ -99,8 +100,10 @@ const getHeaderTitle = (route: any, item: any) => {
 }
 
 export default function MainLayout() {
+  const _navigation = useNavigation()
   return (
     <Tabs
+      initialRouteName="dashboard"
       screenOptions={{
         unmountOnBlur: true,
         tabBarActiveBackgroundColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.2)`,
@@ -109,19 +112,32 @@ export default function MainLayout() {
         tabBarItemStyle: {
           borderRadius: 6,
         },
-        tabBarIconStyle: {
-          color: `rgb(${primaryColor[400]})`
-        },
         tabBarStyle: {
           height: 32 + 24 + 16,
-          display: 'flex',
-          flexDirection: 'row',
-          gap: 8,
           paddingHorizontal: 16,
           paddingBottom: 24,
           paddingTop: 12
         },
-        tabBarShowLabel: false
+        tabBarShowLabel: false,
+        // headerStatusBarHeight: 48,
+        headerTitleStyle: {
+          fontSize: 18
+        },
+        headerLeft: () =>
+          <View className="flex flex-row justify-center w-[60px]">
+            <Image
+              className="h-[30px] w-[30px]"
+              source={require("../../../assets/images/icon.png")}
+              alt="image"
+            />
+          </View>,
+        headerRight: () =>
+          <TouchableOpacity className="rounded-full p-3 mr-4"
+            onPress={() => router.push('/notification')}
+          >
+            <Icon as={BellIcon} className="text-typography-800" size="xl" />
+          </TouchableOpacity>
+
       }}
     >
       {tabsData.map(i => (
@@ -131,11 +147,27 @@ export default function MainLayout() {
           options={({ route }) => ({
             tabBarLabel: undefined,
             title: getHeaderTitle(route, i),
-            tabBarIcon: ({ focused, size, color }) => <i.icon size={size} color={color} />
+            tabBarIcon: ({ focused, size, color }) => focused ?
+              <i.icon size={size} color={color} fillRule='nonzero' fill={color} /> : <i.icon size={size} color={color} />
             ,
+          })}
+          listeners={({ navigation }) => ({
+            tabPress: (e) => {
+              e.preventDefault()
+              _navigation.reset({
+                index: 0,
+                routes: [{ name: i.slug }] as never
+              })
+            },
           })}
         />
       ))}
+      <Tabs.Screen
+        name="index"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   )
 }

@@ -74,7 +74,6 @@ export default function AssetDetailsLayout() {
       {!pathName.endsWith('update') &&
         <View className="bg-white h-[48px] px-4 pt-2 pb-4 flex flex-row justify-between items-center">
           <BackButton backFn={() => {
-            // router.dismiss()
             router.back()
           }} />
           <View className="flex flex-row gap-4">
@@ -104,7 +103,7 @@ export default function AssetDetailsLayout() {
               }}
             >
               <MenuItem key="Edit" textValue="Edit" onPress={() => router.push({
-                pathname: '/(nav)/asset/[asset_id]/update',
+                pathname: '/(_main)/asset/[asset_id]/update',
                 params: {
                   asset_id: asset_id as string
                 }
@@ -124,15 +123,16 @@ export default function AssetDetailsLayout() {
           </View>
         </View>}
 
-      {!pathName.endsWith('update') && <View className="bg-white h-[40px]">
-        <ScrollView
-          ref={scrollViewRef}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-        >
-          <Tabs data={tabData} onPress={handlePress} />
-        </ScrollView>
-      </View>}
+      {!pathName.endsWith('update') &&
+        <View className="bg-white h-[40px]">
+          <ScrollView
+            ref={scrollViewRef}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+          >
+            <Tabs data={tabData} onPress={handlePress} />
+          </ScrollView>
+        </View>}
 
       {assetQuery.isPending || assetQuery.isRefetching ?
         <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />

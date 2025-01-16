@@ -102,37 +102,17 @@ export default function Tabs({
       }),
     );
   };
-  const { platform } = useGlobalContext();
 
   return (
     <HStack className={``}>
       {data.map((i, index) => {
-        if (platform === 'web') {
-          return (
-            <div
-              key={i.slug}
-              className={`flex items-center px-4 py-2 ${borderStateStyle.at(state?.at(index)?.state as number)} hover:cursor-pointer`}
-              onMouseEnter={() => handleHover(i)}
-              onMouseLeave={() => handleMouseLeave(i)}
-              onClick={() => {
-                handleActive(i)
-                router.push(
-                  `${pathname.substring(0, pathname.lastIndexOf("/"))}/${i.slug}` as Href<`${string}/${string}`>,
-                )
-              }}>
-              <Text
-                className={`text-md font-medium ${stateColor.at(state?.at(index)?.state as number)}`}
-              >
-                {i.label}
-              </Text>
-            </div>)
-        }
         return (
           <Pressable
             key={i.slug}
             className={`flex items-center px-4 py-2 ${borderStateStyle.at(state?.at(index)?.state as number)}`}
             onPress={() => {
-              handleActive(i);
+              handleActive(i)
+              console.log(`${pathname.substring(0, pathname.lastIndexOf("/"))}/${i.slug}`)
               router.replace(
                 `${pathname.substring(0, pathname.lastIndexOf("/"))}/${i.slug}` as Href<`${string}/${string}`>,
               );

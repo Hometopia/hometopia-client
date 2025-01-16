@@ -32,7 +32,10 @@ const CategoryService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        console.error(error.response.data)
+        return undefined
+      })
   },
 
   getCategoryList: async (

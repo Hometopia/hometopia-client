@@ -1,9 +1,9 @@
 const AssetStatusList = [
   "IN_USE",
-  "BROKEN",
   "UNDER_REPAIR",
   "MAINTENANCE",
-  "RESERVED"
+  "RESERVED",
+  "BROKEN",
 ]
 
 const AssetStatusListMapToDisplayText = {

@@ -99,7 +99,7 @@ export default function SignIn() {
       } as LoginForm)
 
       if (isLogin) {
-        router.replace('/')
+        router.replace(`/(_main)/asset`)
       }
       else {
         handleToast()

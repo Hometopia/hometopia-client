@@ -4,7 +4,7 @@ import axios from 'axios';
 import { convertToBlob } from '@/helpers/file';
 import { FileUploadResponseType } from './types/response';
 import { removeSpecialCharacters } from '@/helpers/string';
-
+const getImgUri = (fileName: string) => `${BASE_URL}/files?fileName=${fileName}`
 const FileService = {
   getFile: async (fileName: string | undefined): Promise<any> => {
     if (!fileName) return null
@@ -52,4 +52,4 @@ const FileService = {
   },
 }
 
-export { FileService }
+export { FileService, getImgUri }

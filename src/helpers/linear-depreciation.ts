@@ -9,10 +9,13 @@ const depreciationAlgorithm = {
   }
 }
 const calcCurrentValue = (initialValue: number, years: number, currentYear: number) => {
+  if (currentYear > years) currentYear = years
   return depreciationAlgorithm.linear(initialValue, years, currentYear)
 }
 const getDepreciationTable = (initialValue: number, years: number, currentYear: number) => {
+  // if (currentYear > years) currentYear = years
   const table: DepreciationTableItem[] = []
+
   for (let i = 0; i <= currentYear; i++) {
     table.push({
       value: calcCurrentValue(initialValue, years, i),
