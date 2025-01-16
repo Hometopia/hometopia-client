@@ -43,6 +43,20 @@ const ScheduleTypeName = {
   'MAINTENANCE': 'Bảo trì',
   'REPAIR': 'Sửa chữa'
 }
+const MonthName = {
+  january: 'T1',
+  february: 'T2',
+  march: 'T3',
+  april: 'T4',
+  may: 'T5',
+  june: 'T6',
+  july: 'T7',
+  august: 'T8',
+  september: 'T9',
+  october: 'T10',
+  november: 'T11',
+  december: 'T12',
+}
 
 
 export {
@@ -53,4 +67,5 @@ export {
   HouseType,
   HouseTypeName,
   AssetStatusListMapToDisplayText,
+  MonthName
 }
