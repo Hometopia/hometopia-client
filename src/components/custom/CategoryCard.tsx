@@ -13,16 +13,28 @@ export default function CategoryCard({
 }: CategoryCardPropsType) {
   const [longPress, setLongPress] = useState<boolean>(false)
   const [fav, setFav] = useState<boolean>(false)
+
+  const [cannotDelete, setCannotDelete] = useState<boolean>(false)
   const Overlay = (
     <TouchableOpacity
       className='absolute bg-background-0/70 z-50 top-0 left-0 w-full h-full flex flex-row justify-center items-center'
       onPress={() => setLongPress(false)}
     >
-      <TouchableOpacity
-        className='p-4 flex justify-center items-center border border-error-400 rounded-md'
-        onPress={deleteFn}>
-        <Icon as={Trash2Icon} className='text-error-400 w-6 h-6' />
-      </TouchableOpacity>
+      {cannotDelete ?
+        <Text className='text-error-400'>Không thể xóa</Text>
+        :
+        <TouchableOpacity
+          className='p-4 flex justify-center items-center border border-error-400 rounded-md'
+          onPress={() => {
+            if (data.numberOfAssets > 0) {
+              setCannotDelete(true)
+            }
+            else
+              deleteFn()
+          }}>
+          <Icon as={Trash2Icon} className='text-error-400 w-6 h-6' />
+        </TouchableOpacity>
+      }
     </TouchableOpacity>
   )
 
@@ -40,7 +52,10 @@ export default function CategoryCard({
         onPress={onPress}
       >
         <View className='grow'>
-          <Text className='text-md text-typography-600'>{data.parent.name}</Text>
+          <View className='grow flex flex-row justify-between'>
+            <Text className='text-md text-typography-600'>{data.parent.name}</Text>
+            <Text className='text-typography-400'>Số lượng tài sản: {data.numberOfAssets}</Text>
+          </View>
           <Text className='text-lg'>{data.name}</Text>
           <Text className='text-md text-typography-400'>{data.description}</Text>
           <View className='grow flex flex-row justify-end'>

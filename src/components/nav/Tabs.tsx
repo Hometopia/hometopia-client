@@ -112,7 +112,6 @@ export default function Tabs({
             className={`flex items-center px-4 py-2 ${borderStateStyle.at(state?.at(index)?.state as number)}`}
             onPress={() => {
               handleActive(i)
-              console.log(`${pathname.substring(0, pathname.lastIndexOf("/"))}/${i.slug}`)
               router.replace(
                 `${pathname.substring(0, pathname.lastIndexOf("/"))}/${i.slug}` as Href<`${string}/${string}`>,
               );

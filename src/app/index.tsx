@@ -13,16 +13,16 @@ export default function Welcome() {
   }, []);
 
   useEffect(() => {
-    // if (!loading) {
-    SplashScreen.hideAsync()
-    // }
-  }, [])
+    if (!values.loading) {
+      SplashScreen.hideAsync()
+    }
+  }, [values.loading])
 
   useFocusEffect(
     useCallback(() => {
       if (!values.loading) {
         if (values.isLogged)
-          router.replace("/asset")
+          router.replace('/(_main)/dashboard/')
         else
           router.replace("/onboarding")
       }

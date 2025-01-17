@@ -21,7 +21,7 @@ import Pagination from '@/components/custom/Pagination'
 import CustomFilter from '@/components/custom/CustomFilter'
 import { Select, SelectBackdrop, SelectContent, SelectDragIndicator, SelectDragIndicatorWrapper, SelectIcon, SelectInput, SelectItem, SelectPortal, SelectTrigger } from '@/components/ui/select'
 import CategoryPickerModal from '@/components/custom/CategoryPickerModal'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CategoryService } from '@/api/CategoryService'
 import { AssetService } from '@/api/AssetService'
 import Loading from '@/components/feedback/Loading'
@@ -81,6 +81,13 @@ export default function Asset() {
       }
       return res
     },
+  })
+  const deleteAssetMutation = useMutation({
+    mutationFn: (id: string) => AssetService.deleteAsset(id),
+    onSuccess: (res) => {
+      assetListQuery.refetch()
+    },
+    onError: (err) => { }
   })
   const getCategoryName = (): string => {
     return categoryFullList.data?.data.items.find((i: CategoryResponseType) => i.id === category)?.name
@@ -159,7 +166,7 @@ export default function Asset() {
           key={i.id}
           data={i}
           onPress={() => router.push(`/(_main)/asset/${i.id}`)}
-          deleteFn={() => { }} />)}
+          deleteFn={() => deleteAssetMutation.mutate(i.id)} />)}
 
     </View>
   )
@@ -239,7 +246,7 @@ export default function Asset() {
           </View>
           {/* {FavouriteList} */}
 
-          {assetListQuery.isPending ?
+          {assetListQuery.isPending || deleteAssetMutation.isPending ?
             <View className='relative h-40'>
               <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
             </View>

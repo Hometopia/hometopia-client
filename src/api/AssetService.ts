@@ -33,6 +33,20 @@ const AssetService = {
       })
       .catch((error) => console.error(error.response.data))
   },
+  getAllAsset: async (): Promise<any> => {
+    return await axios.get(
+      `${BASE_URL}/assets?all=true`,
+      {
+        headers: {
+          Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,
+        }
+      }
+    )
+      .then((res) => {
+        return res.data
+      })
+      .catch((error) => console.error(error.response.data))
+  },
 
   getAsset: async (assetId: string): Promise<any> => {
     return await axios.get(

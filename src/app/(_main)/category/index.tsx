@@ -13,7 +13,7 @@ import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
 import { Select, SelectBackdrop, SelectContent, SelectDragIndicator, SelectDragIndicatorWrapper, SelectIcon, SelectInput, SelectItem, SelectPortal, SelectTrigger } from "@/components/ui/select";
 import { Text } from "@/components/ui/text";
 import SimpleWidget from "@/components/widget/SimpleWidget";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
 import { ChevronDownIcon, FilterIcon, HeartIcon, PlusIcon, SearchIcon } from "lucide-react-native";
 import { useState } from "react";
@@ -50,9 +50,16 @@ export default function Categories() {
     queryFn: async () => {
       const res = await CategoryService.getCategoryList(page, pageSize, parent, name)
       if (res.status === 200) {
-        setTotalItems(res.data.totalItems)
+        if (name === '')
+          setTotalItems(res.data.totalItems)
       }
       return res
+    },
+  })
+  const deleteCategoryMutation = useMutation({
+    mutationFn: (id: string) => CategoryService.deleteCategory(id),
+    onSuccess: (res) => {
+      categoryListQuery.refetch()
     },
   })
   const getCategoryName = (id: string): string => {
@@ -129,7 +136,7 @@ export default function Categories() {
           key={i.id}
           data={i}
           onPress={() => { }}
-          deleteFn={() => { }} />)}
+          deleteFn={() => deleteCategoryMutation.mutate(i.id)} />)}
 
     </View>
   )
@@ -174,7 +181,7 @@ export default function Categories() {
           </View>
           {/* {FavouriteList} */}
 
-          {categoryListQuery.isPending ?
+          {categoryListQuery.isPending || deleteCategoryMutation.isPending ?
             <View className='relative h-40'>
               <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
             </View>

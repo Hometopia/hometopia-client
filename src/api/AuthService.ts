@@ -37,12 +37,7 @@ const AuthService = {
         return true
       })
       .catch(error => {
-        if (error.status !== 401)
-          console.error(error.response.data)
-        else {
-          return false
-        }
-
+        return false
       })
   },
   signUp: async (formData: RegisterForm): Promise<any> => {

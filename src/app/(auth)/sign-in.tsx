@@ -16,6 +16,8 @@ import { AuthService } from "@/api/AuthService";
 import { Toast, ToastDescription, ToastTitle, useToast } from "@/components/ui/toast";
 import { CloseIcon, Icon } from "@/components/ui/icon";
 import { LoginForm } from "@/api/types/request";
+import { useMutation } from "@tanstack/react-query";
+import Loading from "@/components/feedback/Loading";
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false)
@@ -26,6 +28,18 @@ export default function SignIn() {
   })
   const passwordControl = useFormControl("", (value): boolean => {
     return isValidPassword(value)
+  })
+
+  const signInMutation = useMutation({
+    mutationFn: (form: LoginForm) => AuthService.signIn(form),
+    onSuccess: (res) => {
+      if (res === true) {
+        router.replace('/')
+      } else {
+        handleToast()
+      }
+    },
+    onError: (err) => { }
   })
 
   const handleNavigateToSignUp = () => {
@@ -93,17 +107,10 @@ export default function SignIn() {
       emailControl.isValid &&
       passwordControl.isValid
     ) {
-      let isLogin = await AuthService.signIn({
-        username: emailControl.value,
+      signInMutation.mutate({
+        username: emailControl.value.trim(),
         password: passwordControl.value,
       } as LoginForm)
-
-      if (isLogin) {
-        router.replace(`/(_main)/asset`)
-      }
-      else {
-        handleToast()
-      }
     }
   }
 
@@ -115,74 +122,79 @@ export default function SignIn() {
           <Text className="text-center text-3xl font-bold text-typography-900">
             Đăng nhập
           </Text>
-          <VStack className="gap-8">
-            <VStack className="gap-4">
-              <FormControl
-                isRequired={true}
-                isInvalid={!emailControl.isValid}
-              >
-                <FormControlLabel>
-                  <FormControlLabelText className="text-md text-typography-500">
-                    Email
-                  </FormControlLabelText>
-                </FormControlLabel>
-                <Input className="text-center" size="lg">
-                  <InputField
-                    type="text"
-                    placeholder=""
-                    value={emailControl.value}
-                    onChangeText={emailControl.onChange} />
-                </Input>
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} />
-                  <FormControlErrorText>
-                    Email không hợp lệ
-                  </FormControlErrorText>
-                </FormControlError>
-              </FormControl>
-              <FormControl
-                isRequired={true}
-                isInvalid={!passwordControl.isValid}
-              >
-                <FormControlLabel>
-                  <FormControlLabelText className="text-md text-typography-500">
-                    Mật khẩu
-                  </FormControlLabelText>
-                </FormControlLabel>
-                <Input className="text-center" size="lg">
-                  <InputField
-                    type={showPassword ? "text" : "password"}
-                    value={passwordControl.value}
-                    onChangeText={passwordControl.onChange} />
-                  <InputSlot
-                    className="pr-3"
-                    onPress={() => setShowPassword(!showPassword)}
-                  >
-                    <InputIcon
-                      as={showPassword ? EyeIcon : EyeClosedIcon}
-                      className="text-typography-500"
-                    />
-                  </InputSlot>
-                </Input>
-                <FormControlHelper>
-                  <FormControlHelperText size="lg">
-                    Ít nhất 6 ký tự và không bao gồm khoảng trắng
-                  </FormControlHelperText>
-                </FormControlHelper>
-                <FormControlError>
-                  <FormControlErrorIcon as={AlertCircleIcon} className="text-error-400" />
-                  <FormControlErrorText>
-                    Mật khẩu phải có ít nhất 6 ký tự và không bao gồm khoảng trắng.
-                  </FormControlErrorText>
-                </FormControlError>
-              </FormControl>
+          {signInMutation.isPending ?
+            <Loading texts={[{ condition: true, text: 'Đang đăng nhập...' }]} />
+            :
+            <VStack className="gap-8">
+              <VStack className="gap-4">
+                <FormControl
+                  isRequired={true}
+                  isInvalid={!emailControl.isValid}
+                >
+                  <FormControlLabel>
+                    <FormControlLabelText className="text-md text-typography-500">
+                      Email
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                  <Input className="text-center" size="lg">
+                    <InputField
+                      type="text"
+                      placeholder=""
+                      value={emailControl.value}
+                      onChangeText={emailControl.onChange} />
+                  </Input>
+                  <FormControlError>
+                    <FormControlErrorIcon as={AlertCircleIcon} />
+                    <FormControlErrorText>
+                      Email không hợp lệ
+                    </FormControlErrorText>
+                  </FormControlError>
+                </FormControl>
+                <FormControl
+                  isRequired={true}
+                  isInvalid={!passwordControl.isValid}
+                >
+                  <FormControlLabel>
+                    <FormControlLabelText className="text-md text-typography-500">
+                      Mật khẩu
+                    </FormControlLabelText>
+                  </FormControlLabel>
+                  <Input className="text-center" size="lg">
+                    <InputField
+                      type={showPassword ? "text" : "password"}
+                      value={passwordControl.value}
+                      onChangeText={passwordControl.onChange} />
+                    <InputSlot
+                      className="pr-3"
+                      onPress={() => setShowPassword(!showPassword)}
+                    >
+                      <InputIcon
+                        as={showPassword ? EyeIcon : EyeClosedIcon}
+                        className="text-typography-500"
+                      />
+                    </InputSlot>
+                  </Input>
+                  <FormControlHelper>
+                    <FormControlHelperText size="lg">
+                      Ít nhất 6 ký tự và không bao gồm khoảng trắng
+                    </FormControlHelperText>
+                  </FormControlHelper>
+                  <FormControlError>
+                    <FormControlErrorIcon as={AlertCircleIcon} className="text-error-400" />
+                    <FormControlErrorText>
+                      Mật khẩu phải có ít nhất 6 ký tự và không bao gồm khoảng trắng.
+                    </FormControlErrorText>
+                  </FormControlError>
+                </FormControl>
+              </VStack>
+              <Button size="lg" onPress={handleSubmit}>
+                <ButtonText>Đăng nhập</ButtonText>
+              </Button>
             </VStack>
-            <Button size="lg" onPress={handleSubmit}>
-              <ButtonText>Đăng nhập</ButtonText>
-            </Button>
-          </VStack>
+          }
+
           <VStack className="items-center">
-            <Button
+            {/* <Button
               className="w-fit"
               variant="link"
               size="xs"
@@ -192,7 +204,7 @@ export default function SignIn() {
               <ButtonText className="text-md text-primary-500">
                 Quên mật khẩu
               </ButtonText>
-            </Button>
+            </Button> */}
             <Divider className="my-4 w-16" />
             <HStack className="items-center gap-4">
               <Text className="text-md text-typography-500">

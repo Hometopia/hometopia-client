@@ -21,7 +21,7 @@ export default function Bar({
     <View>
       <BarChart
         maxValue={maxValue()}
-        barWidth={32}
+        barWidth={48}
         noOfSections={5}
         barBorderRadius={4}
         frontColor="lightgray"
@@ -29,6 +29,7 @@ export default function Bar({
         yAxisThickness={0}
         xAxisThickness={0}
         yAxisLabelSuffix='k'
+        yAxisLabelWidth={56}
       />
     </View>
   )

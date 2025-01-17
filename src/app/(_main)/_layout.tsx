@@ -83,7 +83,11 @@ const navigationHeaders = [
   {
     slug: "create-schedule",
     title: "Tạo lịch"
-  }
+  },
+  {
+    slug: "years",
+    title: "Thống kê các năm"
+  },
 ]
 const getHeaderTitle = (route: any, item: any) => {
   // console.log(route)
