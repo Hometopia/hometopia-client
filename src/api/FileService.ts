@@ -27,8 +27,8 @@ const FileService = {
       const tranfFile = {
         uri: file.uri,
         name: removeSpecialCharacters(file.name),
-        type: file.mimeType,
-        size: file.size,
+        type: file.mimeType ? file.mimeType : 'image/jpeg',
+        size: file.size ? file.size : 0,
       }
       formData.append('files', tranfFile as any);
 
@@ -47,6 +47,7 @@ const FileService = {
         return res.data
       })
       .catch((error) => {
+        console.error(error.request)
         return error
       })
   },

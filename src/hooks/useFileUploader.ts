@@ -31,7 +31,7 @@ const useFileUploader = () => {
 
   return {
     pickFile,
-    pickImage
+    pickImage,
   };
 }
 

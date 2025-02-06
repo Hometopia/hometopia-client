@@ -38,6 +38,8 @@ import Loading from '@/components/feedback/Loading'
 import { AssetControl } from '@/components/form/AssetControl'
 import { BASE_URL } from '@/constants/server'
 import { FileInfoType } from '@/api/types/common'
+import { LocationService } from '@/api/LocationService'
+import LocationUpdateModal from '@/components/custom/LocationPickModal'
 
 enum inputFieldNameList {
   name,
@@ -272,6 +274,16 @@ export default function UpdateAsset() {
   })
   //#endregion
 
+  //#region location
+  const [locationModalShow, setLocationModalShow] = React.useState(false)
+  const locationListQuery = useQuery({
+    queryKey: ['locations'],
+    queryFn: () => LocationService.getListLocation()
+  })
+  const getLocationName = (): string => {
+    return locationListQuery.data?.data.items.find((i: any) => i.id === assetCtrl.locationControl.value)?.name
+  }
+  //#endregion
 
   const accorddionItems = [
     {
@@ -393,7 +405,7 @@ export default function UpdateAsset() {
             </View>
           }
         />,
-        <ControllableInput key={1} control={assetCtrl.purchasePlaceControl} label="Nơi mua hàng" errorText='Nơi mua không thể trống'
+        <ControllableInput key={1} control={assetCtrl.purchasePlaceControl} label="Nơi mua hàng" errorText='Nơi mua không thể trống' isRequired={false}
           input={
             <Input
               className="text-center"
@@ -426,7 +438,7 @@ export default function UpdateAsset() {
             </Input>
           }
         />,
-        <ControllableInput key={3} control={assetCtrl.vendorControl} label="Nhà cung cấp" errorText='Nhà cung cấp không thể trống'
+        <ControllableInput key={3} control={assetCtrl.vendorControl} label="Nhà cung cấp" errorText='Nhà cung cấp không thể trống' isRequired={false}
           input={
             <>
               <VendorSearchModal
@@ -454,7 +466,7 @@ export default function UpdateAsset() {
 
           }
         />,
-        <ControllableInput key={4} control={assetCtrl.serialNumberControl} label="Số serial" errorText='Số serial không thể trống'
+        <ControllableInput key={4} control={assetCtrl.serialNumberControl} label="Số serial" errorText='Số serial không thể trống' isRequired={false}
           input={
             <Input
               className="text-center"
@@ -505,19 +517,28 @@ export default function UpdateAsset() {
             </Select>
           }
         />,
-        <ControllableInput key={2} control={assetCtrl.locationControl} label="Vị trí" errorText='Vị trí không thể trống'
+        <ControllableInput key={2} control={assetCtrl.locationControl} label="Vị trí" errorText='Vị trí không thể trống' isRequired={false}
           input={
-            <Input
-              className="text-center"
-              size="lg"
-              ref={(el) => (elementsRef.current[inputFieldNameList.location] = el)}
-            >
-              <InputField
-                type="text"
-                placeholder="Nhập vị trí"
-                value={assetCtrl.locationControl.value}
-                onChangeText={assetCtrl.locationControl.onChange} />
-            </Input>
+            <>
+              <LocationUpdateModal
+                showModal={locationModalShow}
+                setShowModal={setLocationModalShow}
+                data={locationListQuery.data?.data.items}
+                pickFn={assetCtrl.locationControl.onChange}
+              />
+              <Input
+                isReadOnly={true}
+                variant="outline"
+                size="lg"
+                onTouchEnd={() => setLocationModalShow(true)}
+                ref={(el) => (elementsRef.current[inputFieldNameList.location] = el)}
+              >
+                <InputField placeholder="Vị trí" value={getLocationName()} />
+                <InputSlot >
+                  <InputIcon className="mr-3" as={ChevronDownIcon} />
+                </InputSlot>
+              </Input>
+            </>
           }
         />,
       ],
@@ -526,7 +547,7 @@ export default function UpdateAsset() {
       key: 'warranty',
       label: 'Bảo hành',
       items: [
-        <ControllableInput key={1} control={assetCtrl.warrantyExpiryDateControl} label="Ngày kết thúc bảo hành" errorText='Ngày kết thúc không thể trống'
+        <ControllableInput key={1} control={assetCtrl.warrantyExpiryDateControl} label="Ngày kết thúc bảo hành" errorText='Ngày kết thúc không thể trống' isRequired={false}
           input={
             <View ref={(el) => (elementsRef.current[inputFieldNameList.warranDate] = el)}>
               <DatePicker

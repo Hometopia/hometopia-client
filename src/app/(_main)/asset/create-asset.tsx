@@ -63,9 +63,9 @@ export default function CreateAsset() {
       purchaseDate: purchaseDateControl.value,
       purchasePlace: purchasePlaceControl.value,
       purchasePrice: Number(deformatNumber(purchasePriceControl.value)),
-      vendor: vendorControl.value,
+      brand: vendorControl.value,
       serialNumber: serialNumberControl.value,
-      location: locationControl.value,
+      locationId: locationControl.value ? locationControl.value : null,
       warrantyExpiryDate: warrantyExpiryDateControl.value,
       documents: documentInfo || null,
       status: statusControl.value,
@@ -197,27 +197,27 @@ export default function CreateAsset() {
     return value !== ""
   })
   const purchasePlaceControl = useFormControl("", (value): boolean => {
-    return value !== ""
+    return true
   })
   const purchasePriceControl = useFormControl("", (value): boolean => {
     return value !== ""
   })
   const vendorControl = useFormControl("", (value): boolean => {
-    return value !== ""
+    return true
   })
   const serialNumberControl = useFormControl("", (value): boolean => {
-    return value !== ""
+    return true
   })
   //
   const statusControl = useFormControl(AssetStatusList[0], (value): boolean => {
     return value !== ""
   })
   const locationControl = useFormControl("", (value): boolean => {
-    return value !== ""
+    return true
   })
   //
   const warrantyExpiryDateControl = useFormControl("", (value): boolean => {
-    return value !== ""
+    return true
   })
   const documentControl = useFormControl("", (value): boolean => {
     return true
@@ -402,21 +402,7 @@ export default function CreateAsset() {
             </View>
           }
         />,
-        <ControllableInput key={1} control={purchasePlaceControl} label="Nơi mua hàng" errorText='Nơi mua không thể trống'
-          input={
-            <Input
-              className="text-center"
-              size="lg"
-              ref={(el) => (elementsRef.current[inputFieldNameList.purPlace] = el)}
-            >
-              <InputField
-                type="text"
-                placeholder="Nhập nơi mua"
-                value={purchasePlaceControl.value}
-                onChangeText={purchasePlaceControl.onChange} />
-            </Input>
-          }
-        />,
+
         <ControllableInput key={2} control={purchasePriceControl} label="Giá mua" errorText='Giá mua không thể trống'
           input={
             <Input className="text-center" size="lg" ref={(el) => (elementsRef.current[inputFieldNameList.purPrice] = el)}>
@@ -435,7 +421,22 @@ export default function CreateAsset() {
             </Input>
           }
         />,
-        <ControllableInput key={3} control={vendorControl} label="Nhà cung cấp" errorText='Nhà cung cấp không thể trống'
+        <ControllableInput key={1} control={purchasePlaceControl} label="Nơi mua hàng" errorText='Nơi mua không thể trống' isRequired={false}
+          input={
+            <Input
+              className="text-center"
+              size="lg"
+              ref={(el) => (elementsRef.current[inputFieldNameList.purPlace] = el)}
+            >
+              <InputField
+                type="text"
+                placeholder="Nhập nơi mua"
+                value={purchasePlaceControl.value}
+                onChangeText={purchasePlaceControl.onChange} />
+            </Input>
+          }
+        />,
+        <ControllableInput key={3} control={vendorControl} label="Nhà cung cấp" errorText='Nhà cung cấp không thể trống' isRequired={false}
           input={
             <>
               <VendorSearchModal
@@ -463,7 +464,7 @@ export default function CreateAsset() {
 
           }
         />,
-        <ControllableInput key={4} control={serialNumberControl} label="Số serial" errorText='Số serial không thể trống'
+        <ControllableInput key={4} control={serialNumberControl} label="Số serial" errorText='Số serial không thể trống' isRequired={false}
           input={
             <Input
               className="text-center"
@@ -515,7 +516,7 @@ export default function CreateAsset() {
             </Select>
           }
         />,
-        <ControllableInput key={2} control={locationControl} label="Vị trí" errorText='Vị trí không thể trống'
+        <ControllableInput key={2} control={locationControl} label="Vị trí" errorText='Vị trí không thể trống' isRequired={false}
           input={
             <Input
               className="text-center"
@@ -536,7 +537,7 @@ export default function CreateAsset() {
       key: 'warranty',
       label: 'Bảo hành',
       items: [
-        <ControllableInput key={1} control={warrantyExpiryDateControl} label="Ngày kết thúc bảo hành" errorText='Ngày kết thúc không thể trống'
+        <ControllableInput key={1} control={warrantyExpiryDateControl} label="Ngày kết thúc bảo hành" errorText='Ngày kết thúc không thể trống' isRequired={false}
           input={
             <View ref={(el) => (elementsRef.current[inputFieldNameList.warranDate] = el)}>
               <DatePicker

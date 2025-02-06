@@ -4,6 +4,8 @@ const AssetStatusList = [
   "MAINTENANCE",
   "RESERVED",
   "BROKEN",
+  'FOR_LOAN',
+  'SOLD'
 ]
 
 const AssetStatusListMapToDisplayText = {
@@ -11,7 +13,9 @@ const AssetStatusListMapToDisplayText = {
   "BROKEN": "Đang hỏng",
   "UNDER_REPAIR": "Đang sửa",
   "MAINTENANCE": "Đang bảo trì",
-  "RESERVED": "Dự phòng"
+  "RESERVED": "Dự phòng",
+  'FOR_LOAN': "Cho mượn",
+  'SOLD': "Đã thanh lý"
 }
 
 const HouseType = [

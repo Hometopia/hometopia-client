@@ -44,9 +44,9 @@ type AssetType = {
   purchaseDate: string,
   purchasePlace: string,
   purchasePrice: number,
-  vendor: string,
+  brand: string,
   serialNumber: string,
-  location: string,
+  locationId: string,
   warrantyExpiryDate: string,
   documents: FileInfoType[] | null,
   status: string,
@@ -56,7 +56,12 @@ type AssetType = {
 
 
 //#endregion
-
+//#region location
+type LocationType = {
+  name: string,
+  images: FileInfoType[]
+}
+//#endregion
 //#region File
 
 //#endregion
@@ -76,8 +81,8 @@ type UsefulLifeType = {
 type ScheduleType = {
   title: string,
   start: string,
-  end: string,
-  vendor: VendorType,
+  end?: string,
+  vendor: VendorType | null,
   cost: number,
   documents: FileInfoType[],
   type: string,
@@ -92,4 +97,5 @@ export {
   AssetType,
   UsefulLifeType,
   ScheduleType,
+  LocationType
 }

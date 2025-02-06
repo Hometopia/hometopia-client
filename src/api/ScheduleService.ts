@@ -5,7 +5,7 @@ import { ScheduleType } from './types/request';
 import { dateToISOString } from '@/helpers/time';
 
 const ScheduleService = {
-  getListSchedule: async (all: boolean, type?: string): Promise<any> => {
+  getListSchedule: async (type?: string): Promise<any> => {
     const filter = type ? `&filter=type==${type}` : ``
     return await axios.get(
       `${BASE_URL}/schedules?all=true${filter}`,
@@ -66,9 +66,9 @@ const ScheduleService = {
       .catch((error) => console.error(error.response.data))
   },
 
-  updateSchedule: async (scheduleData: ScheduleType): Promise<any> => {
+  updateSchedule: async (id: string, scheduleData: ScheduleType): Promise<any> => {
     return await axios.put(
-      `${BASE_URL}/schedules`,
+      `${BASE_URL}/schedules/${id}`,
       scheduleData,
       {
         headers: {

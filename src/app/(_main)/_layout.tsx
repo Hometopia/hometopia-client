@@ -65,6 +65,10 @@ const navigationHeaders = [
     title: "Tạo tài sản mới",
   },
   {
+    slug: "asset-list",
+    title: "Danh sách tài sản"
+  },
+  {
     slug: "create-category",
     title: "Tạo danh mục mới",
   },
@@ -151,8 +155,7 @@ export default function MainLayout() {
           options={({ route }) => ({
             tabBarLabel: undefined,
             title: getHeaderTitle(route, i),
-            tabBarIcon: ({ focused, size, color }) => focused ?
-              <i.icon size={size} color={color} fillRule='nonzero' fill={color} /> : <i.icon size={size} color={color} />
+            tabBarIcon: ({ size, color }) => <i.icon size={size} color={color} />
             ,
           })}
           listeners={({ navigation }) => ({

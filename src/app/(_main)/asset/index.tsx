@@ -4,15 +4,15 @@ import BaseScreenContainer from '@/components/container/BaseScreenContainer'
 import MainContainer from '@/components/container/MainContainer'
 import UpcomingFeaturePopover from '@/components/custom/UpcomingFeaturePopover'
 import { Button, ButtonIcon, ButtonText } from '@/components/ui/button'
-import { BoxIcon, ChevronDownIcon, FilterIcon, HeartIcon, PlusIcon, QrCodeIcon, SearchIcon } from 'lucide-react-native'
-import { router } from 'expo-router'
+import { BoxIcon, ChevronDownIcon, FilterIcon, HeartIcon, Locate, PlusIcon, QrCodeIcon, SearchIcon } from 'lucide-react-native'
+import { Href, router } from 'expo-router'
 import SimpleWidget from '@/components/widget/SimpleWidget'
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input'
 import { Fab, FabIcon, FabLabel } from '@/components/ui/fab'
 import { Text } from '@/components/ui/text'
 import { Icon } from '@/components/ui/icon'
 import { primaryColor } from '@/constants/color'
-import { AssetResponseType, CategoryResponseType, PageResponseType, ResponseBaseType } from '@/api/types/response'
+import { AssetOnListResponseType, AssetResponseType, CategoryResponseType, PageResponseType, ResponseBaseType } from '@/api/types/response'
 import { Image } from '@/components/ui/image'
 import StatusBadge from '@/components/custom/StatusBadge'
 import { AssetStatusList, AssetStatusListMapToDisplayText } from '@/constants/data_enum'
@@ -25,6 +25,12 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CategoryService } from '@/api/CategoryService'
 import { AssetService } from '@/api/AssetService'
 import Loading from '@/components/feedback/Loading'
+import { Menu, MenuItem, MenuItemLabel } from '@/components/ui/menu'
+import { LocationService } from '@/api/LocationService'
+import { getImgUri } from '@/api/FileService'
+import CreateLocationModal from '@/components/custom/CreateLocationModal'
+import ImageAdder from '@/components/custom/Camera'
+import Camera from '@/components/custom/Camera'
 
 const DEFAULT_PAGE_SIZE = 10
 export default function Asset() {
@@ -44,6 +50,11 @@ export default function Asset() {
   const [name, setName] = useState<string>('')
   const [searchInputValue, setSearchInputValue] = useState<string>('')
   const [categoryModalShow, setCategoryModalShow] = useState(false)
+  const [createLocationModalShow, setCreateLocationModalShow] = useState(false)
+  const locationListQuery = useQuery({
+    queryKey: ['locations'],
+    queryFn: () => LocationService.getListLocation()
+  })
   const categoryFullList = useQuery({
     queryKey: ['categoryFullList'],
     queryFn: async () => {
@@ -93,6 +104,7 @@ export default function Asset() {
     return categoryFullList.data?.data.items.find((i: CategoryResponseType) => i.id === category)?.name
   }
 
+
   //
 
   const SearchInput = (
@@ -127,15 +139,37 @@ export default function Asset() {
       {FilterInput}
     </View>
   )
+
+  // const 
   const ActionFab = () => (
-    <Fab
-      className='bg-primary-400 '
-      size="lg"
-      placement="bottom right"
-      onPress={() => router.push('/(_main)/asset/create-asset')}>
-      <FabLabel >Thêm</FabLabel>
-      <FabIcon as={PlusIcon} />
-    </Fab>
+    <Menu
+      placement='top'
+      offset={25}
+      crossOffset={10}
+      trigger={({ ...triggerProps }) => {
+        return (
+          <Fab
+            className='bg-primary-400 '
+            size="lg"
+            placement="bottom right"
+            {...triggerProps}
+          >
+            <FabLabel >Thêm</FabLabel>
+            <FabIcon as={PlusIcon} />
+          </Fab>
+        )
+      }}
+    >
+      <MenuItem key="Add location" textValue="Add location" onPress={() => setCreateLocationModalShow(true)}>
+        <Icon as={Locate} size="lg" className="mr-2" />
+        <MenuItemLabel size="lg">Thêm vị trí</MenuItemLabel>
+      </MenuItem>
+      <MenuItem key="Add asset" textValue="Add asset" onPress={() => router.push('/(_main)/asset/create-asset')}>
+        <Icon as={BoxIcon} size="lg" className="mr-2" />
+        <MenuItemLabel size="lg">Thêm tài sản</MenuItemLabel>
+      </MenuItem>
+    </Menu>
+
   )
 
   const FavouriteList = () => (
@@ -161,9 +195,10 @@ export default function Asset() {
           active={data.pageIndex}
           onChange={setPage} />
       </View>
-      {data.items.map((i: AssetResponseType) =>
+      {data.items.map((i: AssetOnListResponseType) =>
         <AssetCard
           key={i.id}
+          type='list'
           data={i}
           onPress={() => router.push(`/(_main)/asset/${i.id}`)}
           deleteFn={() => deleteAssetMutation.mutate(i.id)} />)}
@@ -235,8 +270,52 @@ export default function Asset() {
       </Select>
     </View>
   )
+
+  const LocationList = (
+    locationListQuery.isPending ?
+      <View className='relative h-40'>
+        <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
+      </View>
+      :
+      <View className='flex flex-col gap-2 pt-4 pb-10 border-t border-outline-50'>
+        <Text className='text-lg text-typography-800 font-semibold'>
+          Vị trí
+        </Text>
+        <View className='flex flex-col gap-2'>
+          {locationListQuery.data.data.items.map((i: any) =>
+            <TouchableOpacity key={i.id}
+              onPress={() => {
+                router.push({
+                  pathname: '/(_main)/asset/asset-list',
+                  params: {
+                    location: i.id
+                  }
+                })
+              }}
+              className='flex flex-row justify-between rounded-xl py-4 px-4 border border-outline-100'>
+              <View className='flex flex-row gap-2'>
+                {i.images !== null ?
+                  <Image
+                    source={{ uri: getImgUri(i.images[0].fileName) }}
+                    className='w-20 h-20 rounded-xl bg-background-100'
+                    alt={`asset-img-${i.id}`}
+                  /> :
+                  <View className='w-20 h-20 rounded-xl bg-background-100' />
+
+                }
+                <Text className='text-md'>{i.name}</Text>
+              </View>
+
+              <Text className='text-md text-info-400'>Nhấp để xem</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
+  )
   return (
     <BaseScreenContainer>
+
       <MainContainer>
         <View className="flex flex-col gap-4 py-4">
           <SimpleWidget className="h-24" label="Tổng số tài sản" number={totalItems} />
@@ -245,6 +324,7 @@ export default function Asset() {
             <CustomFilter filters={Filters} isFiltered={isFiltered} />
           </View>
           {/* {FavouriteList} */}
+          {LocationList}
 
           {assetListQuery.isPending || deleteAssetMutation.isPending ?
             <View className='relative h-40'>
@@ -255,6 +335,14 @@ export default function Asset() {
 
         </View>
       </MainContainer>
+      <CreateLocationModal
+        showModal={createLocationModalShow}
+        setShowModal={(bool: boolean) => {
+          setCreateLocationModalShow(bool)
+          locationListQuery.refetch()
+        }}
+      />
+
       <ActionFab />
     </BaseScreenContainer>
   )

@@ -15,7 +15,7 @@ import { Input, InputField } from "@/components/ui/input";
 export default function Calendar() {
   const scheduleListQuery = useQuery({
     queryKey: ['schedule-list'],
-    queryFn: () => ScheduleService.getListSchedule(true)
+    queryFn: () => ScheduleService.getListSchedule()
   })
 
   return (
@@ -28,7 +28,7 @@ export default function Calendar() {
         />
         :
         <Schedule
-          data={scheduleListQuery.data.data.items}
+          data={scheduleListQuery.data.data.items.filter((i: ScheduleResponseType) => i.vendor !== null)}
           selected={dateToYYYYMMDD(new Date())}
           touchFn={(id: string) => router.push({
             pathname: '/(_main)/calendar/[schedule_details]',

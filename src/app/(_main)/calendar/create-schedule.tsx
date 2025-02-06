@@ -69,7 +69,7 @@ export default function CreateSchedule() {
           case 201:
             {
               successToast.handleToast()
-              router.back()
+              router.navigate(`/(_main)/asset/${asset_id}/${type === ScheduleType.MAINTENANCE ? 'maintenance' : 'fix'}` as Href)
               return
             }
         }
@@ -83,7 +83,7 @@ export default function CreateSchedule() {
   const successToast = CommonToast({
     toast: toast,
     title: "Tạo lịch thành công",
-    description: `Tạo lịch cho ${assetQuery?.data.name}`,
+    description: `Lịch đã được tạo thành công. Bạn có thể xem chi tiết tại mục lịch của bạn`,
     variant: "success"
   })
   const errorToast = CommonToast({
@@ -129,8 +129,8 @@ export default function CreateSchedule() {
     })
   const costControl = useFormControl("", (v) => true)
   const dateControl = useFormControl("", (v) => v !== "")
-  const startControl = useFormControl("", (v) => v !== "")
-  const endControl = useFormControl("", (v) => v !== "")
+  const startControl = useFormControl("", (v) => true)
+  const endControl = useFormControl("", (v) => true)
   const [vendor, setVendor] = useState<VendorType | undefined>(undefined)
   const validateAll = () => {
     titleControl.validate()
@@ -151,6 +151,7 @@ export default function CreateSchedule() {
 
     for (var i: number = 0; i < validArray.length; i++) {
       if (validArray[i] === false) {
+        console.log('kk', i)
         scrollTo(await getOffsetByIndex(i))
         return
       }
@@ -158,8 +159,8 @@ export default function CreateSchedule() {
 
     createScheduleMutation.mutate({
       title: titleControl.value,
-      start: `${dateControl.value}T${startControl.value}`,
-      end: `${dateControl.value}T${endControl.value}`,
+      start: `${dateControl.value}T${startControl.value !== '' ? startControl.value : '07:00:00'}`,
+      end: `${dateControl.value}T${startControl.value !== '' ? startControl.value : '07:00:00'}`,
       vendor: vendor,
       cost: Number(deformatNumber(costControl.value)),
       documents: [],
@@ -259,6 +260,7 @@ export default function CreateSchedule() {
               />
             </Input>
           }
+
         />
 
       }
@@ -292,17 +294,9 @@ export default function CreateSchedule() {
             placeholder='Chọn giờ bắt đầu'
           />
         }
+        isRequired={false}
       />
 
-      <ControllableInput key={'end'} control={endControl} label="Kết thúc" errorText='Giờ kết thúc không thể trống hoặc sớm hơn giờ bắt đầu'
-        input={
-          <TimePicker
-            value={endControl.value}
-            onChange={endControl.onChange}
-            placeholder='Chọn giờ kết thúc'
-          />
-        }
-      />
 
     </View>
   )
@@ -337,10 +331,21 @@ export default function CreateSchedule() {
 
   const ButtonGroup = (
     <View className='flex flex-row gap-4 justify-end'>
-      <Button variant='outline' action='secondary' size='lg'>
+      <Button className='rounded-lg' variant='outline' action='secondary' size='lg'
+        onPress={() => {
+          titleControl.reset()
+          dateControl.reset()
+          startControl.reset()
+          endControl.reset()
+          costControl.reset()
+          setVendor(undefined)
+        }}
+      >
         <ButtonText>Đặt lại</ButtonText>
       </Button>
-      <Button size='lg'
+      <Button
+        className='rounded-lg'
+        size='lg'
         onPress={handleSubmit}
       >
         <ButtonText>Hoàn thành</ButtonText>

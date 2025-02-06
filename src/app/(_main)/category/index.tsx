@@ -1,9 +1,11 @@
 import { CategoryService } from "@/api/CategoryService";
+import { CategoryUpdateType } from "@/api/types/request";
 import { CategoryResponseType, PageResponseType, ResponseBaseType } from "@/api/types/response";
 import BaseScreenContainer from "@/components/container/BaseScreenContainer";
 import MainContainer from "@/components/container/MainContainer";
 import CategoryCard from "@/components/custom/CategoryCard";
 import CategoryPickerModal from "@/components/custom/CategoryPickerModal";
+import CategoryUpdateModal from "@/components/custom/CategoryUpdateModal";
 import CustomFilter from "@/components/custom/CustomFilter";
 import Pagination from "@/components/custom/Pagination";
 import Loading from "@/components/feedback/Loading";
@@ -35,6 +37,7 @@ export default function Categories() {
   const [name, setName] = useState<string>('')
   const [searchInputValue, setSearchInputValue] = useState<string>('')
   const [categoryModalShow, setCategoryModalShow] = useState(false)
+  const [updateModelShow, setUpdateModelShow] = useState(false)
   const categoryFullList = useQuery({
     queryKey: ['categoryFullList'],
     queryFn: () => CategoryService.getAllCategory()
@@ -61,6 +64,13 @@ export default function Categories() {
     onSuccess: (res) => {
       categoryListQuery.refetch()
     },
+  })
+  const updateCategoryMutation = useMutation({
+    mutationFn: ({ id, updateData }: { id: string, updateData: CategoryUpdateType }) => CategoryService.updateCategory(id, updateData),
+    onSuccess: (res) => {
+      categoryListQuery.refetch()
+    },
+    onError: (err) => { }
   })
   const getCategoryName = (id: string): string => {
     return categoryFullList.data?.data.items.find((i: CategoryResponseType) => i.id === id)?.name
@@ -132,11 +142,22 @@ export default function Categories() {
           onChange={setPage} />
       </View>
       {data.items.map((i: CategoryResponseType) =>
-        <CategoryCard
-          key={i.id}
-          data={i}
-          onPress={() => { }}
-          deleteFn={() => deleteCategoryMutation.mutate(i.id)} />)}
+        <View>
+          <CategoryCard
+            key={i.id}
+            data={i}
+            onPress={() => { }}
+            deleteFn={() => deleteCategoryMutation.mutate(i.id)}
+            updateFn={() => setUpdateModelShow(true)}
+          />
+          <CategoryUpdateModal
+            showModal={updateModelShow}
+            setShowModal={setUpdateModelShow}
+            data={i}
+            updateFn={() => { }}
+          />
+        </View>
+      )}
 
     </View>
   )

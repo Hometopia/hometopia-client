@@ -8,14 +8,16 @@ import { Icon } from "@/components/ui/icon";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { ScheduleType } from "@/constants/data_enum";
+import { ScheduleType as ScheduleRequestType } from "@/api/types/request";
 import { parseAdress } from "@/helpers/address";
 import { currencyFormatter } from "@/helpers/currency";
 import { dateToYYYYMMDD, getTime, YYYYMMDDtoLocalDate } from "@/helpers/time";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
 import { ClockIcon, EditIcon, TrashIcon } from "lucide-react-native";
-import React from "react";
+import React, { useState } from "react";
 import { SafeAreaView, ScrollView, View } from "react-native";
+import ScheduleUpdateModal from "@/components/custom/ScheduleUpdateModal";
 
 
 type infoFieldType = {
@@ -48,6 +50,10 @@ export default function AssetFix() {
   const { asset_id } = useLocalSearchParams()
   const queryClient = useQueryClient()
   const [assetQuery, setAssetQuery] = React.useState<ResponseBaseType | undefined>(queryClient.getQueryData(['asset', asset_id]))
+
+  const [showUpdateModal, setShowUpdateModal] = useState(false)
+  const [currentSchedule, setCurrentSchedule] = useState<ScheduleResponseType>()
+
   const historyQuery = useQuery({
     queryKey: ['schedule-history', ScheduleType.REPAIR, asset_id],
     queryFn: () =>
@@ -65,6 +71,18 @@ export default function AssetFix() {
         new Date()
       )
   })
+  const scheduleUpdateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: ScheduleRequestType }) => ScheduleService.updateSchedule(id, data),
+    onSuccess: (res) => {
+      historyQuery.refetch()
+    }
+  })
+  const scheduleDeleteMutation = useMutation({
+    mutationFn: (id: string) => ScheduleService.deleteSchedule(id),
+    onSuccess: (res) => {
+      historyQuery.refetch()
+    }
+  })
   const userProfile: ResponseBaseType | undefined = queryClient.getQueryData(['user'])
 
   const EmptyTable = ({ heads }: { heads: string[] }) => (
@@ -77,28 +95,35 @@ export default function AssetFix() {
       <TableCol head="Ngày" type='text'
         data={data.map(i => YYYYMMDDtoLocalDate(dateToYYYYMMDD(new Date(i.start))))} />
       <TableCol head="Bên cung cấp dịch vụ" type='text'
-        data={data.map(i => i.vendor.name)} />
-      <TableCol head="Thời gian bảo trì" type='text'
-        data={data.map(i => `${getTime(new Date(i.start))} - ${getTime(new Date(i.end))}`)} />
+        data={data.map(i => i.vendor ? i.vendor.name : '')} />
+      {/* <TableCol head="Thời gian bảo trì" type='text'
+        data={data.map(i => `${getTime(new Date(i.start))} - ${getTime(new Date(i.end))}`)} /> */}
       <TableCol head="Chi phí" type='text'
         data={data.map(i => currencyFormatter().format(i.cost))} />
-      <TableCol head="Minh chứng" type='element'
+      {/* <TableCol head="Minh chứng" type='element'
         data={data.map(i => (
           <Button key={i.id} variant='solid' action='primary'>
             <ButtonText>Xem</ButtonText>
           </Button>
-        ))} />
-      <TableCol head="]" type='element'
+        ))} /> */}
+      <TableCol head="" type='element'
         data={data.map(i => (
           <View key={i.id} className="flex flex-row gap-4">
             <Button
-              className="px-3"
+              onPress={() => {
+                setCurrentSchedule(i)
+                setShowUpdateModal(true)
+              }}
+              className="px-3 rounded-xl"
               variant='outline'
               action='primary'>
               <ButtonIcon as={EditIcon} className="text-primary-400" />
             </Button>
             <Button
-              className="px-3"
+              onPress={() => {
+                // scheduleDeleteMutation.mutate(i.id)
+              }}
+              className="px-3 rounded-xl"
               variant='outline'
               action='negative'>
               <ButtonIcon as={TrashIcon} className="text-error-400">
@@ -118,7 +143,7 @@ export default function AssetFix() {
           },
         ]} />
         :
-        <ScrollView className="my-4 px-4">
+        <ScrollView className="my-4 px-4" overScrollMode="never">
           <View className="flex flex-col gap-4">
             {upcomingQuery.isPending ?
               <Skeleton className="h-10 w-full" variant='rounded' />
@@ -136,7 +161,8 @@ export default function AssetFix() {
                     pathname: '/(_main)/calendar/[schedule_details]',
                     params: {
                       schedule_details: upcomingQuery.data.data.items[0].id,
-                      data: JSON.stringify(upcomingQuery.data.data.items[0])
+                      data: JSON.stringify(upcomingQuery.data.data.items[0]),
+                      from: 'asset'
                     }
                   })
                 }}
@@ -181,6 +207,17 @@ export default function AssetFix() {
             </View>
           </View>
         </ScrollView>
+      }
+      {currentSchedule ?
+        <ScheduleUpdateModal
+          showModal={showUpdateModal}
+          setShowModal={setShowUpdateModal}
+          data={currentSchedule as ScheduleResponseType}
+          updateFn={(id: string, data: ScheduleRequestType) => {
+            scheduleUpdateMutation.mutate({ id, data })
+          }}
+        />
+        : null
       }
     </SafeAreaView>
   )

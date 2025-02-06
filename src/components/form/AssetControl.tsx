@@ -27,7 +27,7 @@ export function AssetControl(data: AssetResponseType) {
   const purchasePriceControl = useFormControl(formatNumber(data.purchasePrice.toString()), (value): boolean => {
     return value !== ""
   })
-  const vendorControl = useFormControl(data.vendor, (value): boolean => {
+  const vendorControl = useFormControl(data.brand, (value): boolean => {
     return value !== ""
   })
   const serialNumberControl = useFormControl(data.serialNumber, (value): boolean => {

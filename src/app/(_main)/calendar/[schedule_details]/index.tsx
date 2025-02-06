@@ -9,14 +9,14 @@ import { Menu, MenuItem, MenuItemLabel } from '@/components/ui/menu'
 import { Icon } from '@/components/ui/icon'
 import { Box } from '@/components/ui/box'
 import { dateToYYYYMMDD, getTime, YYYYMMDDtoLocalDate } from '@/helpers/time'
-import { ScheduleTypeName } from '@/constants/data_enum'
+import { ScheduleType, ScheduleTypeName } from '@/constants/data_enum'
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import { extractLatLng } from '@/helpers/map'
 import { Table, TableBody, TableData, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { BR } from '@expo/html-elements'
 
 export default function ScheduleDetails() {
-  const { schedule_details, data } = useLocalSearchParams()
+  const { schedule_details, data, from } = useLocalSearchParams()
   const [parseData, setParseData] = useState<ScheduleResponseType>(JSON.parse(data as string))
   const [coordinator, setCoordinator] = useState(extractLatLng(JSON.parse(data as string).vendor.link))
 
@@ -30,7 +30,12 @@ export default function ScheduleDetails() {
             variant="outline"
             action="default"
             className="border-outline-200 p-2"
-            onPress={() => router.back()}
+            onPress={() => {
+              if (from && from === 'asset')
+                router.navigate(`/(_main)/asset/${parseData.asset.id}/${parseData.type === ScheduleType.MAINTENANCE ? 'maintenance' : 'fix'}` as Href)
+              else
+                router.back()
+            }}
           >
             <ButtonIcon as={ChevronLeftIcon} className="h-6 w-6 text-typography-700" />
           </Button>
@@ -77,7 +82,7 @@ export default function ScheduleDetails() {
             </Text>
           </View>
 
-          <Box className='flex-row gap-2 p-4 bg-background-50/50 rounded-lg self-stretch'>
+          {/* <Box className='flex-row gap-2 p-4 bg-background-50/50 rounded-lg self-stretch'>
             <View className='flex flex-col gap-4'>
               <Text className='text-lg font-medium text-success-300'>Bắt đầu:</Text>
               <Text className='text-lg font-medium text-error-300'>Kết thúc:</Text>
@@ -86,7 +91,7 @@ export default function ScheduleDetails() {
               <Text className='text-lg'>{' ' + getTime(new Date(parseData.start))}</Text>
               <Text className='text-lg'>{' ' + getTime(new Date(parseData.end))}</Text>
             </View>
-          </Box>
+          </Box> */}
           <View className='flex flex-row justify-between self-stretch'>
             <View>
               <Text className='text-lg font-bold'>Tên tài sản</Text>

@@ -1,19 +1,19 @@
 
-import { View, Text, SafeAreaView, ScrollView } from 'react-native'
-import React, { useEffect } from 'react'
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import ImageUploader from '@/components/custom/ImageUploader'
 import { Accordion, AccordionContent, AccordionHeader, AccordionIcon, AccordionItem, AccordionTitleText, AccordionTrigger } from '@/components/ui/accordion'
-import { ChevronDownIcon, ChevronUpIcon, EditIcon, TrashIcon } from 'lucide-react-native'
+import { ChevronDownIcon, ChevronUpIcon, EditIcon, Locate, TrashIcon } from 'lucide-react-native'
 import { Table, TableBody, TableData, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useLocalSearchParams } from 'expo-router'
+import { Link, router, useLocalSearchParams } from 'expo-router'
 import { AssetResponseType, ResponseBaseType } from '@/api/types/response'
 import { currencyFormatter } from '@/helpers/currency'
 import { ISOtoLocal, YYYYMMDDtoLocalDate } from '@/helpers/time'
 import StatusBadge from '@/components/custom/StatusBadge'
 import { AssetStatusList, AssetStatusListMapToDisplayText } from '@/constants/data_enum'
 import AssetInfoDisplay from '@/components/custom/AssetInfoDisplay'
-import { FileService } from '@/api/FileService'
+import { FileService, getImgUri } from '@/api/FileService'
 import { Spinner } from '@/components/ui/spinner'
 import { BASE_URL } from '@/constants/server'
 import { AssetService } from '@/api/AssetService'
@@ -25,50 +25,21 @@ import { dateToYYYYMMDD } from '@/helpers/time';
 import { Button, ButtonIcon, ButtonText } from '@/components/ui/button'
 import useFileSystem from '@/hooks/useFileSystem'
 import { FileInfoType } from '@/api/types/common'
+import LocationUpdateModal from '@/components/custom/LocationPickModal'
+import { LocationService } from '@/api/LocationService'
+import { Image } from '@/components/ui/image'
 
-const truthData = (asset: AssetResponseType) => [
-  {
-    key: 'overview',
-    label: 'Tổng quan',
-    items: [
-      { head: 'Tên', data: asset.name },
-      { head: 'Danh mục', data: `${asset.category.parent.name} > ${asset.category.name}` },
-      { head: 'Mô tả', data: asset.description },
-      { head: 'Tạo vào', data: ISOtoLocal(asset.createdAt) },
-    ],
-  },
-  {
-    key: 'purchase',
-    label: 'Thông tin mua hàng',
-    items: [
-      { head: 'Ngày mua hàng', data: YYYYMMDDtoLocalDate(asset.purchaseDate) },
-      { head: 'Giá mua', data: currencyFormatter().format((asset.purchasePrice)) },
-      { head: 'Nhà cung cấp', data: asset.vendor },
-      { head: 'Số serial', data: asset.serialNumber },
-    ],
-  },
-  {
-    key: 'use',
-    label: 'Thông tin sử dụng',
-    items: [
-      {
-        head: 'Tình trạng', data: <StatusBadge
-          length={AssetStatusList.length}
-          index={AssetStatusList.indexOf(asset.status)}
-          label={AssetStatusListMapToDisplayText[asset.status as keyof typeof AssetStatusListMapToDisplayText]} />
-      },
-      { head: 'Vị trí', data: asset.location },
-    ],
-  },
-]
 
 export default function AssetGeneral() {
+
   const { asset_id } = useLocalSearchParams()
   const queryClient = useQueryClient()
   // const cachedAsset: ResponseBaseType | undefined = queryClient.getQueryData(['asset', asset_id])
 
-  const [assetQuery, setAssetQuery] = React.useState<ResponseBaseType | undefined>(queryClient.getQueryData(['asset', asset_id]))
-  const [isFileUpload, setIsFileUpload] = React.useState<boolean>(false)
+  const [assetQuery, setAssetQuery] = useState<ResponseBaseType | undefined>(queryClient.getQueryData(['asset', asset_id]))
+  const [isFileUpload, setIsFileUpload] = useState<boolean>(false)
+
+  const [showLocationModal, setShowLocationModal] = useState(false)
 
   const { openFile } = useFileSystem()
   //#region feedback
@@ -93,6 +64,11 @@ export default function AssetGeneral() {
     variant: "error"
   })
   //#endregion
+
+  const locationsQuery = useQuery({
+    queryKey: ['locations'],
+    queryFn: () => LocationService.getListLocation()
+  })
 
   const updateAssetMutation = useMutation({
     mutationFn: (payload: AssetType) => AssetService.updateAsset(asset_id as string, payload),
@@ -131,7 +107,92 @@ export default function AssetGeneral() {
     },
     onError: (err) => console.error(err)
   })
+  const truthData = (asset: AssetResponseType) => [
+    {
+      key: 'overview',
+      label: 'Tổng quan',
+      items: [
+        { head: 'Tên', data: asset.name },
+        { head: 'Danh mục', data: `${asset.category.parent.name} > ${asset.category.name}` },
+        { head: 'Mô tả', data: asset.description },
+        { head: 'Tạo vào', data: ISOtoLocal(asset.createdAt) },
+      ],
+    },
+    {
+      key: 'purchase',
+      label: 'Thông tin mua hàng',
+      items: [
+        { head: 'Ngày mua hàng', data: YYYYMMDDtoLocalDate(asset.purchaseDate) },
+        { head: 'Giá mua', data: currencyFormatter().format((asset.purchasePrice)) },
+        { head: 'Nhà cung cấp', data: asset.brand },
+        { head: 'Số serial', data: asset.serialNumber },
+      ],
+    },
+    {
+      key: 'use',
+      label: 'Thông tin sử dụng',
+      items: [
+        {
+          head: 'Tình trạng', data: <StatusBadge
+            length={AssetStatusList.length}
+            index={AssetStatusList.indexOf(asset.status)}
+            label={AssetStatusListMapToDisplayText[asset.status as keyof typeof AssetStatusListMapToDisplayText]} />
+        },
+        {
+          head: 'Vị trí', data:
+            <View className='grow flex flex-row justify-between'>
+              {asset.location !== null ?
+                <TouchableOpacity className='flex flex-row gap-2 items-center py-2 px-4 rounded-lg bg-background-400/10'
+                  onPress={() => {
+                    router.push({
+                      pathname: '/(_main)/asset/asset-list',
+                      params: {
+                        location: asset.location.id,
+                      }
+                    })
+                  }}>
+                  <Text>{asset.location.name}</Text>
+                </TouchableOpacity> :
+                <Text>Chưa có</Text>
+              }
+              {locationsQuery.isFetched && <LocationUpdateModal
+                showModal={showLocationModal}
+                setShowModal={setShowLocationModal}
+                data={locationsQuery.data.data.items}
+                createFn={() => {
+                  locationsQuery.refetch()
+                }}
+                pickFn={(id: string) => {
+                  if (assetQuery?.data.location && id === assetQuery?.data.location.id) return
+                  updateAssetMutation.mutate({
+                    name: assetQuery?.data.name,
+                    description: assetQuery?.data.description,
+                    images: assetQuery?.data.images,
+                    purchaseDate: assetQuery?.data.purchaseDate,
+                    purchasePlace: assetQuery?.data.purchasePlace,
+                    purchasePrice: assetQuery?.data.purchasePrice,
+                    brand: assetQuery?.data.brand,
+                    serialNumber: assetQuery?.data.serialNumber,
+                    locationId: id,
+                    warrantyExpiryDate: assetQuery?.data.warrantyExpiryDate ?
+                      assetQuery?.data.warrantyExpiryDate : null,
+                    documents: assetQuery?.data.documents,
+                    status: assetQuery?.data.status,
+                    maintenanceCycle: assetQuery?.data.maintenanceCycle || null,
+                    categoryId: assetQuery?.data.category.id
+                  } as AssetType)
+                }}
+              />}
 
+              <Button className='rounded-lg' onPress={() => setShowLocationModal(true)}>
+                <ButtonIcon as={Locate} />
+                <ButtonText>Chọn vị trí</ButtonText>
+              </Button>
+            </View>
+        },
+      ],
+    },
+  ]
   return (
     <SafeAreaView className='h-full bg-white relative'>
       {(assetQuery?.data === undefined || updateAssetMutation.isPending) ?
@@ -162,9 +223,9 @@ export default function AssetGeneral() {
                         purchaseDate: assetQuery?.data.purchaseDate,
                         purchasePlace: assetQuery?.data.purchasePlace,
                         purchasePrice: assetQuery?.data.purchasePrice,
-                        vendor: assetQuery?.data.vendor,
+                        brand: assetQuery?.data.brand,
                         serialNumber: assetQuery?.data.serialNumber,
-                        location: assetQuery?.data.location,
+                        locationId: assetQuery?.data.location ? assetQuery?.data.location.id : null,
                         // warrantyExpiryDate: assetQuery?.data.warrantyExpiryDate,
                         warrantyExpiryDate: dateToYYYYMMDD(new Date()),
                         documents: assetQuery?.data.documents,

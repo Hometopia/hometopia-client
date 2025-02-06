@@ -36,22 +36,8 @@ type UserProfileResponseType = {
 }
 //#endregion
 
+
 //#region Asset
-type AssetListResponseType = {
-  currentItemCount: number,
-  itemsPerPage: number,
-  totalItems: number,
-  pageIndex: number,
-  totalPages: number,
-  items: {
-    id: string,
-    name: string,
-    description: string,
-    status: string,
-    images: FileInfoType[],
-    category: CategoryInAssetResponseType,
-  }[]
-}
 
 type AssetResponseType = {
   id: string,
@@ -63,9 +49,9 @@ type AssetResponseType = {
   purchaseDate: string,
   purchasePlace: string,
   purchasePrice: number,
-  vendor: string,
+  brand: string,
   serialNumber: string,
-  location: string,
+  location: LocationResponseType,
   warrantyExpiryDate: string,
   documents: FileInfoType[],
   status: string,
@@ -73,9 +59,19 @@ type AssetResponseType = {
   category: CategoryInAssetResponseType
 }
 
+type AssetOnListResponseType = {
+  id: string,
+  name: string,
+  description: string,
+  images: FileInfoType[],
+  location: LocationResponseType,
+  status: string,
+  category: CategoryInAssetResponseType
+}
+
 type AssetLifecycleType = {
   id: string,
-  createdAt: string,
+  timestamp: string,
   description: string
 }
 type AssetLifecycleResponseType = {
@@ -110,6 +106,13 @@ type RootCategoryResponseType = {
 }
 //#endregion
 
+//#region location
+type LocationResponseType = {
+  id: string,
+  name: string,
+  images: FileInfoType[]
+}
+//#endregion
 
 //#region file
 type FileUploadResponseType = {
@@ -159,12 +162,22 @@ type MonthCostStatisticType = {
 }
 //#endregion
 
+//#region depreciation
+type DepreciationItemType = {
+  year: number,
+  value: number,
+}
+type DepreciationType = {
+  straightLineDepreciation: DepreciationItemType[],
+  decliningBalanceDepreciation: DepreciationItemType[],
+}
+//#endregion
+
 export {
   ResponseBaseType,
   PageResponseType,
   AddressType,
   UserProfileResponseType,
-  AssetListResponseType,
   AssetResponseType,
   CategoryInAssetResponseType,
   RootCategoryResponseType,
@@ -173,4 +186,8 @@ export {
   AssetLifecycleResponseType,
   AssetLifecycleType,
   ScheduleResponseType,
+  LocationResponseType,
+  AssetOnListResponseType,
+  DepreciationItemType,
+  DepreciationType
 }

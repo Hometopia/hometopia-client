@@ -9,11 +9,11 @@ import { getYear } from 'date-fns'
 import { StatisticService } from '@/api/StatisticService'
 import Loading from '@/components/feedback/Loading'
 import { barDataItem } from 'react-native-gifted-charts'
-import { MonthName } from '@/constants/data_enum'
+import { MonthName, ScheduleType } from '@/constants/data_enum'
 import { primaryColor } from '@/constants/color'
 import { AssetService } from '@/api/AssetService'
 import { CategoryService } from '@/api/CategoryService'
-import { AssetListResponseType, AssetResponseType } from '@/api/types/response'
+import { AssetResponseType } from '@/api/types/response'
 import { Href, router } from 'expo-router'
 
 const backupPredictData = {
@@ -34,29 +34,46 @@ const backupPredictData = {
 export default function Dashboard() {
 
   const [total, setTotal] = useState<number>(0)
-
-  const costByMonthQuery = useQuery({
-    queryKey: ['cost-statistic', 'month', getYear(new Date())],
-    queryFn: () => StatisticService.getCostStatisticsByMonth(getYear(new Date()).toString())
+  const overralStatisticQuery = useQuery({
+    queryKey: ['overral-statistic'],
+    queryFn: StatisticService.getOverralStatistics
   })
-  const assetListQuery = useQuery({
-    queryKey: ['assetFullList'],
-    queryFn: async () => {
-      const res = await AssetService.getAllAsset()
-      if (total === 0) {
-        setTotal(0)
-        await res.data.items.forEach(async (i: any) => {
-          const asset = await AssetService.getAsset(i.id)
-          if (asset) {
-            setTotal(prev => prev + asset.data.purchasePrice)
-          }
-        })
-      }
-
-
-      return res
-    }
+  const maintenanceCostByMonthQuery = useQuery({
+    queryKey: ['cost-statistic', 'month', getYear(new Date()), 'MAINTENANCE'],
+    queryFn: () => StatisticService.getCostStatisticsByMonth(
+      getYear(new Date()).toString(),
+      'MAINTENANCE'
+    )
   })
+  const repairCostByMonthQuery = useQuery({
+    queryKey: ['cost-statistic', 'month', getYear(new Date()), 'REPAIR'],
+    queryFn: () => StatisticService.getCostStatisticsByMonth(
+      getYear(new Date()).toString(),
+      'REPAIR'
+    )
+  })
+  // const assetCostByYearQuery = useQuery({
+  //   queryKey: ['asset']
+  // })
+
+  // const assetListQuery = useQuery({
+  //   queryKey: ['assetFullList'],
+  //   queryFn: async () => {
+  //     const res = await AssetService.getAllAsset()
+  //     if (total === 0) {
+  //       setTotal(0)
+  //       await res.data.items.forEach(async (i: any) => {
+  //         const asset = await AssetService.getAsset(i.id)
+  //         if (asset) {
+  //           setTotal(prev => prev + asset.data.purchasePrice)
+  //         }
+  //       })
+  //     }
+
+
+  //     return res
+  //   }
+  // })
   const categoryListQuery = useQuery({
     queryKey: ['categoryList', 1, 10, '', ''],
     queryFn: () => CategoryService.getCategoryList(1, 10, '', '')
@@ -66,8 +83,8 @@ export default function Dashboard() {
     <View className='flex flex-col p-4 rounded-xl bg-background-400/10'>
       <View className='flex flex-row gap-2 items-end'>
         <Text className='text-md font-bold text-typography-600'>Tổng số tài sản hiện có:</Text>
-        {assetListQuery.isFetched &&
-          <Text className='text-lg font-bold text-primary-400'>{assetListQuery.data.data.totalItems}</Text>}
+        {overralStatisticQuery.isFetched &&
+          <Text className='text-lg font-bold text-primary-400'>{overralStatisticQuery.data.data.totalAssets}</Text>}
 
       </View>
       <View className='flex flex-row gap-2 items-end'>
@@ -81,54 +98,69 @@ export default function Dashboard() {
     <View className='flex flex-col gap-2 my-4 px-4 py-6 items-center rounded-2xl bg-primary-400/10'>
       <Text className='text-lg text-center text-typography-600'>Tổng giá trị của toàn bộ tài sản</Text>
       <Text className='text-2xl text-primary-400 font-bold'>
-        {assetListQuery.isFetched &&
-          currencyFormatter().format(total)}
+        {overralStatisticQuery.isFetched &&
+          currencyFormatter().format(overralStatisticQuery.data.data.totalValueOfAllAssets)}
       </Text>
     </View>
   )
+
+  //
+  const monthBarData = (data: any) => {
+    return Object.entries(data).filter(([label, value]) => label !== 'total')
+  }
   const CostStatistic = (
     <View className='flex flex-col gap-2 my-2'>
       <Text className='text-lg font-semibold'>Thống kê chi phí</Text>
-      <Text className='text-md'>Thống kê chi phí bảo trì/ sửa chữa trong năm</Text>
-      {costByMonthQuery.isPending ?
+      <View className='flex flex-row gap-2 items-center justify-between'>
+        <Text className='text-md'>Thống kê chi phí bảo trì trong năm</Text>
+        <Text className='text-md'>
+          Tổng: {maintenanceCostByMonthQuery.isPending ? '...' :
+            currencyFormatter().format(maintenanceCostByMonthQuery.data.data.total)}
+        </Text>
+      </View>
+      {maintenanceCostByMonthQuery.isPending ?
         <View className='h-60 flex justify-center items-center'>
           <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
         </View>
         :
-        <Bar data={Object.entries(costByMonthQuery.data.data).map(([label, value]) => {
-          const tranflabel = MonthName[label as keyof typeof MonthName]
-          return ({
-            label: tranflabel,
-            value: value,
-            topLabelComponent: () => (
-              <Text className='text-lg'>{Number(value) / 1000}</Text>
-            ),
-            frontColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.4)`
-          } as barDataItem)
-        })} />
+        <TouchableOpacity
+        >
+          <Bar data={monthBarData(maintenanceCostByMonthQuery.data.data).map(([label, value]) => {
+            const tranflabel = MonthName[label as keyof typeof MonthName]
+            return ({
+              label: tranflabel,
+              value: value,
+              topLabelComponent: () => (
+                <Text className='text-lg'>{Number(value) / 1000}</Text>
+              ),
+              frontColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.4)`
+            } as barDataItem)
+          })} />
+        </TouchableOpacity>
+
       }
 
     </View>
   )
-  const PredictCost = (
-    <View className='flex flex-col gap-2 my-2'>
-      <Text className='text-lg font-semibold'>Dự báo chi phí</Text>
-      <Text className='text-md'>Dự báo chi phí bảo trì trong thời gian tới</Text>
-      <Bar data={Object.entries(backupPredictData).map(([label, value]) => {
-        const tranflabel = MonthName[label as keyof typeof MonthName]
-        return ({
-          label: tranflabel,
-          value: value,
-          topLabelComponent: () => (
-            <Text className='text-lg'>{Number(value) / 1000}</Text>
-          ),
-          // frontColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.4)`
-        } as barDataItem)
-      })} />
+  // const PredictCost = (
+  //   <View className='flex flex-col gap-2 my-2'>
+  //     <Text className='text-lg font-semibold'>Dự báo chi phí</Text>
+  //     <Text className='text-md'>Dự báo chi phí bảo trì trong thời gian tới</Text>
+  //     <Bar data={Object.entries(backupPredictData).map(([label, value]) => {
+  //       const tranflabel = MonthName[label as keyof typeof MonthName]
+  //       return ({
+  //         label: tranflabel,
+  //         value: value,
+  //         topLabelComponent: () => (
+  //           <Text className='text-lg'>{Number(value) / 1000}</Text>
+  //         ),
+  //         // frontColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.4)`
+  //       } as barDataItem)
+  //     })} />
 
 
-    </View>
-  )
+  //   </View>
+  // )
   return (
     <BaseScreenContainer>
       <MainContainer>
@@ -148,7 +180,7 @@ export default function Dashboard() {
               </TouchableOpacity>
             </View>
             {CostStatistic}
-            {PredictCost}
+            {/* {PredictCost} */}
           </View>
         </View>
       </MainContainer>

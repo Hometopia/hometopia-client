@@ -15,7 +15,7 @@ export default function Bar({
         if ((i.value > max)) max = i.value
       }
     })
-    return (max * 1.2) / 1000
+    return (max * 2) / 1000
   }
   return (
     <View>

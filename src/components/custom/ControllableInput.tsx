@@ -21,7 +21,7 @@ export default function ControllableInput({
   return (
     <FormControl
       isRequired={isRequired}
-      isInvalid={!control.isValid}
+      isInvalid={isRequired ? !control.isValid : false}
     >
       <FormControlLabel>
         <FormControlLabelText className="text-md text-typography-500">

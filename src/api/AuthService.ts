@@ -11,8 +11,8 @@ const AuthService = {
       {
         username: formData.username,
         password: formData.password,
-        client_id: process.env.EXPO_PUBLIC_CLIENT_ID || 'client-id',
-        client_secret: process.env.EXPO_PUBLIC_CLIENT_SECRET || 'client-secret',
+        client_id: process.env.EXPO_PUBLIC_CLIENT_ID || 'TEQJRvxLkbny0hHAGsSYDrEDrsmMPh3n',
+        client_secret: process.env.EXPO_PUBLIC_CLIENT_SECRET || 'hometopia-client',
         grant_type: 'password'
       },
       {
@@ -93,17 +93,18 @@ const AuthService = {
             return true
           }
           default: {
-            console.log(res.data)
+            // console.log(res.data)
             return false
           }
         }
       })
       .catch((error) => {
-        if (error.response.data.status === 401) {
+        return false
+        if (error.response.status === 401) {
           return false
         }
         else {
-          console.error(error.response.data)
+          console.error(error)
         }
       })
   },

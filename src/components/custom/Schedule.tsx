@@ -34,6 +34,8 @@ export default function Schedule({ data, selected, touchFn }: SchedulePropsType)
   const [items, setItems] = React.useState<CustomAgendaSchedule>(responseToAgendaType(data));
 
   const renderItem = (item: ScheduleResponseType) => {
+    if (item.vendor === null)
+      return null
     return (
       <TouchableOpacity
         style={{ marginRight: 16, marginTop: 16 }}
@@ -43,12 +45,12 @@ export default function Schedule({ data, selected, touchFn }: SchedulePropsType)
           <View className='flex flex-col gap-2'>
             <View className='flex flex-col gap-2 items-start'>
               <Text className='text-2xl font-semibold pb-2'>{item.title}</Text>
-              <View className='px-4 py-1 rounded-full bg-primary-400/15 flex flex-row gap-2 items-center self-start'>
+              {/* <View className='px-4 py-1 rounded-full bg-primary-400/15 flex flex-row gap-2 items-center self-start'>
                 <Icon as={ClockIcon} size='md' className='text-primary-400' />
                 <Text className='text-md font-normal text-primary-300'>
                   {getTime(new Date(item.start))} - {getTime(new Date(item.end))}
                 </Text>
-              </View>
+              </View> */}
               <View className='px-4 py-1 rounded-full bg-warning-400/15 flex flex-row gap-2 items-center self-start'>
                 <Text className='text-md font-normal text-warning-400'>
                   {ScheduleTypeName[item.type as keyof typeof ScheduleTypeName]}

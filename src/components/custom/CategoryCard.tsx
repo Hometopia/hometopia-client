@@ -2,14 +2,15 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { CategoryResponseType } from '@/api/types/response'
 import { Icon } from '../ui/icon'
-import { HeartIcon, Trash2Icon } from 'lucide-react-native'
+import { Edit2Icon, HeartIcon, Trash2Icon } from 'lucide-react-native'
 type CategoryCardPropsType = {
   data: CategoryResponseType,
   onPress: () => void,
-  deleteFn: () => void
+  deleteFn: () => void,
+  updateFn: () => void
 }
 export default function CategoryCard({
-  data, onPress, deleteFn
+  data, onPress, deleteFn, updateFn
 }: CategoryCardPropsType) {
   const [longPress, setLongPress] = useState<boolean>(false)
   const [fav, setFav] = useState<boolean>(false)
@@ -17,9 +18,14 @@ export default function CategoryCard({
   const [cannotDelete, setCannotDelete] = useState<boolean>(false)
   const Overlay = (
     <TouchableOpacity
-      className='absolute bg-background-0/70 z-50 top-0 left-0 w-full h-full flex flex-row justify-center items-center'
+      className='absolute bg-background-0/70 z-50 top-0 left-0 w-full h-full flex flex-row gap-2 justify-center items-center'
       onPress={() => setLongPress(false)}
     >
+      <TouchableOpacity
+        className='p-4 flex justify-center items-center border border-info-400 rounded-md'
+        onPress={updateFn}>
+        <Icon as={Edit2Icon} className='text-info-400 w-6 h-6' />
+      </TouchableOpacity>
       {cannotDelete ?
         <Text className='text-error-400'>Không thể xóa</Text>
         :

@@ -13,11 +13,16 @@ const useFormControl = (initialValue: string = "", validateFn: (value: string) =
     setIsValid(prev => prev = validateFn(value))
   }
 
+  const reset = () => {
+    setValue(initialValue)
+  }
+
   return {
     value,
     isValid,
     onChange,
     validate,
+    reset
   }
 }
 
