@@ -23,6 +23,7 @@ const ClassificationService = {
         return error.response.data
       })
   }
+
 }
 
 export { ClassificationService }

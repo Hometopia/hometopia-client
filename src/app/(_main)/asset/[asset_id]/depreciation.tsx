@@ -20,23 +20,6 @@ export default function AssetDepreciation() {
   const queryClient = useQueryClient()
 
   const [assetQuery, setAssetQuery] = React.useState<ResponseBaseType | undefined>(queryClient.getQueryData(['asset', asset_id]))
-  const [table, setTable] = React.useState<DepreciationTableItem[] | undefined>(undefined)
-  const predictCategoryQuery = useQuery({
-    queryKey: ['predict-category', assetQuery?.data?.images[0].fileName],
-    queryFn: async () => {
-      const res = await ClassificationService.getPredictCategoryByImg(assetQuery?.data?.images[0].fileName as string)
-      return {
-        prediction: res.prediction
-      }
-    },
-    enabled: !!assetQuery?.data
-  })
-
-  const usefulLifeQuery = useQuery({
-    queryKey: ['useful-life', asset_id],
-    queryFn: () => RuleService.getUsefulLife(predictCategoryQuery.data?.prediction),
-    enabled: predictCategoryQuery.isFetched
-  })
 
   const depreciationQuery = useQuery({
     queryKey: ['depreciation', asset_id],

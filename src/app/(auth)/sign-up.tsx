@@ -12,6 +12,8 @@ import LogoFull from "@/components/custom/LogoFull";
 import useFormControl from "@/hooks/useFormControl";
 import { isValidEmail, isValidPassword } from "@/helpers/validation";
 import useFormSubmit from "@/hooks/useFormSubmit";
+import { AuthService } from "@/api/AuthService";
+import { LoginForm, RegisterForm } from "@/api/types/request";
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
@@ -42,16 +44,34 @@ export default function SignUp() {
     passwordControl.validate()
   }
 
-  const goToNextStep = () => {
+  const goToNextStep = async () => {
     if (
       firstNameControl.isValid &&
       lastNameControl.isValid &&
       emailControl.isValid &&
       passwordControl.isValid
     ) {
-      router.navigate(
-        `/(auth)/address?firstName=${firstNameControl.value}&lastName=${lastNameControl.value}&email=${emailControl.value}&password=${passwordControl.value}`
-      )
+      let res = await AuthService.signUp({
+        "username": emailControl.value,
+        "firstName": firstNameControl.value,
+        "lastName": lastNameControl.value,
+        "email": emailControl.value,
+        "password": passwordControl.value,
+      } as RegisterForm)
+
+      if (res.status == 201) {
+        let isLogin = await AuthService.signIn({
+          username: emailControl.value,
+          password: passwordControl.value,
+        } as LoginForm)
+
+        if (isLogin) {
+          router.replace('/')
+        }
+        else {
+
+        }
+      }
     }
   }
 

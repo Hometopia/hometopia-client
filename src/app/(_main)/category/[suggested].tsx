@@ -5,7 +5,7 @@ import { ChevronLeftIcon, SearchIcon } from 'lucide-react-native'
 import { router, useLocalSearchParams, usePathname } from 'expo-router'
 import InputChip from '@/components/custom/InputChip'
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CategoryService } from '@/api/CategoryService'
 import { HouseTypeName } from '@/constants/data_enum'
 import Loading from '@/components/feedback/Loading'
@@ -66,6 +66,8 @@ export default function SuggestedCategories() {
   const currentPath = usePathname()
   const { suggested } = useLocalSearchParams()
 
+  const queryClient = useQueryClient()
+
   //#region feedback
   const toast = useToast()
   const successToast = CommonToast({
@@ -101,7 +103,10 @@ export default function SuggestedCategories() {
           case 201:
             {
               successToast.handleToast()
-              router.replace('/(nav)/categories')
+              queryClient.refetchQueries({
+                queryKey: ['categoryFullList']
+              })
+              router.replace('/(_main)/category')
               return
             }
         }
@@ -133,7 +138,7 @@ export default function SuggestedCategories() {
   const Item = ({ item }: { item: any }) => (
     <TouchableOpacity
       style={{ marginBottom: 8 }}
-      className='w-auto px-4 py-2 flex flex-row justify-center border border-outline-100'
+      className='w-auto px-4 py-2 rounded-lg flex flex-row justify-center border border-outline-100'
       onPress={() => handleListItemChoosing({
         name: item.name,
         description: '',
@@ -201,7 +206,7 @@ export default function SuggestedCategories() {
                 overScrollMode='never'
               ></FlatList>
               <Button
-                className='self-stretch'
+                className='self-stretch rounded-lg'
                 action="primary"
                 size="xl"
                 onPress={handleSubmit}

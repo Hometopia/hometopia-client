@@ -285,6 +285,7 @@ export default function Asset() {
           {locationListQuery.data.data.items.map((i: any) =>
             <TouchableOpacity key={i.id}
               onPress={() => {
+                // console.log(i.images[0].fileName)
                 router.push({
                   pathname: '/(_main)/asset/asset-list',
                   params: {
@@ -294,14 +295,13 @@ export default function Asset() {
               }}
               className='flex flex-row justify-between rounded-xl py-4 px-4 border border-outline-100'>
               <View className='flex flex-row gap-2'>
-                {i.images !== null ?
+                {i.images !== null && i.images.length != 0 ?
                   <Image
                     source={{ uri: getImgUri(i.images[0].fileName) }}
                     className='w-20 h-20 rounded-xl bg-background-100'
                     alt={`asset-img-${i.id}`}
                   /> :
                   <View className='w-20 h-20 rounded-xl bg-background-100' />
-
                 }
                 <Text className='text-md'>{i.name}</Text>
               </View>

@@ -101,8 +101,9 @@ const CategoryService = {
   },
 
   updateCategory: async (id: string, updateData: CategoryUpdateType): Promise<any> => {
+
     return await axios.put(
-      `${BASE_URL}/categories`,
+      `${BASE_URL}/categories/${id}`,
       updateData,
       {
         headers: {

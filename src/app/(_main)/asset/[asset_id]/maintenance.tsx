@@ -15,9 +15,9 @@ import { ScheduleType } from "@/constants/data_enum";
 import { currencyFormatter } from "@/helpers/currency";
 import { calcDuration, dateToISOString, dateToYYYYMMDD, getTime, YYYYMMDDtoLocalDate } from "@/helpers/time";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router, useLocalSearchParams } from "expo-router";
+import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { ClockIcon, EditIcon, TrashIcon } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Alert, SafeAreaView, ScrollView, View } from "react-native";
 const totalOf = (arr: number[]) => {
   var total = 0
@@ -40,12 +40,13 @@ const data = (assetData: AssetResponseType, history: ScheduleResponseType[]) => 
 
   {
     head: 'Chu kỳ bảo trì',
-    data: assetData.maintenanceCycle !== null ? `${assetData.maintenanceCycle} năm` : 'Không có'
+    data: assetData.maintenanceCycle !== null ? `${assetData.maintenanceCycle} tháng` : 'Không có'
   },
 ]
 
 export default function AssetMaintenance() {
   const { asset_id } = useLocalSearchParams()
+
   const queryClient = useQueryClient()
 
   const [assetQuery, setAssetQuery] = React.useState<ResponseBaseType | undefined>(queryClient.getQueryData(['asset', asset_id]))
@@ -68,7 +69,8 @@ export default function AssetMaintenance() {
         asset_id as string,
         ScheduleType.MAINTENANCE,
         new Date()
-      )
+      ),
+
   })
   const scheduleUpdateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string, data: ScheduleRequestType }) => ScheduleService.updateSchedule(id, data),
@@ -79,7 +81,7 @@ export default function AssetMaintenance() {
   const scheduleDeleteMutation = useMutation({
     mutationFn: (id: string) => ScheduleService.deleteSchedule(id),
     onSuccess: (res) => {
-      historyQuery.refetch()
+      upcomingQuery.refetch()
     }
   })
   // const maintenanceQuery = useQuery({
@@ -123,7 +125,7 @@ export default function AssetMaintenance() {
             </Button>
             <Button
               onPress={() => {
-                // scheduleDeleteMutation.mutate(i.id)
+                scheduleDeleteMutation.mutate(i.id)
               }}
               className="px-3 rounded-xl"
               variant='outline'
@@ -159,6 +161,9 @@ export default function AssetMaintenance() {
                   }
                 })}
                 lookFn={() => {
+                  queryClient.invalidateQueries({
+                    queryKey: ['schedule-upcoming', ScheduleType.MAINTENANCE, asset_id]
+                  })
                   router.push({
                     pathname: '/(_main)/calendar/[schedule_details]',
                     params: {
@@ -166,6 +171,9 @@ export default function AssetMaintenance() {
                       data: JSON.stringify(upcomingQuery.data.data.items[0])
                     }
                   })
+                }}
+                cancelFn={() => {
+                  scheduleDeleteMutation.mutate(upcomingQuery.data.data.items[0].id)
                 }}
               />
             }

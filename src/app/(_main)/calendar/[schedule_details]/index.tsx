@@ -14,16 +14,25 @@ import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import { extractLatLng } from '@/helpers/map'
 import { Table, TableBody, TableData, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { BR } from '@expo/html-elements'
+import ScheduleDetailUpdateModal from '@/components/custom/ScheduleDetailUpdateModal'
 
 export default function ScheduleDetails() {
   const { schedule_details, data, from } = useLocalSearchParams()
   const [parseData, setParseData] = useState<ScheduleResponseType>(JSON.parse(data as string))
   const [coordinator, setCoordinator] = useState(extractLatLng(JSON.parse(data as string).vendor.link))
 
+  const [showModal, setShowModal] = useState(false)
+
 
   // const 
   return (
     <SafeAreaView className="h-full bg-white">
+      <ScheduleDetailUpdateModal
+        showModal={showModal}
+        setShowModal={setShowModal}
+        data={parseData}
+        updateFn={() => { }}
+      />
       <ScrollView className='pb-2 px-4' overScrollMode='never'>
         <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-between">
           <Button
@@ -58,7 +67,7 @@ export default function ScheduleDetails() {
               );
             }}
           >
-            <MenuItem key="Edit" textValue="Edit">
+            <MenuItem key="Edit" textValue="Edit" onPress={() => setShowModal(true)}>
               <Icon as={EditIcon} size="md" className="mr-2" />
               <MenuItemLabel size="lg">Chỉnh sửa</MenuItemLabel>
             </MenuItem>

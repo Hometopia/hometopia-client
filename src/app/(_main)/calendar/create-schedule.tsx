@@ -46,7 +46,8 @@ export default function CreateSchedule() {
   const assetQuery: ResponseBaseType | undefined = queryClient.getQueryData(['asset', asset_id])
   const predictCategoryQuery = useQuery({
     queryKey: ['predict-category', asset_id],
-    queryFn: () => ClassificationService.getPredictCategoryByImg(assetQuery?.data?.images[0].fileName as string)
+    queryFn: () => ClassificationService.getPredictCategoryByImg(assetQuery?.data?.images[0].fileName as string),
+    enabled: assetQuery !== undefined
   })
 
   const vendorsQuery = useQuery({
@@ -162,7 +163,7 @@ export default function CreateSchedule() {
       start: `${dateControl.value}T${startControl.value !== '' ? startControl.value : '07:00:00'}`,
       end: `${dateControl.value}T${startControl.value !== '' ? startControl.value : '07:00:00'}`,
       vendor: vendor,
-      cost: Number(deformatNumber(costControl.value)),
+      cost: costControl.value !== '' ? Number(deformatNumber(costControl.value)) : undefined,
       documents: [],
       type: type,
       assetId: asset_id
@@ -363,7 +364,7 @@ export default function CreateSchedule() {
         <ScrollView className='px-4' overScrollMode='never'>
           <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-between">
             <BackButton backFn={() => {
-              router.navigate('/(_main)/calendar/' as Href)
+              router.navigate(`/(_main)/asset/${asset_id}/${type === ScheduleType.MAINTENANCE ? 'maintenance' : 'fix'}` as Href)
             }} />
           </View>
           <View className='flex flex-col gap-4 py-4'>

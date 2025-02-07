@@ -67,7 +67,7 @@ export default function CreateCategory() {
           case 201:
             {
               successToast.handleToast()
-              queryClient.refetchQueries({ queryKey: ['category-list'] })
+              queryClient.refetchQueries({ queryKey: ['categoryFullList'] })
               router.back()
               return
             }
@@ -105,6 +105,12 @@ export default function CreateCategory() {
       subCategories: []
     } as CategoryType)
 
+  }
+
+  const resetForm = () => {
+    nameControl.reset()
+    descControl.reset()
+    parentControl.reset()
   }
 
   const { handleSubmit } = useFormSubmit(validateAll, goToNextStep)
@@ -193,14 +199,16 @@ export default function CreateCategory() {
 
           <View className='flex flex-row gap-4 mt-4 mb-4 justify-end'>
             <Button
+              className='rounded-lg'
               variant='outline'
               action='secondary'
               size='lg'
-            // onPress={resetForm}
+              onPress={resetForm}
             >
               <ButtonText>Đặt lại</ButtonText>
             </Button>
             <Button
+              className='rounded-lg'
               variant='solid'
               action='primary'
               size='lg'

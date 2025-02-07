@@ -37,6 +37,15 @@ export default function CategoryPickerModal(
     }
   }
 
+  const RenderItem = ({ item, onPress }: { item: CategoryResponseType | null, onPress: Function }) => (
+    <TouchableOpacity
+      className='w-auto mb-4 px-4 py-2 flex flex-row justify-center border border-outline-100 rounded-lg'
+      onPress={() => onPress()}
+    >
+      <Text className='text-lg'>{item ? item.name : 'Không có'}</Text>
+    </TouchableOpacity>
+  )
+
 
   return (
     <Modal
@@ -47,7 +56,7 @@ export default function CategoryPickerModal(
       size="md"
     >
       <ModalBackdrop />
-      <ModalContent>
+      <ModalContent className='rounded-xl'>
         <ModalHeader>
           <Text className="text-typography-900 text-lg font-medium">
             Chọn danh mục
@@ -74,50 +83,41 @@ export default function CategoryPickerModal(
         </View>
         {children === undefined ?
           <FlatList
-            className='h-[240px] '
+            className='h-[240px]'
             overScrollMode='never'
-            data={parentList}
+            data={type === 'parent' ? [null, ...(parentList || [])] : parentList}
             renderItem={({ item }) => (
-              <TouchableOpacity
-                style={{ marginBottom: 8 }}
-                className='w-auto px-4 py-2 flex flex-row justify-center border border-outline-100'
-                onPress={() => handleParentCategoryPicked(item.id)}
-              >
-                <Text className='text-lg'>{item.name}</Text>
-              </TouchableOpacity>
+              <RenderItem item={item} onPress={() => {
+                if (item) handleParentCategoryPicked(item.id)
+                else {
+                  pickFn(null)
+                  setShowModal(false)
+                }
+              }} />
             )}
-            keyExtractor={item => item.id}
+            keyExtractor={item => item ? item.id : 'key-blank'}
           /> :
           <FlatList
-            className='h-[240px] '
+            className='h-[240px]'
             overScrollMode='never'
             data={children}
             renderItem={({ item }) => (
-              <TouchableOpacity
-                style={{ marginBottom: 8 }}
-                className='w-auto px-4 py-2 flex flex-row justify-center border border-outline-100'
-                onPress={() => {
-                  pickFn(item.id)
-                  setShowModal(false)
-                }}
-              >
-                <Text className='text-lg'>{item.name}</Text>
-              </TouchableOpacity>
+              <RenderItem item={item} onPress={() => {
+                pickFn(item.id)
+                setShowModal(false)
+              }} />
             )}
             keyExtractor={item => item.id}
           />
         }
-        <Button
-          className='mt-4'
-          variant='solid'
-          action='primary'
-          size='lg'
+        <TouchableOpacity
+          className='mt-4 flex flex-row justify-center p-2 rounded-lg bg-primary-400/10'
           onPress={() => {
             pickFn('')
             setShowModal(false)
           }}>
-          <ButtonText>Bỏ chọn</ButtonText>
-        </Button>
+          <Text className='text-lg font-bold text-primary-400'>Bỏ chọn</Text>
+        </TouchableOpacity>
 
         {/* </ModalBody> */}
       </ModalContent>

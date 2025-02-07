@@ -43,15 +43,8 @@ export default function CategoryCard({
       }
     </TouchableOpacity>
   )
-
-  const FavouriteButton = () => (
-    <TouchableOpacity className='p-2' onPress={() => setFav(!fav)}>
-      <HeartIcon className='w-5 h-5' color={`#D4003F`} fill={fav ? `#D4003F` : `rgba(0,0,0,0.0)`} />
-    </TouchableOpacity>
-  )
   return (
     <View className='relative'>
-      {longPress && Overlay}
       <TouchableOpacity
         className='flex flex-row gap-4 py-4 px-4 rounded-3xl border border-outline-100 '
         onLongPress={() => { setLongPress(true) }}
@@ -59,14 +52,12 @@ export default function CategoryCard({
       >
         <View className='grow'>
           <View className='grow flex flex-row justify-between'>
-            <Text className='text-md text-typography-600'>{data.parent.name}</Text>
+            <Text className='text-sm text-typography-600'>
+              {data.parent ? data.parent.name : 'Không có'}
+            </Text>
             <Text className='text-typography-400'>Số lượng tài sản: {data.numberOfAssets}</Text>
           </View>
           <Text className='text-lg'>{data.name}</Text>
-          <Text className='text-md text-typography-400'>{data.description}</Text>
-          <View className='grow flex flex-row justify-end'>
-            <FavouriteButton />
-          </View>
         </View>
       </TouchableOpacity>
     </View>

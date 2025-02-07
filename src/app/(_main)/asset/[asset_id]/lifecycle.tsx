@@ -50,6 +50,10 @@ export default function AssetLifecycle() {
     queryKey: ['predict-category', assetQuery?.data?.images[0].fileName],
     queryFn: async () => {
       const res = await ClassificationService.getPredictCategoryByImg(assetQuery?.data?.images[0].fileName as string)
+      if (!res.prediction)
+        return {
+          prediction: ''
+        }
       return {
         prediction: res.prediction
       }
@@ -59,7 +63,11 @@ export default function AssetLifecycle() {
 
   const usefulLifeQuery = useQuery({
     queryKey: ['useful-life', asset_id],
-    queryFn: () => RuleService.getUsefulLife(predictCategoryQuery.data?.prediction),
+    queryFn: async () => {
+      if (predictCategoryQuery.data?.prediction === '')
+        return { usefulLife: 3 }
+      return await RuleService.getUsefulLife(predictCategoryQuery.data?.prediction)
+    },
     enabled: predictCategoryQuery.isFetched
   })
 

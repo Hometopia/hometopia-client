@@ -113,7 +113,10 @@ export default function AssetGeneral() {
       label: 'Tổng quan',
       items: [
         { head: 'Tên', data: asset.name },
-        { head: 'Danh mục', data: `${asset.category.parent.name} > ${asset.category.name}` },
+        {
+          head: 'Danh mục',
+          data: asset.category.parent ? `${asset.category.parent.name} > ${asset.category.name}` : asset.category.name
+        },
         { head: 'Mô tả', data: asset.description },
         { head: 'Tạo vào', data: ISOtoLocal(asset.createdAt) },
       ],
@@ -226,8 +229,8 @@ export default function AssetGeneral() {
                         brand: assetQuery?.data.brand,
                         serialNumber: assetQuery?.data.serialNumber,
                         locationId: assetQuery?.data.location ? assetQuery?.data.location.id : null,
-                        // warrantyExpiryDate: assetQuery?.data.warrantyExpiryDate,
-                        warrantyExpiryDate: dateToYYYYMMDD(new Date()),
+                        warrantyExpiryDate: assetQuery?.data.warrantyExpiryDate ?
+                          assetQuery?.data.warrantyExpiryDate : null,
                         documents: assetQuery?.data.documents,
                         status: assetQuery?.data.status,
                         maintenanceCycle: assetQuery?.data.maintenanceCycle || null,

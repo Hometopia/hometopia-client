@@ -71,7 +71,7 @@ export default function ImageAdder(
           </ModalCloseButton>
         </ModalHeader>
         <ModalBody className='mt-4'>
-          <View className='flex flex-row gap-4'>
+          <View className='flex flex-row gap-4 justify-center'>
             {CameraModal}
             <TouchableOpacity className='px-6 py-4 rounded-xl bg-primary-400/15 flex flex-col items-center'
               onPress={() => setTriggerCamera(true)}

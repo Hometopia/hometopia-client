@@ -78,6 +78,7 @@ export default function ImageUploader({
         >
           {!pickedFile &&
             <Button
+              className="rounded-lg"
               variant="solid"
               onPress={async () => {
                 setImgAdderShow(true)
@@ -89,16 +90,18 @@ export default function ImageUploader({
 
           {pickedFile && <View className="flex flex-col gap-4">
             <Button
+              className="rounded-lg"
               variant="solid"
               isDisabled={!isConfirmUpload}
               onPress={() => {
                 uploadFn(pickedFile)
+                setActive(prev => !prev)
               }}
             >
               <ButtonText>Lưu</ButtonText>
             </Button>
             <Button
-              className="bg-white "
+              className="bg-white rounded-lg"
               onPress={async () => {
                 setImgAdderShow(true)
               }}
@@ -106,7 +109,7 @@ export default function ImageUploader({
               <ButtonText className="text-typography-800">Thay đổi</ButtonText>
             </Button>
             <Button
-              className="border border-white bg-white/40"
+              className="border border-white bg-white/40 rounded-lg"
               onPress={() => {
                 setImgUri(uri)
                 setPickedFile(undefined)
