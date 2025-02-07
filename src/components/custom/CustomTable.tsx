@@ -3,7 +3,7 @@ import React from 'react'
 import { Text } from '../ui/text'
 
 type CustomTablePropsType = {
-  width: number,
+  width?: number,
   children?: React.ReactNode
 }
 const tableContainerStyle = (width?: number) => width ? `flex flex-row w-[${width}px]` : `flex flex-row w-full`

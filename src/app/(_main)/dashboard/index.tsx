@@ -13,8 +13,10 @@ import { MonthName, ScheduleType } from '@/constants/data_enum'
 import { primaryColor } from '@/constants/color'
 import { AssetService } from '@/api/AssetService'
 import { CategoryService } from '@/api/CategoryService'
-import { AssetResponseType } from '@/api/types/response'
+import { AssetResponseType, ScheduleResponseType } from '@/api/types/response'
 import { Href, router } from 'expo-router'
+import ScheduleListModal from '@/components/custom/ScheduleListModal'
+import { ScheduleService } from '@/api/ScheduleService'
 
 const backupPredictData = {
   january: 0,
@@ -105,41 +107,112 @@ export default function Dashboard() {
   )
 
   //
+  const [selectedMonth, setSelectedMonth] = useState<number>()
+  const [selectedYear, setSelectedYear] = useState<number>()
+  const [selectedType, setSelectedType] = useState<string>()
+  const [showSchedulesModal, setShowSchedulesModal] = useState(false)
   const monthBarData = (data: any) => {
     return Object.entries(data).filter(([label, value]) => label !== 'total')
   }
+  const scheduleListQuery = useQuery({
+    queryKey: ['schedules', selectedType, selectedMonth, selectedYear],
+    queryFn: async () => {
+      if (selectedType === undefined || selectedMonth === undefined || selectedYear === undefined)
+        return
+      return await ScheduleService.getMonthSchedules(selectedType, selectedYear, selectedMonth)
+    },
+    enabled: showSchedulesModal && (
+      selectedType !== undefined && selectedMonth !== undefined && selectedYear !== undefined
+    )
+  })
   const CostStatistic = (
     <View className='flex flex-col gap-2 my-2'>
+      <ScheduleListModal
+        showModal={showSchedulesModal}
+        setShowModal={setShowSchedulesModal}
+        data={scheduleListQuery.isPending ? [] : scheduleListQuery.data.data.items}
+        loading={scheduleListQuery.isPending}
+      />
       <Text className='text-lg font-semibold'>Thống kê chi phí</Text>
-      <View className='flex flex-row gap-2 items-center justify-between'>
-        <Text className='text-md'>Thống kê chi phí bảo trì trong năm</Text>
-        <Text className='text-md'>
-          Tổng: {maintenanceCostByMonthQuery.isPending ? '...' :
-            currencyFormatter().format(maintenanceCostByMonthQuery.data.data.total)}
-        </Text>
-      </View>
-      {maintenanceCostByMonthQuery.isPending ?
-        <View className='h-60 flex justify-center items-center'>
-          <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
+      <View className='flex flex-col gap-8'>
+        <View className='flex flex-col gap-2'>
+          <View className='py-2 flex flex-row gap-2 items-center justify-between border-t border-outline-100'>
+            <View className=''>
+              <Text className='text-md'>Chi phí bảo trì trong năm</Text>
+              <Text className='text-md'>
+                Tổng: {maintenanceCostByMonthQuery.isPending ? '...' :
+                  currencyFormatter().format(maintenanceCostByMonthQuery.data.data.total)}
+              </Text>
+            </View>
+            {/* <TouchableOpacity className='px-4 py-2 rounded-lg bg-primary-400/10'>
+              <Text className='text-primary-400'>Xem chi tiết</Text>
+            </TouchableOpacity> */}
+          </View>
+          {maintenanceCostByMonthQuery.isPending ?
+            <View className='h-60 flex justify-center items-center'>
+              <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
+            </View>
+            :
+            <Bar
+              data={monthBarData(maintenanceCostByMonthQuery.data.data).map(([label, value]) => {
+                const tranflabel = MonthName[label as keyof typeof MonthName]
+                return ({
+                  label: tranflabel,
+                  value: value,
+                  topLabelComponent: () => (
+                    <Text className='text-lg'>{Number(value) / 1000}</Text>
+                  ),
+                  frontColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.4)`
+                } as barDataItem)
+              })}
+              onItemPress={(item: barDataItem) => {
+                setShowSchedulesModal(true)
+                setSelectedType(ScheduleType.MAINTENANCE)
+                setSelectedMonth(Number(item.label?.replace('T', '')))
+                setSelectedYear(getYear(new Date()))
+              }}
+            />
+          }
         </View>
-        :
-        <TouchableOpacity
-        >
-          <Bar data={monthBarData(maintenanceCostByMonthQuery.data.data).map(([label, value]) => {
-            const tranflabel = MonthName[label as keyof typeof MonthName]
-            return ({
-              label: tranflabel,
-              value: value,
-              topLabelComponent: () => (
-                <Text className='text-lg'>{Number(value) / 1000}</Text>
-              ),
-              frontColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.4)`
-            } as barDataItem)
-          })} />
-        </TouchableOpacity>
-
-      }
-
+        <View className='flex flex-col gap-2'>
+          <View className='py-2 flex flex-row gap-2 items-center justify-between border-t border-outline-100'>
+            <View className=''>
+              <Text className='text-md'>Chi phí sửa chữa trong năm</Text>
+              <Text className='text-md'>
+                Tổng: {repairCostByMonthQuery.isPending ? '...' :
+                  currencyFormatter().format(repairCostByMonthQuery.data.data.total)}
+              </Text>
+            </View>
+            {/* <TouchableOpacity className='px-4 py-2 rounded-lg bg-primary-400/10'>
+              <Text className='text-primary-400'>Xem chi tiết</Text>
+            </TouchableOpacity> */}
+          </View>
+          {repairCostByMonthQuery.isPending ?
+            <View className='h-60 flex justify-center items-center'>
+              <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
+            </View>
+            :
+            <Bar data={monthBarData(repairCostByMonthQuery.data.data).map(([label, value]) => {
+              const tranflabel = MonthName[label as keyof typeof MonthName]
+              return ({
+                label: tranflabel,
+                value: value,
+                topLabelComponent: () => (
+                  <Text className='text-lg'>{Number(value) / 1000}</Text>
+                ),
+                frontColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.4)`
+              } as barDataItem)
+            })}
+              onItemPress={(item: barDataItem) => {
+                setShowSchedulesModal(true)
+                setSelectedType(ScheduleType.REPAIR)
+                setSelectedMonth(Number(item.label?.replace('T', '')))
+                setSelectedYear(getYear(new Date()))
+              }}
+            />
+          }
+        </View>
+      </View>
     </View>
   )
   // const PredictCost = (

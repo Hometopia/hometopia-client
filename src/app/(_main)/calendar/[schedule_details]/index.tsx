@@ -15,6 +15,10 @@ import { extractLatLng } from '@/helpers/map'
 import { Table, TableBody, TableData, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { BR } from '@expo/html-elements'
 import ScheduleDetailUpdateModal from '@/components/custom/ScheduleDetailUpdateModal'
+import { currencyFormatter } from '@/helpers/currency'
+import { ScheduleType as ScheduleRequestType } from '@/api/types/request'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { ScheduleService } from '@/api/ScheduleService'
 
 export default function ScheduleDetails() {
   const { schedule_details, data, from } = useLocalSearchParams()
@@ -23,7 +27,26 @@ export default function ScheduleDetails() {
 
   const [showModal, setShowModal] = useState(false)
 
+  const queryClient = useQueryClient()
 
+  const scheduleUpdateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string, data: ScheduleRequestType }) =>
+      ScheduleService.updateSchedule(id, data),
+    onSuccess: (res) => {
+
+      if (from && from === 'asset')
+        queryClient.refetchQueries({ queryKey: ['schedule-history', parseData.type, parseData.asset.id] })
+    }
+  })
+  const scheduleDeleteMutation = useMutation({
+    mutationFn: (id: string) => ScheduleService.deleteSchedule(id),
+    onSuccess: (res) => {
+      if (from && from === 'asset')
+        queryClient.refetchQueries({
+          queryKey: ['schedule-upcoming', parseData.type, parseData.asset.id]
+        })
+    }
+  })
   // const 
   return (
     <SafeAreaView className="h-full bg-white">
@@ -31,7 +54,17 @@ export default function ScheduleDetails() {
         showModal={showModal}
         setShowModal={setShowModal}
         data={parseData}
-        updateFn={() => { }}
+        updateFn={(id: string, data: ScheduleRequestType) => {
+          scheduleUpdateMutation.mutate({ id, data })
+          setParseData({
+            ...parseData,
+            title: data.title,
+            start: data.start,
+            end: data.end || data.start,
+            cost: data.cost,
+
+          })
+        }}
       />
       <ScrollView className='pb-2 px-4' overScrollMode='never'>
         <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-between">
@@ -90,17 +123,6 @@ export default function ScheduleDetails() {
               {ScheduleTypeName[parseData.type as keyof typeof ScheduleTypeName]}
             </Text>
           </View>
-
-          {/* <Box className='flex-row gap-2 p-4 bg-background-50/50 rounded-lg self-stretch'>
-            <View className='flex flex-col gap-4'>
-              <Text className='text-lg font-medium text-success-300'>Bắt đầu:</Text>
-              <Text className='text-lg font-medium text-error-300'>Kết thúc:</Text>
-            </View>
-            <View className='flex flex-col gap-4'>
-              <Text className='text-lg'>{' ' + getTime(new Date(parseData.start))}</Text>
-              <Text className='text-lg'>{' ' + getTime(new Date(parseData.end))}</Text>
-            </View>
-          </Box> */}
           <View className='flex flex-row justify-between self-stretch'>
             <View>
               <Text className='text-lg font-bold'>Tên tài sản</Text>
@@ -111,6 +133,10 @@ export default function ScheduleDetails() {
               <ButtonIcon as={ArrowRightIcon} className='text-primary-400' />
               <ButtonText className='text-primary-400'>Xem tài sản</ButtonText>
             </Button>
+          </View>
+          <View>
+            <Text className='text-lg font-bold'>Chi phí dự kiến</Text>
+            <Text className='text-lg'>{parseData.cost ? currencyFormatter().format(parseData.cost) : 'Không có'}</Text>
           </View>
           <View className='self-stretch'>
             <Text className='text-lg font-bold'>Bên cung cấp dịch vụ</Text>

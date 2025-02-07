@@ -15,7 +15,7 @@ import DatePicker from './DatePicker'
 import { deformatNumber, formatNumber } from '@/helpers/currency'
 import { dateToISOString, dateToYYYYMMDD, YYYYMMDDtoLocalDate } from '@/helpers/time'
 import { ScheduleType } from '@/api/types/request'
-import { FileInfoType } from '@/api/types/common'
+import { FileInfoType, VendorType } from '@/api/types/common'
 import { useFocusEffect } from 'expo-router'
 
 export default function ScheduleDetailUpdateModal(
@@ -41,15 +41,18 @@ export default function ScheduleDetailUpdateModal(
     }, [data]),
   );
 
+  const titleControl = useFormControl(data.title, (v) => v !== "")
   const dateControl = useFormControl(dateToYYYYMMDD(new Date(data.start)), (v) => v !== "")
   const costControl = useFormControl(data.cost ? formatNumber(data.cost.toString()) : '', (v) => true)
 
   const validateAll = () => {
+    titleControl.validate()
     dateControl.validate()
   }
 
   const goToNextStep = async () => {
     const validArray = [
+      titleControl.isValid,
       dateControl.isValid,
     ]
 
@@ -61,7 +64,7 @@ export default function ScheduleDetailUpdateModal(
 
     setShowModal(false)
     updateFn(data.id, {
-      title: data.title,
+      title: titleControl.value,
       start: dateToISOString(new Date(dateControl.value)),
       end: dateToISOString(new Date(dateControl.value)),
       vendor: data.vendor,
@@ -97,6 +100,18 @@ export default function ScheduleDetailUpdateModal(
         </ModalHeader>
         {/* <ModalBody> */}
         <View className='flex flex-col gap-4 my-4'>
+          <ControllableInput key={'title'} control={titleControl} label="Tên lịch" errorText='Giờ kết thúc không thể trống hoặc sớm hơn giờ bắt đầu'
+            input={
+              <Input size="lg" >
+                <InputField
+                  type='text'
+                  value={titleControl.value}
+                  onChangeText={titleControl.onChange}
+                />
+              </Input>
+            }
+
+          />
           <ControllableInput key={'date'} control={dateControl} label="Ngày" errorText='Ngày không thể trống'
             input={
               <DatePicker
@@ -127,10 +142,16 @@ export default function ScheduleDetailUpdateModal(
               </Input>
             }
           />
+
           <Button
             className='rounded-lg'
             size='lg'
             onPress={handleSubmit}
+            isDisabled={
+              titleControl.value === data.title &&
+              dateControl.value === dateToYYYYMMDD(new Date(data.start)) &&
+              costControl.value === (data.cost ? formatNumber(data.cost.toString()) : '')
+            }
           >
             <ButtonText>Thay đổi</ButtonText>
           </Button>

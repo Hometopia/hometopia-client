@@ -33,6 +33,16 @@ const calcDuration = (startDate: Date, endDate: Date) => {
   return `${formatTimePartical(hours)}:${formatTimePartical(minutes)}:${formatTimePartical(seconds)}`
 }
 
+const getMonthStartEnd = (year: number, month: number) => {
+  const startDate = new Date(year, month - 1, 1)
+  startDate.setHours(0, 0, 0)
+
+  const endDate = new Date(year, month, 0)
+  endDate.setHours(23, 59, 59)
+
+  return { start: startDate, end: endDate }
+}
+
 export {
   ISOtoLocal,
   YYYYMMDDtoLocalDate,
@@ -41,5 +51,6 @@ export {
   dateToISOString,
   dateToYYYYMMDD,
   calcYearAmount,
-  calcDuration
+  calcDuration,
+  getMonthStartEnd
 }

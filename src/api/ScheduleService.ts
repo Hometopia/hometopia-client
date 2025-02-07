@@ -2,7 +2,7 @@ import { BASE_URL } from '@/constants/server';
 import axios from 'axios';
 import { LoginSession, tokenKeyStorage } from './SecureStore';
 import { ScheduleType } from './types/request';
-import { dateToISOString } from '@/helpers/time';
+import { dateToISOString, getMonthStartEnd } from '@/helpers/time';
 
 const ScheduleService = {
   getListSchedule: async (type?: string): Promise<any> => {
@@ -40,6 +40,21 @@ const ScheduleService = {
     const tranfDate: string = dateToISOString(date)
     return await axios.get(
       `${BASE_URL}/schedules?all=true&filter=asset.id==${asssetId};type==${type};start=gt=${tranfDate}`,
+      {
+        headers: {
+          Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,
+        }
+      }
+    )
+      .then((res) => res.data)
+      .catch((error) => console.error(error.response.data))
+  },
+
+  getMonthSchedules: async (type: string, year: number, month: number): Promise<any> => {
+    const startDate: string = dateToISOString(getMonthStartEnd(year, month).start)
+    const endDate: string = dateToISOString(getMonthStartEnd(year, month).end)
+    return await axios.get(
+      `${BASE_URL}/schedules?all=true&filter=type==${type};start=gt=${startDate};start=lt=${endDate}`,
       {
         headers: {
           Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,

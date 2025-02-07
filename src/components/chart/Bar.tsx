@@ -1,12 +1,13 @@
 import { View, Text } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { BarChart, barDataItem } from 'react-native-gifted-charts'
 
 type BarChartPropsType = {
-  data: barDataItem[]
+  data: barDataItem[],
+  onItemPress: Function
 }
 export default function Bar({
-  data
+  data, onItemPress
 }: BarChartPropsType) {
   const maxValue = () => {
     let max = data[0].value ? data[0].value : 0
@@ -19,6 +20,7 @@ export default function Bar({
   }
   return (
     <View>
+      {/* <ScheduleListModal /> */}
       <BarChart
         maxValue={maxValue()}
         barWidth={48}
@@ -30,6 +32,11 @@ export default function Bar({
         xAxisThickness={0}
         yAxisLabelSuffix='k'
         yAxisLabelWidth={56}
+        onPress={(item: barDataItem) => {
+          if (item.value && item.value > 0)
+            onItemPress(item)
+
+        }}
       />
     </View>
   )

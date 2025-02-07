@@ -70,6 +70,9 @@ export default function CreateSchedule() {
           case 201:
             {
               successToast.handleToast()
+              queryClient.refetchQueries({
+                queryKey: ['schedule-upcoming', type, asset_id]
+              })
               router.navigate(`/(_main)/asset/${asset_id}/${type === ScheduleType.MAINTENANCE ? 'maintenance' : 'fix'}` as Href)
               return
             }
