@@ -80,7 +80,7 @@ const AuthService = {
   //poor api for token testing 
   isSignIn: async (): Promise<any> => {
     return await axios.get(
-      `${BASE_URL}/categories/suggested?houseType=HIGH_GRADE`, // pooooooooor
+      `${BASE_URL}/users/my-profile`, // pooooooooor
       {
         headers: {
           Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,

@@ -20,6 +20,7 @@ export default function Welcome() {
 
   useFocusEffect(
     useCallback(() => {
+
       if (!values.loading) {
         if (values.isLogged)
           router.replace('/(_main)/dashboard/')
