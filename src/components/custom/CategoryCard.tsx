@@ -2,62 +2,51 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import { CategoryResponseType } from '@/api/types/response'
 import { Icon } from '../ui/icon'
-import { Edit2Icon, HeartIcon, Trash2Icon } from 'lucide-react-native'
+import { CheckIcon, Edit2Icon, HeartIcon, Trash2Icon } from 'lucide-react-native'
+import { Checkbox, CheckboxIcon, CheckboxIndicator } from '../ui/checkbox'
 type CategoryCardPropsType = {
   data: CategoryResponseType,
   onPress: () => void,
   deleteFn: () => void,
-  updateFn: () => void
+  updateFn: () => void,
+  selectable?: boolean,
+  canPressToSelect?: boolean,
+  isSelect?: boolean,
+  setIsSelect?: Function
 }
 export default function CategoryCard({
-  data, onPress, deleteFn, updateFn
+  data, onPress, deleteFn, updateFn, selectable = true, isSelect = false, setIsSelect, canPressToSelect = false
 }: CategoryCardPropsType) {
-  const [longPress, setLongPress] = useState<boolean>(false)
-  const [fav, setFav] = useState<boolean>(false)
 
   const [cannotDelete, setCannotDelete] = useState<boolean>(false)
-  const Overlay = (
-    <TouchableOpacity
-      className='absolute bg-background-0/70 z-50 top-0 left-0 w-full h-full flex flex-row gap-2 justify-center items-center'
-      onPress={() => setLongPress(false)}
-    >
-      <TouchableOpacity
-        className='p-4 flex justify-center items-center border border-info-400 rounded-md'
-        onPress={updateFn}>
-        <Icon as={Edit2Icon} className='text-info-400 w-6 h-6' />
-      </TouchableOpacity>
-      {cannotDelete ?
-        <Text className='text-error-400'>Không thể xóa</Text>
-        :
-        <TouchableOpacity
-          className='p-4 flex justify-center items-center border border-error-400 rounded-md'
-          onPress={() => {
-            if (data.numberOfAssets > 0) {
-              setCannotDelete(true)
-            }
-            else
-              deleteFn()
-          }}>
-          <Icon as={Trash2Icon} className='text-error-400 w-6 h-6' />
-        </TouchableOpacity>
-      }
-    </TouchableOpacity>
-  )
+
   return (
     <View className='relative'>
       <TouchableOpacity
         className='flex flex-row gap-4 py-4 px-4 rounded-3xl border border-outline-100 '
-        onLongPress={() => { setLongPress(true) }}
         onPress={onPress}
       >
+        <Checkbox
+          size='lg'
+          isChecked={isSelect}
+          onChange={(value: boolean) => {
+            setIsSelect && setIsSelect(value)
+          }}
+          isInvalid={false}
+          isDisabled={!selectable}
+          value={data.id}>
+          <CheckboxIndicator className='rounded-md w-7 h-7' >
+            <CheckboxIcon as={CheckIcon} />
+          </CheckboxIndicator>
+        </Checkbox>
         <View className='grow'>
           <View className='grow flex flex-row justify-between'>
-            <Text className='text-sm text-typography-600'>
+            <Text className='text-sm text-typography-500'>
               {data.parent ? data.parent.name : 'Không có'}
             </Text>
             <Text className='text-typography-400'>Số lượng tài sản: {data.numberOfAssets}</Text>
           </View>
-          <Text className='text-lg'>{data.name}</Text>
+          <Text className='text-lg text-typography-800'>{data.name}</Text>
         </View>
       </TouchableOpacity>
     </View>

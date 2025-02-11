@@ -60,6 +60,7 @@ export default function ImageUploader({
         showModal={imgAdderShow}
         setShowModal={setImgAdderShow}
         pickFn={(img: DocumentPicker.DocumentPickerAsset) => {
+          // console.log(img)
           setPickedFile(img)
           setImgUri(img.uri)
         }}
@@ -101,12 +102,12 @@ export default function ImageUploader({
               <ButtonText>Lưu</ButtonText>
             </Button>
             <Button
-              className="bg-white rounded-lg"
+              className="bg-white/50 rounded-lg"
               onPress={async () => {
                 setImgAdderShow(true)
               }}
             >
-              <ButtonText className="text-typography-800">Thay đổi</ButtonText>
+              <ButtonText className="text-black">Thay đổi</ButtonText>
             </Button>
             <Button
               className="border border-white bg-white/40 rounded-lg"
@@ -120,14 +121,14 @@ export default function ImageUploader({
             </Button>
           </View>}
         </View>
-        {!placeholder || pickedFile !== undefined ?
+        {(!placeholder || pickedFile !== undefined) && imgUri !== '' ?
           <Image
             className="h-full w-full"
             source={{ uri: imgUri }}
             alt="asset-img"
           />
           :
-          <View className="h-full w-full flex justify-center items-center bg-slate-50">
+          <View className="h-full w-full flex justify-center items-center bg-background-100">
             <Text className="text-typography-600">Chưa có ảnh</Text>
           </View>
         }

@@ -12,7 +12,8 @@ const NotificationService = {
     size: number = 15,
     isRead?: boolean
   ): Promise<any> => {
-    const filter = isRead !== undefined ? `` : `&filter=isRead==${isRead}`
+    const filter = isRead === undefined ? `` : `&filter=isRead==${isRead}`
+    console.log(`${BASE_URL}/notifications?page=${page}&size=${size}${filter}`)
     return await axios.get(
       `${BASE_URL}/notifications?page=${page}&size=${size}${filter}`,
       {
@@ -30,6 +31,7 @@ const NotificationService = {
   markAsRead: async (ids: string[]): Promise<any> => {
     return await axios.patch(
       `${BASE_URL}/notifications?ids=${ids.join(',')}`,
+      {},
       {
         headers: {
           Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,

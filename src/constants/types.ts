@@ -16,3 +16,5 @@ export type DepreciationTableItem = {
   year: number;
   value: number;
 }
+
+export type AssetDisplayModeType = "location" | "list"

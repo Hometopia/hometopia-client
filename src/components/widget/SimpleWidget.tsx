@@ -19,9 +19,9 @@ export default function SimpleWidget({
     <VStack
       className={`${className} relative rounded-2xl justify-center items-center gap-2`}
     >
-      <Text className="text-md font-medium text-typography-0">{label}</Text>
+      <Text className="text-md font-medium text-white">{label}</Text>
       {(number !== undefined) ?
-        <Text className="justify-center px-4 text-4xl text-typography-0 font-bold">
+        <Text className="justify-center px-4 text-4xl text-white font-bold">
           {number}
         </Text> :
         <Spinner size="large" className="text-white" />

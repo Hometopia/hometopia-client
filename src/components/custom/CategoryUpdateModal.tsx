@@ -15,6 +15,7 @@ import { useFocusEffect } from 'expo-router'
 import { TrashIcon } from 'lucide-react-native'
 import { CategoryUpdateType } from '@/api/types/request'
 import useFormSubmit from '@/hooks/useFormSubmit'
+import { BLANK_CATEGORY_NAME } from '@/constants/client'
 
 export default function CategoryUpdateModal(
   {
@@ -146,7 +147,7 @@ export default function CategoryUpdateModal(
                     type='parent'
                     showModal={categoryModalShow}
                     setShowModal={setCategoryModalShow}
-                    data={fullList}
+                    data={fullList.filter(i => i.id !== data.id && i.name !== BLANK_CATEGORY_NAME)}
                     pickFn={(id: string) => {
                       parentControl.onChange(id)
                     }}
@@ -190,10 +191,10 @@ export default function CategoryUpdateModal(
             size='lg'
             onPress={() => {
               setShowModal(false)
-              deleteFn(data.id)
+              deleteFn()
             }}
           >
-            <ButtonIcon as={TrashIcon} />
+            <ButtonIcon as={TrashIcon} className='text-error-400' />
             <ButtonText className='text-error-400'>Xóa danh mục</ButtonText>
           </Button>
         </View>

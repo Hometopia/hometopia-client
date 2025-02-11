@@ -107,7 +107,7 @@ export default function Callout(
               cancelFn()
               setBlank(prev => prev = true)
             }}>
-              <ButtonIcon as={TrashIcon} size='md' />
+              <ButtonIcon className='text-error-400' as={TrashIcon} size='md' />
               <ButtonText className='text-error-400'>Hủy lịch</ButtonText>
             </Button>
             <Button size='sm' variant='outline' action='primary' onPress={lookFn}>

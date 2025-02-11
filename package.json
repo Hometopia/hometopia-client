@@ -22,6 +22,7 @@
     "@expo/vector-icons": "^14.0.3",
     "@gluestack-ui/accordion": "^1.0.7",
     "@gluestack-ui/actionsheet": "^0.2.46",
+    "@gluestack-ui/alert-dialog": "^0.1.32",
     "@gluestack-ui/avatar": "^0.1.17",
     "@gluestack-ui/button": "^1.0.7",
     "@gluestack-ui/checkbox": "^0.1.32",

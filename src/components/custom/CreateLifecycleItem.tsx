@@ -120,7 +120,7 @@ export default function CreateLifecycleItem(
                       <Button
                         variant="outline"
                         action="default"
-                        className="border-outline-200 justify-between"
+                        className="border-outline-200 justify-between rounded-lg"
                         {...triggerProps}
 
                       >

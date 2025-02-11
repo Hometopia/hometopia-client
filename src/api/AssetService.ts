@@ -41,7 +41,7 @@ const AssetService = {
     status?: string,
     name?: string,
   ): Promise<any> => {
-    let filter_param = `&filter=location.id==${location}`
+    let filter_param = `&filter=location.id==${location};`
     filter_param += (!!name) ? `name=ilike='${name}';` : ``
     filter_param += (!!categoryId) ? `category.id==${categoryId};` : ``
     filter_param += (!!status) ? `status==${status}` : ``

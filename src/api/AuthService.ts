@@ -21,11 +21,11 @@ const AuthService = {
         }
       }
     )
-      .then((res) => {
+      .then(async (res) => {
         switch (res.status) {
           case 200: {
-            LoginSession.saveTokenWithKey(tokenKeyStorage.ACCESS_KEY, res.data.access_token)
-            LoginSession.saveTokenWithKey(tokenKeyStorage.REFRESH_KEY, res.data.refresh_token)
+            await LoginSession.saveTokenWithKey(tokenKeyStorage.ACCESS_KEY, res.data.access_token)
+            await LoginSession.saveTokenWithKey(tokenKeyStorage.REFRESH_KEY, res.data.refresh_token)
             break
           }
           default: {
@@ -43,34 +43,15 @@ const AuthService = {
   signUp: async (formData: RegisterForm): Promise<any> => {
     return await axios.post(
       `${BASE_URL}/auth/sign-up`,
-      {
-        "username": formData.username,
-        "firstName": formData.firstName,
-        "lastName": formData.lastName,
-        "email": formData.email,
-        "password": formData.password,
-        "address": {
-          "line": formData.address.line,
-          "provinceId": formData.address.provinceId,
-          "districtId": formData.address.districtId,
-          "wardId": formData.address.wardId,
-        }
-      },
+      formData,
     )
       .then((res) => {
-        switch (res.status) {
-          case 201: {  // created
-
-            break
-          }
-          default: {
-            console.log(res.statusText)
-          }
-
-        }
-        return res.data;
+        return res.data
       })
-      .catch(error => console.error(error.response.data))
+      .catch(error => {
+        console.error(error.response.data)
+        return error.response.data
+      })
   },
 
   signOut: () => {
@@ -80,7 +61,7 @@ const AuthService = {
   //poor api for token testing 
   isSignIn: async (): Promise<any> => {
     return await axios.get(
-      `${BASE_URL}/users/my-profile`, // pooooooooor
+      `${BASE_URL}/notifications?page=1&size=1`, // pooooooooor
       {
         headers: {
           Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,
@@ -93,19 +74,12 @@ const AuthService = {
             return true
           }
           default: {
-            // console.log(res.data)
             return false
           }
         }
       })
       .catch((error) => {
         return false
-        if (error.response.status === 401) {
-          return false
-        }
-        else {
-          console.error(error)
-        }
       })
   },
 

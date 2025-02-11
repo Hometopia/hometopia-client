@@ -40,6 +40,9 @@ import { BASE_URL } from '@/constants/server'
 import { FileInfoType } from '@/api/types/common'
 import { LocationService } from '@/api/LocationService'
 import LocationUpdateModal from '@/components/custom/LocationPickModal'
+import BaseScreenContainer from '@/components/container/BaseScreenContainer'
+import AddImageTrigger from '@/components/custom/AddImageTrigger'
+import ImageUploader from '@/components/custom/ImageUploader'
 
 enum inputFieldNameList {
   name,
@@ -72,9 +75,9 @@ export default function UpdateAsset() {
         purchaseDate: assetCtrl.purchaseDateControl.value,
         purchasePlace: assetCtrl.purchasePlaceControl.value,
         purchasePrice: Number(deformatNumber(assetCtrl.purchasePriceControl.value)),
-        vendor: assetCtrl.vendorControl.value,
+        brand: assetCtrl.vendorControl.value,
         serialNumber: assetCtrl.serialNumberControl.value,
-        location: assetCtrl.locationControl.value,
+        locationId: assetCtrl.locationControl.value === '' ? null : assetCtrl.locationControl.value,
         warrantyExpiryDate: assetCtrl.warrantyExpiryDateControl.value,
         documents: assetCtrl.docInfo || null,
         status: assetCtrl.statusControl.value,
@@ -252,6 +255,38 @@ export default function UpdateAsset() {
   useAsyncExec({ condition: isFileUpload, callback: updateAssetMutation.mutate })
   const { handleSubmit } = useFormSubmit(validateAll, goToNextStep)
 
+  const resetForm = () => {
+    assetCtrl.nameControl.reset()
+    assetCtrl.categoryControl.reset()
+    assetCtrl.descontrol.reset()
+    assetCtrl.purchaseDateControl.reset()
+    assetCtrl.purchasePlaceControl.reset()
+    assetCtrl.purchasePriceControl.reset()
+    assetCtrl.vendorControl.reset()
+    assetCtrl.serialNumberControl.reset()
+    assetCtrl.statusControl.reset()
+    assetCtrl.locationControl.reset()
+    assetCtrl.warrantyExpiryDateControl.reset()
+    setImgPicked(undefined)
+    setSelectedFiles([])
+  }
+
+  const isSubmitDisable = (
+    assetCtrl.nameControl.value === assetQuery?.data.name &&
+    assetCtrl.categoryControl.value === assetQuery?.data.category.id &&
+    assetCtrl.descontrol.value === assetQuery?.data.description &&
+    assetCtrl.purchaseDateControl.value === assetQuery?.data.purchaseDate &&
+    assetCtrl.purchasePlaceControl.value === assetQuery?.data.purchasePlace &&
+    assetCtrl.purchasePriceControl.value === formatNumber(assetQuery?.data.purchasePrice.toString()) &&
+    assetCtrl.vendorControl.value === assetQuery?.data.brand &&
+    assetCtrl.serialNumberControl.value === assetQuery?.data.serialNumber &&
+    assetCtrl.statusControl.value === assetQuery?.data.status &&
+    (!assetQuery?.data.location || (assetQuery?.data.location && assetCtrl.locationControl.value === assetQuery?.data.location.id)) &&
+    assetCtrl.warrantyExpiryDateControl.value === assetQuery?.data.warrantyExpiryDate &&
+    imgPicked === undefined &&
+    selectedFiles.length === 0
+  )
+
   //#endregion
 
   //#region category
@@ -342,50 +377,14 @@ export default function UpdateAsset() {
           <Text className="text-md text-typography-500 font-semibold">
             Hình ảnh
           </Text>
-          <View className='flex flex-col gap-4'>
-            {imgPicked ?
-              <View className='flex flex-col items-center'>
-                <Image
-                  // className="w-[12rem] h-[12rem]"
-                  size='2xl'
-                  source={{ uri: imgPicked.uri }}
-                  alt="asset img"
-                />
-              </View>
-              :
-              assetCtrl.imgInfo !== null &&
-              <View className='flex flex-col items-center'>
-                <Image
-                  // className="w-[12rem] h-[12rem]"
-                  size='2xl'
-                  source={{ uri: `${BASE_URL}/files?fileName=${assetCtrl.imgInfo.fileName}` }}
-                  alt="asset img"
-                />
-                {/* <Text>{assetCtrl.imgInfo.originalFileName}</Text> */}
-              </View>
-            }
-            <Button className="px-3 w-full" variant='solid' action='primary'
-              onPress={async () => {
-                const pickedFile = await FileUploader.pickImage()
-                if (pickedFile) {
-                  setImgPicked(pickedFile)
-                }
-              }} >
-              <ButtonText>
-                {imgPicked || assetCtrl.imgInfo !== null ? 'Thay ảnh' : 'Thêm hình ảnh'}
-              </ButtonText>
-            </Button>
-            {
-              (imgPicked) &&
-              <Button className="px-3 w-full" variant='outline' action='primary'
-                onPress={async () => {
-                  setImgPicked(undefined)
-                }} >
-                <ButtonText>
-                  Hủy thay đổi
-                </ButtonText>
-              </Button>
-            }
+          <View className='m-auto'>
+            <ImageUploader
+              placeholder={assetQuery?.data.images[0] === null}
+              uri={`${BASE_URL}/files?fileName=${assetQuery?.data.images[0]?.fileName}`}
+              uploadFn={(img: DocumentPicker.DocumentPickerAsset) => {
+                setImgPicked(img)
+              }}
+            />
           </View>
         </View>
       ],
@@ -525,6 +524,7 @@ export default function UpdateAsset() {
                 setShowModal={setLocationModalShow}
                 data={locationListQuery.data?.data.items}
                 pickFn={assetCtrl.locationControl.onChange}
+                createFn={() => { }}
               />
               <Input
                 isReadOnly={true}
@@ -636,7 +636,7 @@ export default function UpdateAsset() {
               </View>
             </View>
             <Button
-              className='w-full bg-primary-50'
+              className='w-full bg-primary-400/10'
               variant='solid'
               size='lg'
               onPress={async () => {
@@ -656,7 +656,7 @@ export default function UpdateAsset() {
     },
   ]
   return (
-    <SafeAreaView className="h-full bg-white relative">
+    <BaseScreenContainer>
       {(filesUploadMutation.isPending || updateAssetMutation.isPending) &&
         <Loading texts={[
           {
@@ -669,13 +669,13 @@ export default function UpdateAsset() {
           }
         ]} />
       }
-      <ScrollView ref={scrollViewRef} overScrollMode='never'>
-        <View className='px-4 pb-4 flex flex-col '>
-          <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-start gap-4 items-center">
+      <ScrollView className='px-4 py-2' ref={scrollViewRef} overScrollMode='never'>
+        <View className='pb-4 flex flex-col '>
+          <View className="h-[48px] pt-2 pb-4 flex flex-row justify-start gap-4 items-center">
             <Button variant="outline" action="default" className="border-outline-200 p-2" onPress={() => router.back()}>
               <ButtonIcon as={ChevronLeftIcon} className="h-6 w-6 text-typography-700" />
             </Button>
-            <Text className='text-lg'>Chỉnh sửa</Text>
+            <Text className='text-lg text-typography-800'>Chỉnh sửa</Text>
           </View>
           <View style={{ paddingTop: 8 }} className="flex flex-col gap-4">
             <Accordion
@@ -686,7 +686,7 @@ export default function UpdateAsset() {
             >
               {accorddionItems.map(i =>
                 <AccordionItem key={i.key} value={i.key} className="p-2">
-                  <AccordionHeader className="bg-primary-50 px-4 py-2 rounded-xl">
+                  <AccordionHeader className="bg-primary-400/10 px-4 py-2 rounded-xl">
                     <AccordionTrigger >
                       {({ isExpanded }) => {
                         return (
@@ -715,25 +715,28 @@ export default function UpdateAsset() {
           </View>
           <View className='flex flex-row gap-4 mt-2 mb-4 justify-end'>
             <Button
+              className='rounded-lg'
               variant='outline'
               action='secondary'
               size='lg'
-            // onPress={resetForm}
+              onPress={resetForm}
             >
               <ButtonText>Đặt lại</ButtonText>
             </Button>
             <Button
+              className='rounded-lg'
               variant='solid'
               action='primary'
               size='lg'
               onPress={handleSubmit}
+              isDisabled={isSubmitDisable}
             >
               <ButtonText>Hoàn thành</ButtonText>
             </Button>
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView >
+    </BaseScreenContainer >
   )
 }
 

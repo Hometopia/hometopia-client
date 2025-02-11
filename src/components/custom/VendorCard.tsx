@@ -18,7 +18,7 @@ export default function VendorCard({ data, choosenFn, isChosen, cancelFn }: Vend
     <View>
       <Text
         numberOfLines={2}
-        className={!isChosen ? 'text-md' :
+        className={!isChosen ? 'text-md text-typography-800' :
           'text-md text-white'
         }
       >{data.address}</Text>
@@ -27,7 +27,7 @@ export default function VendorCard({ data, choosenFn, isChosen, cancelFn }: Vend
   const Phone = () => (
     <View>
       <Text
-        className={!isChosen ? 'text-md' :
+        className={!isChosen ? 'text-md text-typography-800' :
           'text-md text-white'
         }
       >{data.phoneNumber}</Text>
@@ -37,7 +37,7 @@ export default function VendorCard({ data, choosenFn, isChosen, cancelFn }: Vend
     <View>
       <Text
         numberOfLines={2}
-        className={!isChosen ? 'text-md' :
+        className={!isChosen ? 'text-md text-typography-800' :
           'text-md text-white'
         }
       >{data.website}</Text>
@@ -76,7 +76,3 @@ export default function VendorCard({ data, choosenFn, isChosen, cancelFn }: Vend
     </TouchableOpacity>
   )
 }
-
-const styles = StyleSheet.create({
-
-})

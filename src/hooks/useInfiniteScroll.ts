@@ -5,7 +5,7 @@ type UseInfiniteScrollPropsType = {
   fetchFn: (page: number, size: number) => Promise<any>,
   pageSize: number
 }
-const VIRTUAL_LIST_MAX = 40
+// const VIRTUAL_LIST_MAX = 40
 export default function useInfiniteScroll<T>({ fetchFn, pageSize = 10 }: UseInfiniteScrollPropsType) {
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const [data, setData] = useState<T[]>([])
@@ -21,13 +21,9 @@ export default function useInfiniteScroll<T>({ fetchFn, pageSize = 10 }: UseInfi
     await fetchFn(page, size).then((res) => {
       if (res !== null) {
         setData([...data, ...res.data.items])
-        if (data.length > VIRTUAL_LIST_MAX) {
-          setData(data.slice(data.length - size))
-        }
         res.data.pageIndex === res.data.totalPages ? setLastPage(true) : setPage(prev => prev + 1)
         setIsLoading(false)
         !isFirstPageReceived && setIsFirstPageReceived(true)
-
       }
     })
   }
@@ -39,13 +35,13 @@ export default function useInfiniteScroll<T>({ fetchFn, pageSize = 10 }: UseInfi
     fetchData()
   };
 
-  const fetchPreviousPage = () => {
-    if (isFirstPageReceived || data.length > VIRTUAL_LIST_MAX) {
-      // End of data.
-      return
-    }
-    fetchData()
-  };
+  // const fetchPreviousPage = () => {
+  //   if (isFirstPageReceived || data.length > VIRTUAL_LIST_MAX) {
+  //     // End of data.
+  //     return
+  //   }
+  //   fetchData()
+  // };
 
   useEffect(() => {
     fetchData();
@@ -57,7 +53,7 @@ export default function useInfiniteScroll<T>({ fetchFn, pageSize = 10 }: UseInfi
     isFirstPageReceived,
     isLastPage,
     fetchNextPage,
-    fetchPreviousPage
+    // fetchPreviousPage
   }
 
 }

@@ -54,29 +54,37 @@ export default function ScheduleListModal(
             />
           </ModalCloseButton>
         </ModalHeader>
-        <ScrollView className='h-80' overScrollMode='never' horizontal >
-          <View className=' flex flex-col gap-4 my-4'>
-            <Table className='w-[500px] rounded-lg overflow-hidden'>
-              <TableHeader>
-                <TableRow className="bg-background-100">
-                  <TableHead>Tài sản</TableHead>
-                  <TableHead>Ngày</TableHead>
-                  <TableHead>Chi phí</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.filter(i => i.cost).map(i => (
-                  <TableRow key={i.id}>
-                    <TableData>{i.asset.name}</TableData>
-                    <TableData>{YYYYMMDDtoLocalDate(dateToYYYYMMDD(new Date(i.start)))}</TableData>
-                    <TableData>{currencyFormatter().format(i.cost)}</TableData>
-                  </TableRow>
-                ))}
-
-              </TableBody>
-            </Table>
+        {loading ?
+          <View className='h-80'>
+            <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
           </View>
-        </ScrollView>
+          :
+          <ScrollView className='h-80' overScrollMode='never'>
+            <ScrollView className='h-full' overScrollMode='never' horizontal>
+              <View className='flex flex-col gap-4 my-4'>
+                <Table className='w-[500px] rounded-lg overflow-hidden'>
+                  <TableHeader>
+                    <TableRow className="bg-background-100">
+                      <TableHead>Tài sản</TableHead>
+                      <TableHead>Ngày</TableHead>
+                      <TableHead>Chi phí</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.filter(i => i.cost).map(i => (
+                      <TableRow key={i.id}>
+                        <TableData>{i.asset.name}</TableData>
+                        <TableData>{YYYYMMDDtoLocalDate(dateToYYYYMMDD(new Date(i.start)))}</TableData>
+                        <TableData>{currencyFormatter().format(i.cost)}</TableData>
+                      </TableRow>
+                    ))}
+
+                  </TableBody>
+                </Table>
+              </View>
+            </ScrollView>
+          </ScrollView>
+        }
       </ModalContent>
     </Modal>
   )

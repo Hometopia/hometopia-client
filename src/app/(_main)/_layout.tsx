@@ -1,11 +1,17 @@
 import { View, Text, TouchableOpacity } from 'react-native'
 import React from 'react'
 import { router, Tabs, useNavigation } from 'expo-router'
-import { BellIcon, BoxIcon, CalendarCogIcon, FileChartColumnIcon, LayoutDashboardIcon, TagIcon, WrenchIcon } from 'lucide-react-native';
+import { BellIcon, BoxIcon, CalendarCogIcon, CalendarIcon, FileChartColumnIcon, LayoutDashboardIcon, TagIcon, WrenchIcon } from 'lucide-react-native';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { primaryColor } from '@/constants/color';
 import { Image } from '@/components/ui/image';
 import { Icon } from '@/components/ui/icon';
+import { useGlobalContext } from '@/contexts/GlobalProvider';
+import { useQuery } from '@tanstack/react-query';
+import { ScheduleService } from '@/api/ScheduleService';
+import { CategoryService } from '@/api/CategoryService';
+import { DEFAULT_PAGE_SIZE } from '@/constants/config';
+import { AssetService } from '@/api/AssetService';
 
 const tabsData = [
   {
@@ -14,6 +20,7 @@ const tabsData = [
     title: "Dashboard",
     icon: LayoutDashboardIcon,
   },
+
   {
     slug: "asset",
     label: "Tài sản",
@@ -21,16 +28,16 @@ const tabsData = [
     icon: BoxIcon,
   },
   {
+    slug: "calendar",
+    label: "Lịch",
+    title: "Lịch",
+    icon: CalendarIcon,
+  },
+  {
     slug: "category",
     label: "Danh mục",
     title: "Danh mục",
     icon: TagIcon,
-  },
-  {
-    slug: "calendar",
-    label: "Lịch",
-    title: "Lịch",
-    icon: CalendarCogIcon,
   },
   {
     slug: "setting",
@@ -65,8 +72,8 @@ const navigationHeaders = [
     title: "Tạo tài sản mới",
   },
   {
-    slug: "asset-list",
-    title: "Danh sách tài sản"
+    slug: "location/[location_id]",
+    title: "Danh mục tài sản"
   },
   {
     slug: "create-category",
@@ -109,14 +116,29 @@ const getHeaderTitle = (route: any, item: any) => {
 
 export default function MainLayout() {
   const _navigation = useNavigation()
+  const globalValues = useGlobalContext()
+
+  //refetch data
+  const scheduleListQuery = useQuery({
+    queryKey: ['schedule-list'],
+    queryFn: () => ScheduleService.getListSchedule()
+  })
+  const categoryFullList = useQuery({
+    queryKey: ['categoryFullList'],
+    queryFn: () => CategoryService.getAllCategory()
+  })
+  const assetListQuery = useQuery({
+    queryKey: ['asset-list', 1, DEFAULT_PAGE_SIZE, '', '', '',],
+    queryFn: () => AssetService.getAssetList(1, DEFAULT_PAGE_SIZE, '', '', '')
+  })
   return (
     <Tabs
       initialRouteName="dashboard"
       screenOptions={{
         unmountOnBlur: true,
-        tabBarActiveBackgroundColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.2)`,
+        // tabBarActiveBackgroundColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.2)`,
         tabBarActiveTintColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 1.0)`,
-        tabBarInactiveBackgroundColor: `#fff`,
+        // tabBarInactiveBackgroundColor: globalValues.themeMode === 'dark' ? 'rgb(18 18 18)' : '#fff',
         tabBarItemStyle: {
           borderRadius: 6,
         },
@@ -124,12 +146,18 @@ export default function MainLayout() {
           height: 32 + 24 + 16,
           paddingHorizontal: 16,
           paddingBottom: 24,
-          paddingTop: 12
+          paddingTop: 12,
+          backgroundColor: globalValues.themeMode === 'dark' ? 'rgb(18 18 18)' : '#fff',
+          borderColor: globalValues.themeMode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)'
         },
         tabBarShowLabel: false,
         // headerStatusBarHeight: 48,
         headerTitleStyle: {
-          fontSize: 18
+          fontSize: 18,
+          color: globalValues.themeMode === 'dark' ? '#fff' : '#000'
+        },
+        headerStyle: {
+          backgroundColor: globalValues.themeMode === 'dark' ? 'rgb(18 18 18)' : '#fff'
         },
         headerLeft: () =>
           <View className="flex flex-row justify-center w-[60px]">
@@ -155,7 +183,17 @@ export default function MainLayout() {
           options={({ route }) => ({
             tabBarLabel: undefined,
             title: getHeaderTitle(route, i),
-            tabBarIcon: ({ size, color }) => <i.icon size={size} color={color} />
+            tabBarIcon: ({ size, color, focused }) =>
+              <View className='flex flex-col gap-0 items-center'>
+                <i.icon
+                  size={size}
+                  color={color}
+                  fill={focused ? color : 'rgba(0,0,0,0)'} />
+                <Text className={focused ?
+                  'text-xs text-primary-400' :
+                  'text-xs text-typography-400'
+                }>{i.label}</Text>
+              </View>
             ,
           })}
           listeners={({ navigation }) => ({

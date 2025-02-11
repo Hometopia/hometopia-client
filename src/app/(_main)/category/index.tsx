@@ -7,8 +7,11 @@ import CategoryCard from "@/components/custom/CategoryCard";
 import CategoryPickerModal from "@/components/custom/CategoryPickerModal";
 import CategoryUpdateModal from "@/components/custom/CategoryUpdateModal";
 import CustomFilter from "@/components/custom/CustomFilter";
+import DeleteDialog from "@/components/custom/DeleteDialog";
 import HouseClassifiModal from "@/components/custom/HouseClassifiModal";
+import NotificationDialog from "@/components/custom/NotificationDialog";
 import Pagination from "@/components/custom/Pagination";
+import SelectedListActionPanel from "@/components/custom/SelectedListActionPanel";
 import SuggestedCategoriesModal from "@/components/custom/SuggestedCategoriesModal";
 import Loading from "@/components/feedback/Loading";
 import { Button, ButtonText } from "@/components/ui/button";
@@ -19,6 +22,7 @@ import { Select, SelectBackdrop, SelectContent, SelectDragIndicator, SelectDragI
 import { Text } from "@/components/ui/text";
 import SimpleWidget from "@/components/widget/SimpleWidget";
 import { HouseType, HouseTypeName } from "@/constants/data_enum";
+import { useGlobalContext } from "@/contexts/GlobalProvider";
 import { BR } from "@expo/html-elements";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { router } from "expo-router";
@@ -29,6 +33,7 @@ import { TouchableOpacity, View } from "react-native";
 const DEFAULT_PAGE_SIZE = 10
 const BLANK_PARENT = 'blank'
 export default function Categories() {
+  const globalValues = useGlobalContext()
   //
   const queryClient = useQueryClient()
   const cacheData = queryClient.getQueryData<ResponseBaseType | undefined>(['categoryFullList'])
@@ -47,7 +52,12 @@ export default function Categories() {
   const [searchInputValue, setSearchInputValue] = useState<string>('')
   const [categoryModalShow, setCategoryModalShow] = useState(false)
   const [updateModalShow, setUpdateModalShow] = useState(false)
+  const [deleteCategoryDialogShow, setDeleteCategoryDialogShow] = useState(false)
   const [currentCategory, setCurrentCategory] = useState<CategoryResponseType>()
+
+  const [selectedCategories, setSelectedCategories] = useState<Record<string, boolean>>({})
+  const [notiDialogShow, setNotiDialogShow] = useState(false)
+
   const categoryFullList = useQuery({
     queryKey: ['categoryFullList'],
     queryFn: () => CategoryService.getAllCategory()
@@ -55,6 +65,12 @@ export default function Categories() {
 
   const deleteCategoryMutation = useMutation({
     mutationFn: (id: string) => CategoryService.deleteCategory(id),
+    onSuccess: (res) => {
+      categoryFullList.refetch()
+    },
+  })
+  const deleteCategoryListMutation = useMutation({
+    mutationFn: (ids: string[]) => CategoryService.deleteCategoryList(ids),
     onSuccess: (res) => {
       categoryFullList.refetch()
     },
@@ -69,6 +85,9 @@ export default function Categories() {
   const getCategoryName = (id: string): string => {
     if (id === BLANK_PARENT) return 'Không có'
     return categoryFullList.data?.data.items.find((i: CategoryResponseType) => i.id === id)?.name
+  }
+  const isNotBlankParentCategory = (id: string) => {
+    return categoryFullList.data?.data.items.filter((i: CategoryResponseType) => i.parent && i.parent.id === id).length > 0
   }
   //filter
   const applyFilter = (i: CategoryResponseType): boolean => {
@@ -155,6 +174,14 @@ export default function Categories() {
           <CategoryCard
             key={i.id}
             data={i}
+            isSelect={!!selectedCategories[i.id]}
+            setIsSelect={() => {
+              setSelectedCategories(prev => ({
+                ...prev,
+                [i.id]: !prev[i.id],
+              }))
+            }}
+            canPressToSelect={Object.entries(selectedCategories).filter(([_, v]) => v).length > 0}
             onPress={() => {
               setCurrentCategory(i)
               setUpdateModalShow(true)
@@ -210,7 +237,7 @@ export default function Categories() {
             {SearchInput}
             <CustomFilter filters={Filters} isFiltered={isFiltered} />
           </View>
-          {totalItems === 0 ?
+          {categoryFullList.isFetched && categoryFullList.data.data.totalItems === 0 ?
             <TouchableOpacity className="h-60 p-4 rounded-xl bg-primary-400/10 flex justify-center items-center border-dashed border-2 border-primary-400 "
               onPress={() => setSuggestedCategories(true)}
             >
@@ -223,7 +250,7 @@ export default function Categories() {
               <Text className="text-center text-primary-400">hoặc tự tạo qua nút "Thêm" bên dưới </Text>
             </TouchableOpacity>
             :
-            categoryFullList.isPending || deleteCategoryMutation.isPending ?
+            categoryFullList.isPending || deleteCategoryMutation.isPending || deleteCategoryListMutation.isPending ?
               <View className='relative h-40'>
                 <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
               </View>
@@ -233,7 +260,27 @@ export default function Categories() {
 
         </View>
       </MainContainer>
-      <ActionFab />
+      {Object.entries(selectedCategories).filter(([_, v]) => v).length > 0 ?
+        <SelectedListActionPanel
+          theme={globalValues.themeMode === 'dark' ? 'dark' : 'light'}
+          number={Object.entries(selectedCategories).filter(([_, v]) => v).length}
+          selectAllFn={() => {
+            let current = selectedCategories
+            categoryFullList.data.data.items
+              .map((i: CategoryResponseType) => current = { ...current, [i.id]: true })
+
+            setSelectedCategories(current)
+          }}
+          unSelectAllFn={() => setSelectedCategories({})}
+          actionText='Xóa hết'
+          actionVariant='negative'
+          actionFn={() => {
+            setDeleteCategoryDialogShow(true)
+          }}
+        />
+        :
+        <ActionFab />
+      }
       {currentCategory ?
         <CategoryUpdateModal
           showModal={updateModalShow}
@@ -241,8 +288,50 @@ export default function Categories() {
           data={currentCategory as CategoryResponseType}
           fullList={categoryFullList.data.data.items}
           updateFn={updateCategoryMutation.mutate}
-          deleteFn={deleteCategoryMutation.mutate}
+          deleteFn={() => setDeleteCategoryDialogShow(true)}
         /> : null}
+      {
+        currentCategory &&
+        <DeleteDialog
+          text={`${currentCategory.name}`}
+          show={deleteCategoryDialogShow}
+          setShow={setDeleteCategoryDialogShow}
+          deleteFn={() => {
+            if (currentCategory.numberOfAssets > 0 || isNotBlankParentCategory(currentCategory.id)) {
+              setNotiDialogShow(true)
+              return
+            }
+
+            deleteCategoryMutation.mutate(currentCategory.id)
+          }} />
+      }
+      {
+        Object.entries(selectedCategories).filter(([_, v]) => v).length > 0 &&
+        <DeleteDialog
+          text={`${Object.entries(selectedCategories).filter(([_, v]) => v).length} danh mục đã chọn`}
+          show={deleteCategoryDialogShow}
+          setShow={setDeleteCategoryDialogShow}
+          deleteFn={() => {
+            const invalidList = categoryFullList.data.data.items
+              .filter((i: CategoryResponseType) =>
+                selectedCategories[i.id] && (i.numberOfAssets > 0 || isNotBlankParentCategory(i.id)))
+            if (invalidList.length > 0) {
+              setNotiDialogShow(true)
+              return
+            }
+            deleteCategoryListMutation.mutate(
+              Object.entries(selectedCategories)
+                .filter(([_, v]) => v)
+                .map(([key, value]) => key)
+            )
+            setSelectedCategories({})
+          }} />
+      }
+      <NotificationDialog
+        text='Không thể xóa danh mục đang có tài sản hoặc danh mục cha đang chưa danh mục khác.'
+        show={notiDialogShow}
+        setShow={setNotiDialogShow}
+      />
     </BaseScreenContainer>
   )
 }

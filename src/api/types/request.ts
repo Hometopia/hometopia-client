@@ -7,16 +7,16 @@ type LoginForm = {
 }
 
 type RegisterForm = {
-  "username": string,
-  "firstName": string,
-  "lastName": string,
-  "email": string,
-  "password": string,
-  "address": {
-    "line": string,
-    "provinceId": number,
-    "districtId": number,
-    "wardId": number
+  username: string,
+  firstName: string,
+  lastName: string,
+  email: string,
+  password: string,
+  address?: {
+    line: string,
+    provinceId: number,
+    districtId: number,
+    wardId: number
   }
 }
 //#endregion

@@ -18,6 +18,7 @@ import { ClockIcon, EditIcon, TrashIcon } from "lucide-react-native";
 import React, { useState } from "react";
 import { SafeAreaView, ScrollView, View } from "react-native";
 import ScheduleUpdateModal from "@/components/custom/ScheduleUpdateModal";
+import BaseScreenContainer from "@/components/container/BaseScreenContainer";
 
 
 type infoFieldType = {
@@ -134,7 +135,7 @@ export default function AssetFix() {
     </CustomTable>
   )
   return (
-    <SafeAreaView className='h-full bg-white'>
+    <BaseScreenContainer>
       {assetQuery?.data === undefined ?
         <Loading texts={[
           {
@@ -165,6 +166,9 @@ export default function AssetFix() {
                       from: 'asset'
                     }
                   })
+                }}
+                cancelFn={() => {
+                  scheduleDeleteMutation.mutate(upcomingQuery.data.data.items[0].id)
                 }}
               />
             }
@@ -219,6 +223,6 @@ export default function AssetFix() {
         />
         : null
       }
-    </SafeAreaView>
+    </BaseScreenContainer>
   )
 }

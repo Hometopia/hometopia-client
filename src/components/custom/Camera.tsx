@@ -48,7 +48,7 @@ export default function Camera({
   }
 
   const CaptureFail = <View className='absolute w-full flex flex-row justify-center'>
-    <Text className='text-error-400 p-4 rounded-lg bg-white/10 '>Không chụp được, hãy thử lại</Text>
+    <Text className='text-error-400 p-4 rounded-lg bg-background-0/10 '>Không chụp được, hãy thử lại</Text>
   </View>
 
   return (
@@ -93,7 +93,7 @@ export default function Camera({
             }}
           >
             <View className='flex justify-center items-center p-2 border-2 border-white rounded-full'>
-              <View className='bg-background-0 h-16 w-16 rounded-full' />
+              <View className='bg-white h-16 w-16 rounded-full' />
             </View>
           </TouchableOpacity>
           <TouchableOpacity

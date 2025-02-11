@@ -14,6 +14,7 @@ import { RuleService } from '@/api/RuleService'
 import Loading from '@/components/feedback/Loading'
 import { AssetService } from '@/api/AssetService'
 import { getYear } from 'date-fns'
+import BaseScreenContainer from '@/components/container/BaseScreenContainer'
 
 export default function AssetDepreciation() {
   const { asset_id } = useLocalSearchParams()
@@ -27,7 +28,7 @@ export default function AssetDepreciation() {
   })
 
   return (
-    <SafeAreaView className='h-full bg-white'>
+    <BaseScreenContainer>
       {assetQuery?.data &&
         <ScrollView className="flex flex-col my-4 px-4 gap-4 " overScrollMode='never'>
           <AssetInfoDisplay
@@ -43,9 +44,6 @@ export default function AssetDepreciation() {
               }`}
             opts='em'
           />
-          {/* <AssetInfoDisplay
-            head="Năm hiện tại"
-            data={calcYearAmount(new Date(), assetQuery?.data.purchaseDate).toString()} /> */}
           <AssetInfoDisplay
             head="Giá mua"
             data={currencyFormatter().format((assetQuery?.data.purchasePrice))}
@@ -81,6 +79,6 @@ export default function AssetDepreciation() {
         </ScrollView>
       }
 
-    </SafeAreaView>
+    </BaseScreenContainer>
   )
 }

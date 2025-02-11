@@ -17,6 +17,10 @@ import { CategoryType } from '@/api/types/request'
 import { useToast } from '@/components/ui/toast'
 import CommonToast from '@/components/feedback/CommonToast'
 import Loading from '@/components/feedback/Loading'
+import BaseScreenContainer from '@/components/container/BaseScreenContainer'
+import MainContainer from '@/components/container/MainContainer'
+import BackButton from '@/components/custom/BackButton'
+import { BLANK_CATEGORY_NAME, BLANK_PARENT_CATEGORY } from '@/constants/client'
 
 export default function CreateCategory() {
   const nameControl = useFormControl("", (v): boolean => {
@@ -116,7 +120,7 @@ export default function CreateCategory() {
   const { handleSubmit } = useFormSubmit(validateAll, goToNextStep)
 
   return (
-    <SafeAreaView className='h-full bg-white'>
+    <BaseScreenContainer>
       {(createCategory.isPending) &&
         <Loading texts={[
           {
@@ -125,17 +129,10 @@ export default function CreateCategory() {
           }
         ]} />
       }
-      <ScrollView overScrollMode='never'>
-        <View className='px-4 pb-4 flex flex-col '>
-          <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-between">
-            <Button
-              variant="outline"
-              action="default"
-              className="border-outline-200 p-2"
-              onPress={() => router.back()}
-            >
-              <ButtonIcon as={ChevronLeftIcon} className="h-6 w-6 text-typography-700" />
-            </Button>
+      <MainContainer>
+        <View className='flex flex-col gap-4'>
+          <View className="bg-background-0 h-[48px] pt-2 flex flex-row justify-between">
+            <BackButton backFn={() => router.back()} />
           </View>
 
           <View className='flex flex-col gap-2'>
@@ -166,32 +163,27 @@ export default function CreateCategory() {
               isRequired={false}
               input={
                 <>
-                  <Text className='text-typography-600'>Không chọn nếu tạo danh mục cha</Text>
-                  <Select
-                    selectedValue={parentControl.value}
-                    onValueChange={(v) => {
-                      parentControl.onChange(v)
-                      console.log(parentControl.value)
+                  <CategoryPickerModal
+                    type='category'
+                    showModal={categoryModalShow}
+                    setShowModal={setCategoryModalShow}
+                    data={parentListQuery.data ? parentListQuery.data?.data.items as CategoryResponseType[] : []}
+                    pickFn={(id: string | null) => {
+                      parentControl.onChange(id !== null ? id : BLANK_PARENT_CATEGORY)
                     }}
+                  />
+                  <Text className='text-typography-600'>Không chọn nếu tạo danh mục cha</Text>
+                  <Input
+                    isReadOnly={true}
+                    variant="outline"
+                    size="lg"
+                    onTouchEnd={() => setCategoryModalShow(true)}
                   >
-                    <SelectTrigger className="flex flex-row justify-between" variant="outline" size="lg">
-                      <SelectInput placeholder="Danh mục cha" />
-                      <SelectIcon className="mr-3" as={ChevronDownIcon} />
-                    </SelectTrigger>
-                    <SelectPortal>
-                      <SelectBackdrop />
-                      <SelectContent>
-                        <SelectDragIndicatorWrapper>
-                          <SelectDragIndicator />
-                        </SelectDragIndicatorWrapper>
-                        {
-                          parentListQuery.isFetched && parentListQuery.data?.data?.items.map((i: any) => (
-                            <SelectItem key={i.id} label={i.name} value={i.id} />
-                          ))
-                        }
-                      </SelectContent>
-                    </SelectPortal>
-                  </Select>
+                    <InputField placeholder="Danh mục cha" value={getCategoryName()} />
+                    <InputSlot >
+                      <InputIcon className="mr-3" as={ChevronDownIcon} />
+                    </InputSlot>
+                  </Input>
                 </>
               }
             />
@@ -218,7 +210,7 @@ export default function CreateCategory() {
             </Button>
           </View>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </MainContainer>
+    </BaseScreenContainer>
   )
 }

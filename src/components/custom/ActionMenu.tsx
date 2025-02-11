@@ -18,7 +18,7 @@ export default function ActionMenu() {
       disabledKeys={["Settings"]}
       trigger={({ ...triggerProps }) => {
         return (
-          <Button {...triggerProps} variant="outline" action="secondary">
+          <Button {...triggerProps} variant="outline" action="secondary" className="rounded-lg">
             <ButtonText>Menu</ButtonText>
             <ButtonIcon as={ChevronDownIcon} />
           </Button>

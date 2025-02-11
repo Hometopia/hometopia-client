@@ -5,6 +5,8 @@ import { CloseIcon, Icon } from '../ui/icon'
 import { Input, InputField } from '../ui/input'
 import { Button, ButtonText } from '../ui/button'
 
+const NAME_MAX_LENGTH = 30
+
 export default function NameUpdateModal(
   {
     showModal,
@@ -42,13 +44,21 @@ export default function NameUpdateModal(
       </ModalHeader>
       {/* <ModalBody> */}
       <View className='flex flex-col gap-4 my-4'>
-        <Input>
-          <InputField
-            type='text'
-            placeholder='Nhập tên cho vị trí này'
-            value={nameInputValue}
-            onChangeText={setNameInputValue} />
-        </Input>
+        <View className='flex flex-col gap-2 items-end'>
+          <Input>
+            <InputField
+              type='text'
+              placeholder='Nhập tên cho vị trí này'
+              value={nameInputValue}
+              onChangeText={(value: string) => {
+                if (value.length > NAME_MAX_LENGTH) return
+                setNameInputValue(value)
+              }} />
+          </Input>
+          <Text className={nameInputValue.length < NAME_MAX_LENGTH ? 'text-typography-600' : 'text-error-400'} >
+            {nameInputValue.length + ' / ' + NAME_MAX_LENGTH}
+          </Text>
+        </View>
         <Button
           className='rounded-lg'
           size='lg'
@@ -62,5 +72,5 @@ export default function NameUpdateModal(
       </View>
       {/* </ModalBody> */}
     </ModalContent>
-  </Modal>
+  </Modal >
 }

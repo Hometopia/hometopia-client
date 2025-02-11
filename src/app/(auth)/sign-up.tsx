@@ -14,10 +14,24 @@ import { isValidEmail, isValidPassword } from "@/helpers/validation";
 import useFormSubmit from "@/hooks/useFormSubmit";
 import { AuthService } from "@/api/AuthService";
 import { LoginForm, RegisterForm } from "@/api/types/request";
+import BaseScreenContainer from "@/components/container/BaseScreenContainer";
+import { useToast } from "@/components/ui/toast";
+import CommonToast from "@/components/feedback/CommonToast";
+import { useMutation } from "@tanstack/react-query";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+
+  //fb
+  const toast = useToast()
+  const errorToast = CommonToast({
+    toast: toast,
+    title: "Đăng ký thất bại",
+    description: "Email đã tồn tại",
+    variant: 'error'
+  })
 
   const emailControl = useFormControl("", (value): boolean => {
     return isValidEmail(value)
@@ -32,8 +46,46 @@ export default function SignUp() {
     return value !== ""
   })
 
+  const signInMutation = useMutation({
+    mutationFn: (form: LoginForm) => AuthService.signIn(form),
+    onSuccess: (res) => {
+      if (res === true) {
+        router.replace('/')
+      } else {
+        router.replace('/(auth)/sign-in')
+      }
+    },
+    onError: (err) => { }
+  })
+
+  const signUpMutation = useMutation({
+    mutationFn: () => AuthService.signUp({
+      username: emailControl.value,
+      firstName: firstNameControl.value,
+      lastName: lastNameControl.value,
+      email: emailControl.value,
+      password: passwordControl.value,
+    } as RegisterForm),
+    onSuccess: (res) => {
+      // console.log(res)
+      switch (res.status) {
+        case 201: {
+          signInMutation.mutate({
+            username: emailControl.value.trim(),
+            password: passwordControl.value,
+          } as LoginForm)
+          break
+        }
+        case 500: {
+          errorToast.handleToast()
+          break
+        }
+      }
+    }
+  })
+
   const handleNavigateToSignIn = () => {
-    // router.navigate('/(auth)/sign-in')
+    router.navigate('/(auth)/sign-in')
 
   }
 
@@ -51,34 +103,15 @@ export default function SignUp() {
       emailControl.isValid &&
       passwordControl.isValid
     ) {
-      let res = await AuthService.signUp({
-        "username": emailControl.value,
-        "firstName": firstNameControl.value,
-        "lastName": lastNameControl.value,
-        "email": emailControl.value,
-        "password": passwordControl.value,
-      } as RegisterForm)
 
-      if (res.status == 201) {
-        let isLogin = await AuthService.signIn({
-          username: emailControl.value,
-          password: passwordControl.value,
-        } as LoginForm)
-
-        if (isLogin) {
-          router.replace('/')
-        }
-        else {
-
-        }
-      }
+      signUpMutation.mutate()
     }
   }
 
   const { handleSubmit } = useFormSubmit(validateAll, goToNextStep)
 
   return (
-    <SafeAreaView className="h-full bg-white">
+    <BaseScreenContainer>
       <VStack className="h-full items-center justify-center">
         <VStack className="flex w-96 flex-col justify-center gap-12">
           <Text className="text-center text-3xl font-bold text-typography-900">
@@ -149,6 +182,8 @@ export default function SignUp() {
               <Input className="text-center" size="lg">
                 <InputField
                   type="text"
+                  autoCapitalize='none'
+                  keyboardType='visible-password'
                   placeholder="example@gmail.com"
                   value={emailControl.value}
                   onChangeText={emailControl.onChange} />
@@ -172,6 +207,7 @@ export default function SignUp() {
               <Input className="text-center" size="lg">
                 <InputField
                   type={showPassword ? "text" : "password"}
+                  autoCapitalize='none'
                   value={passwordControl.value}
                   onChangeText={passwordControl.onChange} />
                 <InputSlot
@@ -197,8 +233,16 @@ export default function SignUp() {
               </FormControlError>
             </FormControl>
           </VStack>
-          <Button size="lg" onPress={handleSubmit}>
-            <ButtonText>Đăng ký</ButtonText>
+          <Button
+            className="rounded-lg"
+            size="lg"
+            onPress={handleSubmit}>
+            {signUpMutation.isPending || signInMutation.isPending ?
+              <Spinner size='small' color='#fff' />
+              :
+              <ButtonText>Đăng ký</ButtonText>
+            }
+
           </Button>
           <VStack className="items-center">
             <HStack className="items-center gap-4">
@@ -212,7 +256,7 @@ export default function SignUp() {
           </VStack>
         </VStack>
       </VStack>
-    </SafeAreaView>
+    </BaseScreenContainer>
   );
 }
 

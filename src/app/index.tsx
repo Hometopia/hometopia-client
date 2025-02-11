@@ -20,10 +20,9 @@ export default function Welcome() {
 
   useFocusEffect(
     useCallback(() => {
-
       if (!values.loading) {
         if (values.isLogged)
-          router.replace('/(_main)/dashboard/')
+          router.replace('/(_main)/asset/')
         else
           router.replace("/onboarding")
       }
@@ -32,7 +31,7 @@ export default function Welcome() {
   );
 
   return (
-    <View className="h-full bg-white flex justify-center items-center">
+    <View className="h-full bg-background-0 flex justify-center items-center">
       <Spinner size="large" className="text-primary-400" />
     </View>
   )

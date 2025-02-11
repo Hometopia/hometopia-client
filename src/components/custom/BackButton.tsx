@@ -8,7 +8,7 @@ export default function BackButton({ backFn }: { backFn: () => void }) {
     <Button
       variant="outline"
       action="default"
-      className="border-outline-200 p-2"
+      className="border-outline-200 p-2 rounded-lg"
       onPress={backFn}
     >
       <ButtonIcon as={ChevronLeftIcon} className="h-6 w-6 text-typography-700" />

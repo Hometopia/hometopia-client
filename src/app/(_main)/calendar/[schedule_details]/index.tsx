@@ -1,10 +1,10 @@
-import { View, SafeAreaView, ScrollView, StyleSheet } from 'react-native'
+import { View, SafeAreaView, ScrollView, StyleSheet, BackHandler } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Href, Link, router, useLocalSearchParams } from 'expo-router'
 import { Button, ButtonIcon, ButtonText } from '@/components/ui/button'
 import { Text } from '@/components/ui/text'
 import { ScheduleResponseType } from '@/api/types/response'
-import { ArrowLeftIcon, ArrowRightIcon, CalendarCheckIcon, ChevronDownIcon, ChevronLeftIcon, EditIcon, TrashIcon } from 'lucide-react-native'
+import { ArrowLeftIcon, ArrowRightIcon, Calendar, CalendarCheckIcon, ChevronDownIcon, ChevronLeftIcon, EditIcon, TrashIcon } from 'lucide-react-native'
 import { Menu, MenuItem, MenuItemLabel } from '@/components/ui/menu'
 import { Icon } from '@/components/ui/icon'
 import { Box } from '@/components/ui/box'
@@ -19,13 +19,19 @@ import { currencyFormatter } from '@/helpers/currency'
 import { ScheduleType as ScheduleRequestType } from '@/api/types/request'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ScheduleService } from '@/api/ScheduleService'
+import BaseScreenContainer from '@/components/container/BaseScreenContainer'
+import MainContainer from '@/components/container/MainContainer'
+import DeleteDialog from '@/components/custom/DeleteDialog'
+import { compareAsc } from 'date-fns'
 
 export default function ScheduleDetails() {
   const { schedule_details, data, from } = useLocalSearchParams()
+
   const [parseData, setParseData] = useState<ScheduleResponseType>(JSON.parse(data as string))
   const [coordinator, setCoordinator] = useState(extractLatLng(JSON.parse(data as string).vendor.link))
 
   const [showModal, setShowModal] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
 
   const queryClient = useQueryClient()
 
@@ -33,9 +39,11 @@ export default function ScheduleDetails() {
     mutationFn: ({ id, data }: { id: string, data: ScheduleRequestType }) =>
       ScheduleService.updateSchedule(id, data),
     onSuccess: (res) => {
-
       if (from && from === 'asset')
         queryClient.refetchQueries({ queryKey: ['schedule-history', parseData.type, parseData.asset.id] })
+      queryClient.refetchQueries({
+        queryKey: ['schedule-list']
+      })
     }
   })
   const scheduleDeleteMutation = useMutation({
@@ -45,11 +53,41 @@ export default function ScheduleDetails() {
         queryClient.refetchQueries({
           queryKey: ['schedule-upcoming', parseData.type, parseData.asset.id]
         })
+      queryClient.refetchQueries({
+        queryKey: ['schedule-list']
+      })
+      backFn()
     }
   })
-  // const 
+  // 
+  const backFn = () => {
+    if (!from) router.back()
+    if (from === 'asset')
+      router.push(`/(_main)/asset/${parseData.asset.id}/${parseData.type === ScheduleType.MAINTENANCE ? 'maintenance' : 'fix'}` as Href)
+    else if (from === 'asset-back') {
+      router.navigate({
+        pathname: '/(_main)/calendar',
+        params: {
+          selected: dateToYYYYMMDD(new Date(parseData.start))
+        }
+      })
+    }
+  }
+  useEffect(() => {
+    const backAction = () => {
+      backFn()
+      return true
+    }
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    )
+
+    return () => backHandler.remove()
+  }, [])
   return (
-    <SafeAreaView className="h-full bg-white">
+    <BaseScreenContainer>
       <ScheduleDetailUpdateModal
         showModal={showModal}
         setShowModal={setShowModal}
@@ -64,26 +102,26 @@ export default function ScheduleDetails() {
             cost: data.cost,
 
           })
-        }}
-      />
-      <ScrollView className='pb-2 px-4' overScrollMode='never'>
-        <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-between">
+        }} />
+      <DeleteDialog text='lịch'
+        show={showDeleteDialog}
+        setShow={setShowDeleteDialog}
+        deleteFn={() => {
+          scheduleDeleteMutation.mutate(parseData.id)
+        }} />
+      <MainContainer>
+        <View className="h-[48px] pt-2 pb-4 flex flex-row justify-between">
           <Button
             variant="outline"
             action="default"
-            className="border-outline-200 p-2"
-            onPress={() => {
-              if (from && from === 'asset')
-                router.navigate(`/(_main)/asset/${parseData.asset.id}/${parseData.type === ScheduleType.MAINTENANCE ? 'maintenance' : 'fix'}` as Href)
-              else
-                router.back()
-            }}
+            className="border-outline-200 p-2  rounded-lg"
+            onPress={backFn}
           >
             <ButtonIcon as={ChevronLeftIcon} className="h-6 w-6 text-typography-700" />
           </Button>
           <Menu
-            className='p-2'
-            placement="top"
+            className='p-2 '
+            placement="bottom right"
             offset={5}
             disabledKeys={['Settings']}
             trigger={({ ...triggerProps }) => {
@@ -91,7 +129,7 @@ export default function ScheduleDetails() {
                 <Button
                   variant="outline"
                   action="default"
-                  className="border-outline-200"
+                  className="border-outline-200 rounded-lg"
                   {...triggerProps}
                 >
                   <ButtonText className="text-typography-700 text-lg">Menu</ButtonText>
@@ -104,15 +142,16 @@ export default function ScheduleDetails() {
               <Icon as={EditIcon} size="md" className="mr-2" />
               <MenuItemLabel size="lg">Chỉnh sửa</MenuItemLabel>
             </MenuItem>
-            <MenuItem key="Delete" textValue="Delete">
-              <Icon as={TrashIcon} size="md" className="mr-2" />
-              <MenuItemLabel size="lg">Xóa</MenuItemLabel>
+            <MenuItem key="Delete" textValue="Delete" onPress={() => setShowDeleteDialog(true)}>
+              <Icon as={TrashIcon} size="md" className="mr-2 text-error-400" />
+              <MenuItemLabel className='text-error-400' size="lg">Xóa</MenuItemLabel>
             </MenuItem>
           </Menu>
         </View>
         <View style={{ paddingTop: 8 }} className="mb-4 flex flex-col gap-4 items-start">
           <Box className='p-4 flex-row gap-2 justify-center items-center bg-primary-400/15 rounded-xl self-stretch'>
-            <Icon as={CalendarCheckIcon} size='xl' className='text-primary-400' />
+            <Icon as={compareAsc(new Date(parseData.start), new Date()) === -1 ? CalendarCheckIcon : Calendar}
+              size='xl' className='text-primary-400' />
             <Text className='text-lg text-primary-400 font-semibold'>
               {YYYYMMDDtoLocalDate(dateToYYYYMMDD(new Date(parseData.start)))}
             </Text>
@@ -128,8 +167,15 @@ export default function ScheduleDetails() {
               <Text className='text-lg font-bold'>Tên tài sản</Text>
               <Text className='text-lg'>{parseData.asset.name}</Text>
             </View>
-            <Button className='bg-primary-400/15' onPress={() =>
-              router.navigate(`/(_main)/asset/${parseData.asset.id}`)}>
+            <Button className='bg-primary-400/10 rounded-lg' onPress={() =>
+              router.push({
+                pathname: '/(_main)/asset/[asset_id]',
+                params: {
+                  asset_id: parseData.asset.id,
+                  redirect: `/(_main)/calendar/${parseData.id}`,
+                  data: JSON.stringify(parseData)
+                }
+              })}>
               <ButtonIcon as={ArrowRightIcon} className='text-primary-400' />
               <ButtonText className='text-primary-400'>Xem tài sản</ButtonText>
             </Button>
@@ -182,7 +228,7 @@ export default function ScheduleDetails() {
           </View>
 
         </View>
-      </ScrollView>
-    </SafeAreaView>
+      </MainContainer>
+    </BaseScreenContainer>
   )
 }

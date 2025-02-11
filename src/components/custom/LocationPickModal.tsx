@@ -70,14 +70,14 @@ export default function LocationUpdateModal(
                   /> :
                   <View className='w-20 h-20 rounded-xl bg-background-100' />
                 }
-                <Text className='text-md'>{item.name}</Text>
+                <Text className='text-md text-typography-800 max-w-40'>{item.name}</Text>
               </TouchableOpacity>
             }
           />
 
           <Text className='self-stretch text-center text-typography-400'>Hoặc</Text>
           <View className='flex flex-col gap-2'>
-            <Button className='rounded-lg' onPress={() => setCreateLocationModalShow(true)}>
+            <Button size='lg' className='rounded-lg' onPress={() => setCreateLocationModalShow(true)}>
               <ButtonText>Tạo mới</ButtonText>
             </Button>
             <CreateLocationModal

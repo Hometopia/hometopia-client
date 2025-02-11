@@ -54,7 +54,7 @@ export default function SuggestedCategoriesModal(
         {/* <ModalBody> */}
         <View className='flex flex-col gap-4 my-4'>
           <View className="flex flex-row gap-0 items-center justify-center">
-            <Text className="text-lg">Xem tham khảo </Text>
+            <Text className="text-lg text-typography-600">Xem tham khảo </Text>
             <Button
               variant="link"
               action="primary"
@@ -74,7 +74,7 @@ export default function SuggestedCategoriesModal(
                   setShowModal(false)
                 }}
               >
-                <Text className="text-lg">{HouseTypeName[`${i}` as keyof typeof HouseTypeName]}</Text>
+                <Text className="text-lg text-typography-800">{HouseTypeName[`${i}` as keyof typeof HouseTypeName]}</Text>
               </TouchableOpacity>
             ))}
           </View>

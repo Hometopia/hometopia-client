@@ -2,6 +2,7 @@ import { AssetService } from "@/api/AssetService";
 import { ScheduleService } from "@/api/ScheduleService";
 import { ScheduleType as ScheduleRequestType } from "@/api/types/request";
 import { AssetResponseType, ResponseBaseType, ScheduleResponseType } from "@/api/types/response";
+import BaseScreenContainer from "@/components/container/BaseScreenContainer";
 import Callout from "@/components/custom/Callout";
 import { CustomTable, TableCol } from "@/components/custom/CustomTable";
 import ScheduleUpdateModal from "@/components/custom/ScheduleUpdateModal";
@@ -138,7 +139,7 @@ export default function AssetMaintenance() {
     </CustomTable>
   )
   return (
-    <SafeAreaView className='h-full bg-white'>
+    <BaseScreenContainer>
       {assetQuery?.data === undefined ?
         <Loading texts={[
           {
@@ -168,7 +169,8 @@ export default function AssetMaintenance() {
                     pathname: '/(_main)/calendar/[schedule_details]',
                     params: {
                       schedule_details: upcomingQuery.data.data.items[0].id,
-                      data: JSON.stringify(upcomingQuery.data.data.items[0])
+                      data: JSON.stringify(upcomingQuery.data.data.items[0]),
+                      from: 'asset'
                     }
                   })
                 }}
@@ -228,6 +230,6 @@ export default function AssetMaintenance() {
         : null
       }
 
-    </SafeAreaView >
+    </BaseScreenContainer >
   )
 }

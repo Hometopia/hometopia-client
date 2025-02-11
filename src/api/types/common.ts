@@ -17,6 +17,7 @@ export type VendorType = {
 
 export type NotificationType = {
   id: string,
+  createdAt: string,
   title: string,
   message: string,
   isRead: boolean,

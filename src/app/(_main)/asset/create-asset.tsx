@@ -9,7 +9,7 @@ import useFormSubmit from '@/hooks/useFormSubmit'
 import ControllableInput from '@/components/custom/ControllableInput'
 import { Input, InputField, InputIcon, InputSlot } from '@/components/ui/input'
 import CategoryPickerModal from '@/components/custom/CategoryPickerModal'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CategoryService } from '@/api/CategoryService'
 import { CategoryResponseType, FileUploadResponseType } from '@/api/types/response'
 import { Textarea, TextareaInput } from '@/components/ui/textarea'
@@ -34,6 +34,13 @@ import { useAsyncExec } from '@/hooks/useAsyncExec'
 import { Spinner } from '@/components/ui/spinner'
 import { useToast } from '@/components/ui/toast'
 import { FileInfoType } from '@/api/types/common'
+import AddImageTrigger from '@/components/custom/AddImageTrigger'
+import { useImageManipulator } from '@/hooks/useImageManipulator'
+import MainContainer from '@/components/container/MainContainer'
+import BaseScreenContainer from '@/components/container/BaseScreenContainer'
+import Loading from '@/components/feedback/Loading'
+import BackButton from '@/components/custom/BackButton'
+import { DEFAULT_PAGE_SIZE } from '@/constants/config'
 
 enum inputFieldNameList {
   name,
@@ -51,6 +58,8 @@ enum inputFieldNameList {
 }
 
 export default function CreateAsset() {
+
+  const queryClient = useQueryClient()
 
   //#region Queries
 
@@ -77,6 +86,9 @@ export default function CreateAsset() {
         switch (res.status) {
           case 201:
           case 200: {
+            queryClient.refetchQueries({
+              queryKey: ['asset-list', 1, DEFAULT_PAGE_SIZE, '', '', '',]
+            })
             successToast.handleToast()
             router.back()
             return
@@ -176,7 +188,8 @@ export default function CreateAsset() {
   const FileUploader = useFileUploader()
   const [imgPicked, setImgPicked] = useState<DocumentPicker.DocumentPickerAsset>()
   const [selectedFiles, setSelectedFiles] = useState<DocumentPicker.DocumentPickerAsset[]>([])
-  const { openFile } = useFileSystem()
+  const [isConfirmUpload, setIsConfirmUpload] = useState(true)
+  const ImgManipulator = useImageManipulator()
   //#endregion
 
   //#region Form control
@@ -278,9 +291,44 @@ export default function CreateAsset() {
       createAssetMutation.mutate()
     }
   }
+  useAsyncExec({
+    condition:
+      imgPicked !== undefined &&
+      imgPicked.size !== undefined &&
+      imgPicked.size >= 500000, callback: async () => {
+        if (imgPicked !== undefined) {
+          if (imgPicked.size && imgPicked.size >= 500000) {
+            const tmpUri = await ImgManipulator.compressImage(imgPicked.uri, Math.ceil((500000 / imgPicked.size) * 100) / 100)
+            setImgPicked({
+              ...imgPicked,
+              uri: tmpUri,
+              size: Math.round(imgPicked.size * (Math.ceil((500000 / imgPicked.size) * 100) / 100))
+            } as DocumentPicker.DocumentPickerAsset)
+            setIsConfirmUpload(true)
+          }
+        }
+      }
+  })
   useAsyncExec({ condition: isFileUpload, callback: createAssetMutation.mutate })
   const { handleSubmit } = useFormSubmit(validateAll, goToNextStep)
 
+  const resetForm = () => {
+    nameControl.reset()
+    categoryControl.reset()
+    descontrol.reset()
+    purchaseDateControl.reset()
+    purchasePlaceControl.reset()
+    purchasePriceControl.reset()
+    vendorControl.reset()
+    serialNumberControl.reset()
+    statusControl.reset()
+    locationControl.reset()
+    warrantyExpiryDateControl.reset()
+    setImgPicked(undefined)
+    setSelectedFiles([])
+
+    scrollTo(0)
+  }
   //#endregion
 
   //#region category
@@ -364,25 +412,22 @@ export default function CreateAsset() {
             {imgPicked &&
               <View className='flex flex-col items-center'>
                 <Image
-                  // className="w-[12rem] h-[12rem]"
+                  className="rounded-lg"
                   size='2xl'
                   source={{ uri: imgPicked.uri }}
                   alt="asset img"
                 />
-                <Text>{imgPicked.name}</Text>
               </View>}
-            <Button
-              className="px-3 w-full"
-              variant='solid'
-              action='primary'
-              onPress={async () => {
-                const pickedFile = await FileUploader.pickImage()
-                if (pickedFile) {
-                  setImgPicked(pickedFile)
+            <AddImageTrigger imgPicked={imgPicked} setImgPicked={
+              (i: DocumentPicker.DocumentPickerAsset) => {
+                setImgPicked(i)
+
+                if (imgPicked !== undefined) {
+                  if (imgPicked.size && imgPicked.size >= 500000) {
+                    setIsConfirmUpload(false)
+                  }
                 }
-              }} >
-              <ButtonText>{imgPicked ? 'Thay ảnh' : 'Thêm hình ảnh'}</ButtonText>
-            </Button>
+              }} />
           </View>
         </View>
       ],
@@ -416,7 +461,7 @@ export default function CreateAsset() {
                   purchasePriceControl.onChange(formatValue)
                 }} />
               <InputSlot >
-                <Text className='px-4'>₫</Text>
+                <Text className='px-4 text-typography-800'>₫</Text>
               </InputSlot>
             </Input>
           }
@@ -548,7 +593,7 @@ export default function CreateAsset() {
             </View>
           }
         />,
-        <ControllableInput key={2} control={documentControl} label="Thẻ bảo hành , hóa đơn" errorText=''
+        <ControllableInput key={2} control={documentControl} label="Thẻ bảo hành , hóa đơn" errorText='' isRequired={false}
           input={
             <View className='flex flex-col rounded-xl overflow-hidden'>
               <View className="flex flex-row">
@@ -615,7 +660,7 @@ export default function CreateAsset() {
                 </View>
               </View>
               <Button
-                className='w-full bg-primary-50'
+                className='w-full bg-primary-400/10'
                 variant='solid'
                 size='lg'
                 onPress={async () => {
@@ -634,27 +679,19 @@ export default function CreateAsset() {
     },
   ]
   return (
-    <SafeAreaView className="h-full bg-white relative">
+    <BaseScreenContainer>
       {filesUploadMutation.isPending || createAssetMutation.isPending &&
-        <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }} className='absolute z-50 top-0 left-0 w-full h-full flex justify-center items-center'>
-          <Spinner size="large" className="text-primary-400" />
-          <Text className='text-typography-800 text-md'>
-            {filesUploadMutation.isPending && 'Đang tải file lên'}
-            {createAssetMutation.isPending && 'Đang tạo...'}
-          </Text>
+        <View className='h-full flex justify-center items-center'>
+          <Loading texts={[
+            { condition: filesUploadMutation.isPending, text: 'Đang tải file lên' },
+            { condition: createAssetMutation.isPending, text: 'Đang tạo...' },
+          ]} />
         </View>
       }
       <ScrollView ref={scrollViewRef} overScrollMode='never'>
         <View className='px-4 pb-4 flex flex-col '>
-          <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-between">
-            <Button
-              variant="outline"
-              action="default"
-              className="border-outline-200 p-2"
-              onPress={() => router.back()}
-            >
-              <ButtonIcon as={ChevronLeftIcon} className="h-6 w-6 text-typography-700" />
-            </Button>
+          <View className="h-[48px] pt-2 pb-4 flex flex-row justify-between">
+            <BackButton backFn={() => router.back()} />
           </View>
           <View style={{ paddingTop: 8 }} className="flex flex-col gap-4">
             <Accordion
@@ -665,7 +702,7 @@ export default function CreateAsset() {
             >
               {accorddionItems.map(i =>
                 <AccordionItem key={i.key} value={i.key} className="p-2">
-                  <AccordionHeader className="bg-primary-50 px-4 py-2 rounded-xl">
+                  <AccordionHeader className="bg-primary-400/10 px-4 py-2 rounded-xl">
                     <AccordionTrigger >
                       {({ isExpanded }) => {
                         return (
@@ -694,14 +731,16 @@ export default function CreateAsset() {
           </View>
           <View className='flex flex-row gap-4 mt-2 mb-4 justify-end'>
             <Button
+              className='rounded-lg'
               variant='outline'
               action='secondary'
               size='lg'
-            // onPress={resetForm}
+              onPress={resetForm}
             >
               <ButtonText>Đặt lại</ButtonText>
             </Button>
             <Button
+              className='rounded-lg'
               variant='solid'
               action='primary'
               size='lg'
@@ -712,7 +751,7 @@ export default function CreateAsset() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView >
+    </ BaseScreenContainer>
   )
 }
 

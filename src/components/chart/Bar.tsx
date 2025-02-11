@@ -1,13 +1,15 @@
 import { View, Text } from 'react-native'
 import React, { useState } from 'react'
 import { BarChart, barDataItem } from 'react-native-gifted-charts'
+import { primaryColor } from '@/constants/color'
 
 type BarChartPropsType = {
   data: barDataItem[],
-  onItemPress: Function
+  onItemPress: Function,
+  theme?: 'light' | 'dark'
 }
 export default function Bar({
-  data, onItemPress
+  data, onItemPress, theme = 'light'
 }: BarChartPropsType) {
   const maxValue = () => {
     let max = data[0].value ? data[0].value : 0
@@ -25,18 +27,35 @@ export default function Bar({
         maxValue={maxValue()}
         barWidth={48}
         noOfSections={5}
-        barBorderRadius={4}
-        frontColor="lightgray"
-        data={data.map((i: barDataItem) => ({ ...i, value: i.value && i.value / 1000 }))}
+        barBorderRadius={8}
+        frontColor={`rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.8)`}
+        data={data.map((i: barDataItem) => (
+          {
+            ...i,
+            value: i.value && i.value / 1000,
+            topLabelComponent: () => (
+              <Text className='text-lg text-typography-800'>{Number(i.value) / 1000}</Text>
+            ),
+            labelTextStyle: {
+              color: theme === 'dark' ?
+                `rgba(255, 255, 255, 0.8)` : `rgba(0, 0, 0, 0.8)`
+            },
+          }
+        ))}
         yAxisThickness={0}
         xAxisThickness={0}
         yAxisLabelSuffix='k'
         yAxisLabelWidth={56}
+        yAxisTextStyle={{
+          color: theme === 'dark' ?
+            `rgba(255, 255, 255, 0.8)` : `rgba(0, 0, 0, 0.8)`
+        }}
         onPress={(item: barDataItem) => {
           if (item.value && item.value > 0)
             onItemPress(item)
 
         }}
+      // isAnimated
       />
     </View>
   )

@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, ScrollView, StyleSheet, findNodeHandle } from 'react-native'
+import { View, Text, SafeAreaView, ScrollView, StyleSheet, findNodeHandle, BackHandler } from 'react-native'
 import React, { useEffect, useRef, useState } from 'react'
 import { Href, router, useLocalSearchParams, useNavigation } from 'expo-router'
 import BackButton from '@/components/custom/BackButton'
@@ -28,6 +28,7 @@ import { ScheduleType as ScheduleRequestType } from '@/api/types/request'
 import { useToast } from '@/components/ui/toast'
 import CommonToast from '@/components/feedback/CommonToast'
 import { deformatNumber, formatNumber } from '@/helpers/currency'
+import BaseScreenContainer from '@/components/container/BaseScreenContainer'
 
 enum inputFieldNameList {
   title
@@ -87,7 +88,7 @@ export default function CreateSchedule() {
   const successToast = CommonToast({
     toast: toast,
     title: "Tạo lịch thành công",
-    description: `Lịch đã được tạo thành công. Bạn có thể xem chi tiết tại mục lịch của bạn`,
+    description: `Lịch đã được tạo thành công. `,
     variant: "success"
   })
   const errorToast = CommonToast({
@@ -356,8 +357,25 @@ export default function CreateSchedule() {
       </Button>
     </View>
   )
+  // 
+  const backFn = () => {
+    router.navigate(`/(_main)/asset/${asset_id}/${type === ScheduleType.MAINTENANCE ? 'maintenance' : 'fix'}` as Href)
+  }
+  useEffect(() => {
+    const backAction = () => {
+      backFn()
+      return true
+    }
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    )
+
+    return () => backHandler.remove()
+  }, [])
   return (
-    <SafeAreaView className="h-full bg-white">
+    <BaseScreenContainer>
       {createScheduleMutation.isPending ?
         <Loading texts={[{
           condition: true,
@@ -365,10 +383,8 @@ export default function CreateSchedule() {
         }]} />
         :
         <ScrollView className='px-4' overScrollMode='never'>
-          <View className="bg-white h-[48px] pt-2 pb-4 flex flex-row justify-between">
-            <BackButton backFn={() => {
-              router.navigate(`/(_main)/asset/${asset_id}/${type === ScheduleType.MAINTENANCE ? 'maintenance' : 'fix'}` as Href)
-            }} />
+          <View className=" h-[48px] pt-2 pb-4 flex flex-row justify-between">
+            <BackButton backFn={backFn} />
           </View>
           <View className='flex flex-col gap-4 py-4'>
             {Title}
@@ -381,6 +397,6 @@ export default function CreateSchedule() {
         </ScrollView>
       }
 
-    </SafeAreaView>
+    </BaseScreenContainer>
   )
 }

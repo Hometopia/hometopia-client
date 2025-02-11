@@ -23,12 +23,12 @@ export default function CommonToast({
 
   const styles = {
     error: {
-      toast: "gap-6 bg-error-50 w-full flex flex-row justify-between px-4 rounded-lg",
+      toast: "gap-6 bg-error-0 w-full flex flex-row justify-between px-4 rounded-lg",
       title: "text-xl font-semibold text-error-500",
       desc: "text-error-400"
     },
     success: {
-      toast: "gap-6 bg-success-50 w-full flex flex-row justify-between px-4 rounded-lg",
+      toast: "gap-6 bg-success-0 w-full flex flex-row justify-between px-4 rounded-lg",
       title: "text-xl font-semibold text-success-500",
       desc: "text-success-400"
     }
@@ -52,7 +52,7 @@ export default function CommonToast({
         return (
           <View className="bg-transparent px-4 py-6">
             <Toast
-              action="error"
+              action='info'
               variant="solid"
               nativeID={uniqueToastId}
               style={{ paddingBottom: 40, paddingTop: 16 }}

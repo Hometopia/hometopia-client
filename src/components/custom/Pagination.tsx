@@ -5,6 +5,7 @@ import { View } from "react-native";
 import { Pressable } from "../ui/pressable";
 import { rgbaColor } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 import React from "react";
+import { Icon } from "../ui/icon";
 
 const PageChangeButton = ({
   leftDirection = true,
@@ -19,7 +20,7 @@ const PageChangeButton = ({
     "w-fit h-[36px] flex flex-row items-center px-3 rounded-lg";
   const items = (
     <>
-      {leftDirection ? <ArrowLeft size={16} color="#333" /> : <></>}
+      {leftDirection ? <Icon as={ArrowLeft} className="text-typography-800" /> : <></>}
       <Text className="select-none text-base font-normal text-primary-300">
         {leftDirection ? "Trước" : "Sau"}
       </Text>
@@ -37,9 +38,9 @@ const PageChangeButton = ({
         className={`${containerStyle} bg-background-0 border border-typography-200 text-typography-900 active:bg-background-50`}
         onPress={onChange}
       >
-        {leftDirection ? <ArrowLeft size={16} color="rgb(23 23 23)" /> : <></>}
+        {leftDirection ? <Icon as={ArrowLeft} className="text-typography-800" /> : <></>}
         {!leftDirection ? (
-          <ArrowRight size={16} color="rgb(23 23 23)" />
+          <Icon as={ArrowRight} className="text-typography-800" />
         ) : (
           <></>
         )}
@@ -50,9 +51,9 @@ const PageChangeButton = ({
       <View
         className={`${containerStyle} bg-background-0 border border-typography-200 text-typography-400`}
       >
-        {leftDirection ? <ArrowLeft size={16} color="rgb(163 163 163)" /> : <></>}
+        {leftDirection ? <Icon as={ArrowLeft} className="text-typography-300" /> : <></>}
         {!leftDirection ? (
-          <ArrowRight size={16} color="rgb(163 163 163)" />
+          <Icon as={ArrowRight} className="text-typography-300" />
         ) : (
           <></>
         )}
@@ -74,7 +75,7 @@ const PageNumber = ({
     "w-[40px] h-[36px] flex items-center justify-center gap-1 rounded-lg ";
   const styles = {
     default: `${generalStyle} border border-background-200 bg-background-0 active:bg-background-100 text-typography-900 font-normal`,
-    active: `${generalStyle} bg-primary-50 active:bg-primary-100 text-primary-400 font-bold`,
+    active: `${generalStyle} bg-primary-400/10 active:bg-primary-100 text-primary-400 font-bold`,
   };
   const textStyle = {
     default: `text-base leading-4 text-inherit text-typography-900 font-normal`,

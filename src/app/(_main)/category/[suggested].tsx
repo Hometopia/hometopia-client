@@ -12,54 +12,10 @@ import Loading from '@/components/feedback/Loading'
 import { CategoryType } from '@/api/types/request'
 import { useToast } from '@/components/ui/toast'
 import CommonToast from '@/components/feedback/CommonToast'
+import BaseScreenContainer from '@/components/container/BaseScreenContainer'
+import BackButton from '@/components/custom/BackButton'
+import { BLANK_CATEGORY_DESC, BLANK_CATEGORY_NAME } from '@/constants/client'
 
-const data = [
-  {
-    id: '1',
-    name: "Thiết bị phòng ngủ",
-  },
-  {
-    id: '2',
-    name: "Thiết bị phòng ngủ",
-  },
-  {
-    id: '3',
-    name: "Thiết bị phòng ngủ",
-  },
-  {
-    id: '4',
-    name: "Thiết bị phòng ngủ",
-  },
-  {
-    id: '5',
-    name: "Thiết bị phòng ngủ",
-  },
-  {
-    id: '6',
-    name: "Thiết bị phòng ngủ",
-  },
-  {
-    id: '7',
-    name: "Thiết bị phòng ngủ",
-  },
-  {
-    id: '8',
-    name: "Thiết bị phòng ngủ",
-  },
-  {
-    id: '42',
-    name: "Thiết bị phòng ngủ",
-  },
-  {
-    id: '52',
-    name: "Thiết bị phòng ngủ",
-  },
-  {
-    id: '62',
-    name: "Thiết bị phòng ngủ",
-  }
-
-]
 
 export default function SuggestedCategories() {
 
@@ -131,12 +87,18 @@ export default function SuggestedCategories() {
       invalidToast.handleToast()
       return
     }
-    createCategoriesMutation.mutate(chosenCategories)
+    createCategoriesMutation.mutate([{
+      name: BLANK_CATEGORY_NAME,
+      description: BLANK_CATEGORY_DESC,
+      subCategories: [] as CategoryType[]
+    } as CategoryType,
+    ...chosenCategories])
 
   }
 
   const Item = ({ item }: { item: any }) => (
     <TouchableOpacity
+      key={item.id}
       style={{ marginBottom: 8 }}
       className='w-auto px-4 py-2 rounded-lg flex flex-row justify-center border border-outline-100'
       onPress={() => handleListItemChoosing({
@@ -145,11 +107,11 @@ export default function SuggestedCategories() {
         subCategories: item.subCategories
       } as CategoryType)}
     >
-      <Text className='text-lg'>{item.name}</Text>
+      <Text className='text-lg  text-typography-800'>{item.name}</Text>
     </TouchableOpacity>
   )
   return (
-    <SafeAreaView className='h-full bg-white'>
+    <BaseScreenContainer>
       {suggestedCategoriesQuery.isPending || createCategoriesMutation.isPending ?
         <Loading texts={[
           {
@@ -163,19 +125,12 @@ export default function SuggestedCategories() {
         ]} />
         :
         <View className="h-full flex flex-col gap-4 px-4 pb-8">
-          <View className="h-[48px] pt-2 pb-4 flex flex-row gap-4 items-center">
-            <Button
-              variant="outline"
-              action="default"
-              className="border-outline-200 p-2"
-              onPress={() => router.back()}
-            >
-              <ButtonIcon as={ChevronLeftIcon} className="h-6 w-6 text-typography-700" />
-            </Button>
-            <Text className='text-lg'>Đề xuất cho {HouseTypeName[`${suggested}` as keyof typeof HouseTypeName]}</Text>
+          <View className="py-4 flex flex-row gap-4 items-center">
+            <BackButton backFn={() => router.back()} />
+            <Text className='text-lg text-typography-600'>Đề xuất cho {HouseTypeName[`${suggested}` as keyof typeof HouseTypeName]}</Text>
           </View>
           <View className='grow flex flex-col gap-4'>
-            <Text className='text-md font-semibold'>Danh mục đã chọn</Text>
+            <Text className='text-md font-semibold text-typography-800'>Danh mục đã chọn</Text>
             <ScrollView style={{ height: 50 }} overScrollMode='never'>
               <View
                 style={{ flexWrap: 'wrap' }}
@@ -189,7 +144,7 @@ export default function SuggestedCategories() {
               </View>
             </ScrollView>
             <View className='grow flex flex-col gap-2 items-center '>
-              <Text className='text-md font-semibold'>Đề xuất</Text>
+              <Text className='text-md font-semibold  text-typography-600'>Đề xuất</Text>
               <FlatList
                 className='h-40 self-stretch '
                 data={suggestedCategoriesQuery
@@ -210,6 +165,7 @@ export default function SuggestedCategories() {
                 action="primary"
                 size="xl"
                 onPress={handleSubmit}
+              // isDisabled={chosenCategories.length}
               >
                 <ButtonText>Hoàn thành</ButtonText>
               </Button>
@@ -218,6 +174,6 @@ export default function SuggestedCategories() {
         </View>
       }
 
-    </SafeAreaView>
+    </BaseScreenContainer>
   )
 }

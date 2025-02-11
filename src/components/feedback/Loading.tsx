@@ -12,7 +12,7 @@ export default function Loading({
   texts
 }: LoadingProps) {
   return (
-    <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }} className='absolute z-50 top-0 left-0 w-full h-full flex justify-center items-center'>
+    <View className='absolute z-50 top-0 left-0 w-full h-full flex justify-center items-center bg-background-0/50'>
       <Spinner size="large" className="text-primary-400" />
       <Text className='text-typography-800 text-md'>
         {texts.map(i => i.condition && i.text)}

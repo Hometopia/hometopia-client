@@ -18,12 +18,14 @@ import { CloseIcon, Icon } from "@/components/ui/icon";
 import { LoginForm } from "@/api/types/request";
 import { useMutation } from "@tanstack/react-query";
 import Loading from "@/components/feedback/Loading";
+import BaseScreenContainer from "@/components/container/BaseScreenContainer";
+import { Spinner } from "@/components/ui/spinner";
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false)
 
   const emailControl = useFormControl("", (value): boolean => {
-    // return isValidEmail(value)
+    return isValidEmail(value)
     return true
   })
   const passwordControl = useFormControl("", (value): boolean => {
@@ -116,82 +118,86 @@ export default function SignIn() {
 
   const { handleSubmit } = useFormSubmit(validateAll, submit)
   return (
-    <SafeAreaView className="h-full bg-white">
+    <BaseScreenContainer>
       <View className="h-full flex flex-col items-center justify-center">
         <VStack className="flex w-96 flex-col justify-center gap-12">
           <Text className="text-center text-3xl font-bold text-typography-900">
             Đăng nhập
           </Text>
-          {signInMutation.isPending ?
-            <Loading texts={[{ condition: true, text: 'Đang đăng nhập...' }]} />
-            :
-            <VStack className="gap-8">
-              <VStack className="gap-4">
-                <FormControl
-                  isRequired={true}
-                  isInvalid={!emailControl.isValid}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText className="text-md text-typography-500">
-                      Email
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input className="text-center" size="lg">
-                    <InputField
-                      type="text"
-                      placeholder=""
-                      value={emailControl.value}
-                      onChangeText={emailControl.onChange} />
-                  </Input>
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} />
-                    <FormControlErrorText>
-                      Email không hợp lệ
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-                <FormControl
-                  isRequired={true}
-                  isInvalid={!passwordControl.isValid}
-                >
-                  <FormControlLabel>
-                    <FormControlLabelText className="text-md text-typography-500">
-                      Mật khẩu
-                    </FormControlLabelText>
-                  </FormControlLabel>
-                  <Input className="text-center" size="lg">
-                    <InputField
-                      type={showPassword ? "text" : "password"}
-                      value={passwordControl.value}
-                      onChangeText={passwordControl.onChange} />
-                    <InputSlot
-                      className="pr-3"
-                      onPress={() => setShowPassword(!showPassword)}
-                    >
-                      <InputIcon
-                        as={showPassword ? EyeIcon : EyeClosedIcon}
-                        className="text-typography-500"
-                      />
-                    </InputSlot>
-                  </Input>
-                  <FormControlHelper>
-                    <FormControlHelperText size="lg">
-                      Ít nhất 6 ký tự và không bao gồm khoảng trắng
-                    </FormControlHelperText>
-                  </FormControlHelper>
-                  <FormControlError>
-                    <FormControlErrorIcon as={AlertCircleIcon} className="text-error-400" />
-                    <FormControlErrorText>
-                      Mật khẩu phải có ít nhất 6 ký tự và không bao gồm khoảng trắng.
-                    </FormControlErrorText>
-                  </FormControlError>
-                </FormControl>
-              </VStack>
-              <Button size="lg" onPress={handleSubmit}>
-                <ButtonText>Đăng nhập</ButtonText>
-              </Button>
+          <VStack className="gap-8">
+            <VStack className="gap-4">
+              <FormControl
+                isRequired={true}
+                isInvalid={!emailControl.isValid}
+              >
+                <FormControlLabel>
+                  <FormControlLabelText className="text-md text-typography-500">
+                    Email
+                  </FormControlLabelText>
+                </FormControlLabel>
+                <Input className="text-center" size="lg">
+                  <InputField
+                    type="text"
+                    placeholder=""
+                    autoCapitalize='none'
+                    keyboardType='visible-password'
+                    value={emailControl.value}
+                    onChangeText={emailControl.onChange} />
+                </Input>
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} />
+                  <FormControlErrorText>
+                    Email không hợp lệ
+                  </FormControlErrorText>
+                </FormControlError>
+              </FormControl>
+              <FormControl
+                isRequired={true}
+                isInvalid={!passwordControl.isValid}
+              >
+                <FormControlLabel>
+                  <FormControlLabelText className="text-md text-typography-500">
+                    Mật khẩu
+                  </FormControlLabelText>
+                </FormControlLabel>
+                <Input className="text-center" size="lg">
+                  <InputField
+                    type={showPassword ? "text" : "password"}
+                    value={passwordControl.value}
+                    autoCapitalize='none'
+                    onChangeText={passwordControl.onChange} />
+                  <InputSlot
+                    className="pr-3"
+                    onPress={() => setShowPassword(!showPassword)}
+                  >
+                    <InputIcon
+                      as={showPassword ? EyeIcon : EyeClosedIcon}
+                      className="text-typography-500"
+                    />
+                  </InputSlot>
+                </Input>
+                <FormControlHelper>
+                  <FormControlHelperText size="lg">
+                    Ít nhất 6 ký tự và không bao gồm khoảng trắng
+                  </FormControlHelperText>
+                </FormControlHelper>
+                <FormControlError>
+                  <FormControlErrorIcon as={AlertCircleIcon} className="text-error-400" />
+                  <FormControlErrorText>
+                    Mật khẩu phải có ít nhất 6 ký tự và không bao gồm khoảng trắng.
+                  </FormControlErrorText>
+                </FormControlError>
+              </FormControl>
             </VStack>
-          }
+            <Button className="rounded-lg" size="xl" onPress={handleSubmit}>
+              {signInMutation.isPending ?
+                <Spinner size='small' color='#fff' />
+                :
+                <ButtonText>Đăng nhập</ButtonText>
+              }
+            </Button>
+          </VStack>
+
 
           <VStack className="items-center">
             {/* <Button
@@ -219,6 +225,6 @@ export default function SignIn() {
           </VStack>
         </VStack>
       </View>
-    </SafeAreaView>
+    </BaseScreenContainer>
   );
 }

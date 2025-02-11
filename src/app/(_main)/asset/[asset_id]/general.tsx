@@ -28,6 +28,7 @@ import { FileInfoType } from '@/api/types/common'
 import LocationUpdateModal from '@/components/custom/LocationPickModal'
 import { LocationService } from '@/api/LocationService'
 import { Image } from '@/components/ui/image'
+import BaseScreenContainer from '@/components/container/BaseScreenContainer'
 
 
 export default function AssetGeneral() {
@@ -143,20 +144,22 @@ export default function AssetGeneral() {
         },
         {
           head: 'Vị trí', data:
-            <View className='grow flex flex-row justify-between'>
+            <View className='grow flex flex-row gap-4 justify-between'>
               {asset.location !== null ?
-                <TouchableOpacity className='flex flex-row gap-2 items-center py-2 px-4 rounded-lg bg-background-400/10'
+                <TouchableOpacity className='max-w-[240px] flex flex-row gap-2 items-center py-2 px-4 rounded-lg bg-background-50'
                   onPress={() => {
                     router.push({
-                      pathname: '/(_main)/asset/asset-list',
+                      pathname: '/(_main)/asset/location/[location_id]',
                       params: {
-                        location: asset.location.id,
+                        location_id: asset.location.id,
                       }
                     })
                   }}>
-                  <Text>{asset.location.name}</Text>
+                  <Text className='text-md text-typography-800 '>
+                    {asset.location.name}
+                  </Text>
                 </TouchableOpacity> :
-                <Text>Chưa có</Text>
+                <Text className='text-md text-typography-800'>Chưa có</Text>
               }
               {locationsQuery.isFetched && <LocationUpdateModal
                 showModal={showLocationModal}
@@ -197,9 +200,9 @@ export default function AssetGeneral() {
     },
   ]
   return (
-    <SafeAreaView className='h-full bg-white relative'>
+    <BaseScreenContainer>
       {(assetQuery?.data === undefined || updateAssetMutation.isPending) ?
-        <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }} className='absolute z-50 top-0 left-0 w-full h-full flex justify-center items-center'>
+        <View className='absolute z-50 top-0 left-0 bg-background-0/20 w-full h-full flex justify-center items-center'>
           <Spinner size="large" className="text-primary-400" />
           <Text className='text-typography-800 text-md'>
             {updateAssetMutation.isPending && 'Đang lưu thay đổi'}
@@ -254,7 +257,7 @@ export default function AssetGeneral() {
           >
             {truthData(assetQuery?.data).map(i =>
               <AccordionItem key={i.key} value={i.key} className="p-2">
-                <AccordionHeader className="bg-primary-50 px-4 py-2 rounded-xl">
+                <AccordionHeader className="bg-primary-400/10 px-4 py-2 rounded-xl">
                   <AccordionTrigger >
                     {({ isExpanded }) => {
                       return (
@@ -285,7 +288,7 @@ export default function AssetGeneral() {
             )}
 
             <AccordionItem value="warranty" className="p-2">
-              <AccordionHeader className="bg-primary-50 px-4 py-2 rounded-xl">
+              <AccordionHeader className="bg-primary-400/15 px-4 py-2 rounded-xl">
                 <AccordionTrigger >
                   {({ isExpanded }) => {
                     return (
@@ -337,7 +340,7 @@ export default function AssetGeneral() {
         </ScrollView>
       }
 
-    </SafeAreaView>
+    </BaseScreenContainer>
 
   )
 }

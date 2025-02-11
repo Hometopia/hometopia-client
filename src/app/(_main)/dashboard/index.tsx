@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, TouchableOpacity } from 'react-native'
 import React, { useState } from 'react'
 import BaseScreenContainer from '@/components/container/BaseScreenContainer'
 import MainContainer from '@/components/container/MainContainer'
@@ -17,6 +17,11 @@ import { AssetResponseType, ScheduleResponseType } from '@/api/types/response'
 import { Href, router } from 'expo-router'
 import ScheduleListModal from '@/components/custom/ScheduleListModal'
 import { ScheduleService } from '@/api/ScheduleService'
+import { Icon } from '@/components/ui/icon'
+import { ArrowLeftIcon, ArrowRightIcon, ChartColumnBigIcon, ConstructionIcon, WrenchIcon } from 'lucide-react-native'
+import { Text } from '@/components/ui/text'
+import { useGlobalContext } from '@/contexts/GlobalProvider'
+import { DEFAULT_PAGE_SIZE } from '@/constants/config'
 
 const backupPredictData = {
   january: 0,
@@ -34,7 +39,7 @@ const backupPredictData = {
 }
 
 export default function Dashboard() {
-
+  const globalValues = useGlobalContext()
   const [total, setTotal] = useState<number>(0)
   const overralStatisticQuery = useQuery({
     queryKey: ['overral-statistic'],
@@ -77,8 +82,8 @@ export default function Dashboard() {
   //   }
   // })
   const categoryListQuery = useQuery({
-    queryKey: ['categoryList', 1, 10, '', ''],
-    queryFn: () => CategoryService.getCategoryList(1, 10, '', '')
+    queryKey: ['categoryList', 1, DEFAULT_PAGE_SIZE, '', ''],
+    queryFn: () => CategoryService.getCategoryList(1, DEFAULT_PAGE_SIZE, '', '')
   })
 
   const TotalOfThings = (
@@ -133,13 +138,23 @@ export default function Dashboard() {
         data={scheduleListQuery.isPending ? [] : scheduleListQuery.data.data.items}
         loading={scheduleListQuery.isPending}
       />
-      <Text className='text-lg font-semibold'>Thống kê chi phí</Text>
+      <View className='flex flex-row gap-4'>
+        <Icon as={ChartColumnBigIcon} className='text-warning-400 w-8 h-8 items-center' />
+        <View className='rounded-lg py-2 px-4 bg-warning-400/10 overflow-hidden'>
+          <Text className='text-lg text-warning-600 font-semibold'>Thống kê chi phí</Text>
+        </View>
+      </View>
       <View className='flex flex-col gap-8'>
         <View className='flex flex-col gap-2'>
           <View className='py-2 flex flex-row gap-2 items-center justify-between border-t border-outline-100'>
-            <View className=''>
-              <Text className='text-md'>Chi phí bảo trì trong năm</Text>
-              <Text className='text-md'>
+            <View className='grow'>
+              <View className='my-2 p-2 rounded-lg flex flex-row gap-2 justify-start items-center bg-primary-400/10'>
+                <Icon as={ConstructionIcon} size='md' className='text-primary-400' />
+                <Text className='text-lg font-semibold text-primary-400'>
+                  Chi phí bảo trì trong năm
+                </Text>
+              </View>
+              <Text className='text-md text-typography-800'>
                 Tổng: {maintenanceCostByMonthQuery.isPending ? '...' :
                   currencyFormatter().format(maintenanceCostByMonthQuery.data.data.total)}
               </Text>
@@ -159,10 +174,6 @@ export default function Dashboard() {
                 return ({
                   label: tranflabel,
                   value: value,
-                  topLabelComponent: () => (
-                    <Text className='text-lg'>{Number(value) / 1000}</Text>
-                  ),
-                  frontColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.4)`
                 } as barDataItem)
               })}
               onItemPress={(item: barDataItem) => {
@@ -171,14 +182,20 @@ export default function Dashboard() {
                 setSelectedMonth(Number(item.label?.replace('T', '')))
                 setSelectedYear(getYear(new Date()))
               }}
+              theme={globalValues.themeMode === 'dark' ? 'dark' : 'light'}
             />
           }
         </View>
         <View className='flex flex-col gap-2'>
           <View className='py-2 flex flex-row gap-2 items-center justify-between border-t border-outline-100'>
-            <View className=''>
-              <Text className='text-md'>Chi phí sửa chữa trong năm</Text>
-              <Text className='text-md'>
+            <View className='grow '>
+              <View className='my-2 p-2 rounded-lg flex flex-row gap-2 justify-start items-center bg-primary-400/10'>
+                <Icon as={WrenchIcon} size='md' className='text-primary-400' />
+                <Text className='text-lg font-semibold text-primary-400'>
+                  Chi phí sửa chữa trong năm
+                </Text>
+              </View>
+              <Text className='text-md text-typography-800'>
                 Tổng: {repairCostByMonthQuery.isPending ? '...' :
                   currencyFormatter().format(repairCostByMonthQuery.data.data.total)}
               </Text>
@@ -192,23 +209,21 @@ export default function Dashboard() {
               <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
             </View>
             :
-            <Bar data={monthBarData(repairCostByMonthQuery.data.data).map(([label, value]) => {
-              const tranflabel = MonthName[label as keyof typeof MonthName]
-              return ({
-                label: tranflabel,
-                value: value,
-                topLabelComponent: () => (
-                  <Text className='text-lg'>{Number(value) / 1000}</Text>
-                ),
-                frontColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 0.4)`
-              } as barDataItem)
-            })}
+            <Bar
+              data={monthBarData(repairCostByMonthQuery.data.data).map(([label, value]) => {
+                const tranflabel = MonthName[label as keyof typeof MonthName]
+                return ({
+                  label: tranflabel,
+                  value: value,
+                } as barDataItem)
+              })}
               onItemPress={(item: barDataItem) => {
                 setShowSchedulesModal(true)
                 setSelectedType(ScheduleType.REPAIR)
                 setSelectedMonth(Number(item.label?.replace('T', '')))
                 setSelectedYear(getYear(new Date()))
               }}
+              theme={globalValues.themeMode === 'dark' ? 'dark' : 'light'}
             />
           }
         </View>
@@ -242,14 +257,15 @@ export default function Dashboard() {
           {ValueStatistic}
           <View className="flex flex-col gap-2">
             <View className='flex flex-row justify-center items-center gap-2'>
-              <Text className='text-md text-typography-400'>Năm hiện tại:</Text>
-              <View className='p-4 rounded-xl bg-success-200/10 shrink'>
-                <Text className='font-bold text-success-400'>{getYear(new Date())}</Text>
+              <Text className='text-md text-typography-800'>Năm hiện tại:</Text>
+              <View className='p-4 rounded-xl bg-success-0 shrink'>
+                <Text className='font-bold text-success-600'>{getYear(new Date())}</Text>
               </View>
-              <TouchableOpacity className='p-4 rounded-xl bg-background-400/10'
+              <TouchableOpacity className='p-4 rounded-xl bg-background-400/10 flex flex-row gap-2'
                 onPress={() => router.push(`/(_main)/dashboard/years` as Href)}
               >
-                <Text>Xem thêm</Text>
+                <Text className='text-typography-800'>Xem thêm</Text>
+                <Icon className='text-typography-800' as={ArrowRightIcon} />
               </TouchableOpacity>
             </View>
             {CostStatistic}

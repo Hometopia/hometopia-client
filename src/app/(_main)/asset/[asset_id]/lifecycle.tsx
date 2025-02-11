@@ -20,6 +20,7 @@ import { ScheduleType as ScheduleRequestType } from '@/api/types/request';
 import { FileInfoType } from '@/api/types/common';
 import { useToast } from '@/components/ui/toast';
 import CommonToast from '@/components/feedback/CommonToast';
+import BaseScreenContainer from '@/components/container/BaseScreenContainer';
 
 export default function AssetLifecycle() {
   const { asset_id } = useLocalSearchParams()
@@ -75,7 +76,7 @@ export default function AssetLifecycle() {
     mutationFn: (data: ScheduleRequestType) => ScheduleService.createSchedule(data),
     onSuccess: (res) => {
       setCreateItemShowModal(false)
-      successToast.handleToast()
+      // successToast.handleToast()
       lifecycleQuery.refetch()
     }
   })
@@ -92,9 +93,9 @@ export default function AssetLifecycle() {
 
   )
   return (
-    <SafeAreaView className='h-full bg-white'>
+    <BaseScreenContainer>
       {lifecycleQuery.isPending ?
-        <View style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }} className='absolute z-50 top-0 left-0 w-full h-full flex justify-center items-center'>
+        <View className='absolute z-50 top-0 left-0 w-full h-full bg-background-0/50 flex justify-center items-center'>
           <Spinner size="large" className="text-primary-400" />
           <Text className='text-typography-800 text-md'>
             {lifecycleQuery.isPending && 'Đang tải thông tin'}
@@ -142,6 +143,6 @@ export default function AssetLifecycle() {
         }}
         loading={createScheduleMutation.isPending}
       />
-    </SafeAreaView>
+    </BaseScreenContainer>
   )
 }

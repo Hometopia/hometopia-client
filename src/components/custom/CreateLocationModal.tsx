@@ -21,6 +21,7 @@ import { LocationType } from '@/api/types/request'
 import { useImageManipulator } from '@/hooks/useImageManipulator'
 import { useMutation } from '@tanstack/react-query'
 import { set } from 'date-fns'
+const NAME_MAX_LENGTH = 30
 export default function CreateLocationModal(
   {
     showModal,
@@ -146,13 +147,21 @@ export default function CreateLocationModal(
             label='Tên'
             errorText='Không thể trống'
             input={
-              <Input>
-                <InputField
-                  type='text'
-                  value={nameControl.value}
-                  onChangeText={nameControl.onChange}
-                  placeholder='Tên vị trí. Ví dụ: Phòng ngủ' />
-              </Input>
+              <View className='flex flex-col gap-2 items-end'>
+                <Input>
+                  <InputField
+                    type='text'
+                    value={nameControl.value}
+                    onChangeText={(value: string) => {
+                      if (value.length > NAME_MAX_LENGTH) return
+                      nameControl.onChange(value)
+                    }}
+                    placeholder='Tên vị trí. Ví dụ: Phòng ngủ' />
+                </Input>
+                <Text className={nameControl.value.length < NAME_MAX_LENGTH ? 'text-typography-600' : 'text-error-400'} >
+                  {nameControl.value.length + ' / ' + NAME_MAX_LENGTH}
+                </Text>
+              </View>
             }
           />
 

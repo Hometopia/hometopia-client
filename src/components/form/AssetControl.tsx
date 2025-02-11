@@ -22,27 +22,27 @@ export function AssetControl(data: AssetResponseType) {
     return value !== ""
   })
   const purchasePlaceControl = useFormControl(data.purchasePlace, (value): boolean => {
-    return value !== ""
+    return true
   })
   const purchasePriceControl = useFormControl(formatNumber(data.purchasePrice.toString()), (value): boolean => {
     return value !== ""
   })
   const vendorControl = useFormControl(data.brand, (value): boolean => {
-    return value !== ""
+    return true
   })
   const serialNumberControl = useFormControl(data.serialNumber, (value): boolean => {
-    return value !== ""
+    return true
   })
   //
   const statusControl = useFormControl(data.status, (value): boolean => {
     return value !== ""
   })
-  const locationControl = useFormControl(data.location, (value): boolean => {
-    return value !== ""
+  const locationControl = useFormControl(data.location ? data.location.id : '', (value): boolean => {
+    return true
   })
   //
   const warrantyExpiryDateControl = useFormControl(data.warrantyExpiryDate, (value): boolean => {
-    return value !== ""
+    return true
   })
   const [docInfo, setDocInfo] = useState<FileInfoType[]>(data.documents)
   return {

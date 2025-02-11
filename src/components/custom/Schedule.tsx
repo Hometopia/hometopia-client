@@ -8,11 +8,13 @@ import { ScheduleResponseType } from '@/api/types/response';
 import { Icon } from '../ui/icon';
 import { ClockIcon } from 'lucide-react-native';
 import { ScheduleTypeName } from '@/constants/data_enum';
+import { primaryColor } from '@/constants/color';
 
 type SchedulePropsType = {
   data: ScheduleResponseType[],
   selected: string,
-  touchFn: Function
+  touchFn: Function,
+  theme?: 'light' | 'dark'
 }
 type CustomAgendaSchedule = {
   [date: string]: ScheduleResponseType[]
@@ -30,7 +32,7 @@ const responseToAgendaType = (data: ScheduleResponseType[]): CustomAgendaSchedul
   return tranfData
 }
 
-export default function Schedule({ data, selected, touchFn }: SchedulePropsType) {
+export default function Schedule({ data, selected, touchFn, theme = 'light' }: SchedulePropsType) {
   const [items, setItems] = React.useState<CustomAgendaSchedule>(responseToAgendaType(data));
 
   const renderItem = (item: ScheduleResponseType) => {
@@ -41,26 +43,21 @@ export default function Schedule({ data, selected, touchFn }: SchedulePropsType)
         style={{ marginRight: 16, marginTop: 16 }}
         onPress={() => touchFn(item.id)}
       >
-        <Card className='bg-white shadow-xl'>
+        <Card className='bg-background-0 border border-outline-100 rounded-xl'>
           <View className='flex flex-col gap-2'>
             <View className='flex flex-col gap-2 items-start'>
               <Text className='text-2xl font-semibold pb-2'>{item.title}</Text>
-              {/* <View className='px-4 py-1 rounded-full bg-primary-400/15 flex flex-row gap-2 items-center self-start'>
-                <Icon as={ClockIcon} size='md' className='text-primary-400' />
-                <Text className='text-md font-normal text-primary-300'>
-                  {getTime(new Date(item.start))} - {getTime(new Date(item.end))}
-                </Text>
-              </View> */}
+
               <View className='px-4 py-1 rounded-full bg-warning-400/15 flex flex-row gap-2 items-center self-start'>
                 <Text className='text-md font-normal text-warning-400'>
                   {ScheduleTypeName[item.type as keyof typeof ScheduleTypeName]}
                 </Text>
               </View>
             </View>
-            <View className='flex flex-col px-4 py-2'>
-              <Text className='text-lg font-normal text-typography-600'>Tài sản: {item.asset.name}</Text>
-              <Text className='text-lg font-normal text-typography-600'>Dịch vụ: {item.vendor.name}</Text>
-              <Text className='text-lg font-normal text-typography-600'>Website: {item.vendor.website}</Text>
+            <View className='flex flex-col py-2'>
+              <Text className='text-lg font-normal text-typography-600 italic'>Tài sản: {item.asset.name}</Text>
+              <Text className='text-lg font-normal text-typography-600 italic'>Dịch vụ: {item.vendor.name}</Text>
+              <Text className='text-lg font-normal text-typography-600 italic'>Website: {item.vendor.website}</Text>
             </View>
           </View>
         </Card>
@@ -70,22 +67,32 @@ export default function Schedule({ data, selected, touchFn }: SchedulePropsType)
 
   const renderEmptyDate = () => {
     return (
-      <View className='flex h-40 pt-8'>
-        <Text>Trống</Text>
+      <View className='h-full flex flex-col justify-center items-center'>
+        <Text className='text-typography-600'>Trống</Text>
       </View>
     )
   }
 
   return (
     <Agenda
+      showOnlySelectedDayItems
       items={items}
-      loadItemsForMonth={(date: DateData) => {
-
-      }}
       selected={selected}
       renderItem={renderItem}
       renderEmptyData={renderEmptyDate}
       showClosingKnob={true}
+      theme={{
+        "stylesheet.agenda.main": {
+          reservations: {
+            backgroundColor: theme === 'dark' ? 'rgb(18 18 18)' : '#fff',
+            flex: 1,
+            marginTop: 64 + 32,
+            paddingVertical: 16,
+          },
+        },
+        calendarBackground: theme === 'dark' ? 'rgb(18 18 18)' : '#fff',
+        selectedDayBackgroundColor: `rgba(${primaryColor[400].replace(/ /g, ', ')}, 1.0)`,
+      }}
     />
   )
 }

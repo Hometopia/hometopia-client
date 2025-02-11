@@ -1,8 +1,8 @@
 import Tabs from "@/components/nav/Tabs";
 import { TabItemType } from "@/constants/types";
-import { Stack, useLocalSearchParams, useNavigation, usePathname, useRouter } from "expo-router";
+import { Href, Stack, useLocalSearchParams, useNavigation, usePathname, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { ScrollView, View, SafeAreaView } from "react-native";
+import { ScrollView, View, SafeAreaView, BackHandler } from "react-native";
 import { useHeaderHeight } from '@react-navigation/elements';
 import { Icon } from "@/components/ui/icon";
 import { ChevronDownIcon, ChevronLeftIcon, CopyIcon, EditIcon, HeartCrackIcon, QrCodeIcon, ReplaceIcon, TrashIcon } from "lucide-react-native";
@@ -15,6 +15,9 @@ import Loading from "@/components/feedback/Loading";
 import BackButton from "@/components/custom/BackButton";
 import StatusUpdateModal from "@/components/custom/StatusUpdateModal";
 import { AssetType } from "@/api/types/request";
+import BaseScreenContainer from "@/components/container/BaseScreenContainer";
+import DeleteDialog from "@/components/custom/DeleteDialog";
+import QRGenerateButton from "@/components/custom/QRButton";
 
 const tabData: TabItemType[] = [
   {
@@ -43,7 +46,12 @@ export default function AssetDetailsLayout() {
   const pathName = usePathname()
   const navigation = useNavigation()
 
+  //
+  const { asset_id, redirect, data } = useLocalSearchParams()
+
+  //
   const [showStatusUpdateModal, setShowStatusUpdateModal] = useState(false)
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   //scroll..
   const scrollViewRef = useRef<ScrollView>(null)
   const handlePress = (index: number) => {
@@ -56,9 +64,6 @@ export default function AssetDetailsLayout() {
       animated: true,
     });
   }
-
-  //
-  const { asset_id } = useLocalSearchParams()
 
   //
   const assetQuery = useQuery({
@@ -79,18 +84,49 @@ export default function AssetDetailsLayout() {
     },
     onError: (err) => { }
   })
-  // useEffect(() => {
-  //   console.log(assetQuery.data)
-  // }, [assetQuery])
+  // 
+  const backFn = () => {
+    if (redirect) {
+      router.navigate({
+        pathname: '/(_main)/calendar/[schedule_details]',
+        params: {
+          schedule_details: redirect as string,
+          data: data,
+          from: 'asset-back'
+        }
+      })
+    }
+    else
+      router.back()
+  }
+  useEffect(() => {
+    const backAction = () => {
+      backFn()
+      return true
+    }
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    )
+
+    return () => backHandler.remove()
+  }, [])
   return (
-    <SafeAreaView className="h-full bg-white">
+    <BaseScreenContainer>
+      <DeleteDialog text='lịch'
+        show={showDeleteDialog}
+        setShow={setShowDeleteDialog}
+        deleteFn={() => {
+          deleteAssetMutation.mutate(asset_id as string)
+        }} />
+
       {assetQuery.isFetched && <StatusUpdateModal
         showModal={showStatusUpdateModal}
         setShowModal={setShowStatusUpdateModal}
         data={assetQuery.data.data.status}
         updateFn={(status: string) => {
           if (status === assetQuery?.data.data.status) return
-          console.log()
           updateAssetMutation.mutate({
             name: assetQuery?.data.data.name,
             description: assetQuery?.data.data.description,
@@ -112,20 +148,15 @@ export default function AssetDetailsLayout() {
         loading={updateAssetMutation.isPending}
       />}
 
-
       {!pathName.endsWith('update') &&
-        <View className="bg-white h-[48px] px-4 pt-2 pb-4 flex flex-row justify-between items-center">
-          <BackButton backFn={() => {
-            router.back()
-          }} />
+        <View className="px-4 py-4 flex flex-row justify-between items-center">
+          <BackButton backFn={() => backFn()} />
           <View className="flex flex-row gap-4">
-            <Button
-              variant="outline"
-              action="default"
-              className="border-outline-200 px-2"
-            >
-              <ButtonIcon as={QrCodeIcon} className="h-8 w-8 text-typography-700" />
-            </Button>
+            <QRGenerateButton
+              name={assetQuery.isFetched ? assetQuery.data.data.name : ''}
+              uri={`(_main)/asset/${asset_id as string}`}
+              size='xl' />
+
             <Menu
               placement="bottom right"
               offset={5}
@@ -135,7 +166,7 @@ export default function AssetDetailsLayout() {
                   <Button
                     variant="outline"
                     action="default"
-                    className="border-outline-200"
+                    className="border-outline-200 rounded-lg"
                     {...triggerProps}
                   >
                     <ButtonText className="text-typography-700 text-lg">Menu</ButtonText>
@@ -149,7 +180,7 @@ export default function AssetDetailsLayout() {
                 <Icon as={ReplaceIcon} size="md" className="mr-2" />
                 <MenuItemLabel size="lg">Thay đổi trạng thái</MenuItemLabel>
               </MenuItem>
-              <MenuSeparator />
+              <MenuSeparator className="my-2" />
               <MenuItem key="Edit" textValue="Edit" onPress={() => router.push({
                 pathname: '/(_main)/asset/[asset_id]/update',
                 params: {
@@ -159,16 +190,16 @@ export default function AssetDetailsLayout() {
                 <Icon as={EditIcon} size="md" className="mr-2" />
                 <MenuItemLabel size="lg">Chỉnh sửa</MenuItemLabel>
               </MenuItem>
-              <MenuItem key="Delete" textValue="Delete">
-                <Icon as={TrashIcon} size="md" className="mr-2" />
-                <MenuItemLabel size="lg">Xóa</MenuItemLabel>
+              <MenuItem key="Delete" textValue="Delete" onPress={() => setShowDeleteDialog(true)}>
+                <Icon as={TrashIcon} size="md" className="mr-2 text-error-400" />
+                <MenuItemLabel className='text-error-400' size="lg">Xóa</MenuItemLabel>
               </MenuItem>
             </Menu>
           </View>
         </View>}
 
       {!pathName.endsWith('update') &&
-        <View className="bg-white h-[40px]">
+        <View className="h-[40px]">
           <ScrollView
             ref={scrollViewRef}
             horizontal={true}
@@ -184,8 +215,9 @@ export default function AssetDetailsLayout() {
         <Stack screenOptions={{
           headerShown: false,
           animation: 'fade',
+
         }} />
       }
-    </SafeAreaView>
+    </BaseScreenContainer>
   )
 }
