@@ -28,11 +28,6 @@ const AuthService = {
             await LoginSession.saveTokenWithKey(tokenKeyStorage.REFRESH_KEY, res.data.refresh_token)
             break
           }
-          default: {
-            console.log(res.statusText)
-            return false
-          }
-
         }
         return true
       })

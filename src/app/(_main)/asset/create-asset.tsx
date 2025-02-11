@@ -41,6 +41,8 @@ import BaseScreenContainer from '@/components/container/BaseScreenContainer'
 import Loading from '@/components/feedback/Loading'
 import BackButton from '@/components/custom/BackButton'
 import { DEFAULT_PAGE_SIZE } from '@/constants/config'
+import LocationUpdateModal from '@/components/custom/LocationPickModal'
+import { LocationService } from '@/api/LocationService'
 
 enum inputFieldNameList {
   name,
@@ -238,6 +240,17 @@ export default function CreateAsset() {
   const [documentInfo, setdocumentInfo] = useState([])
 
   const [isFileUpload, setIsFileUpload] = useState<boolean>(false)
+
+  //#region location
+  const [locationModalShow, setLocationModalShow] = React.useState(false)
+  const locationListQuery = useQuery({
+    queryKey: ['locations'],
+    queryFn: () => LocationService.getListLocation()
+  })
+  const getLocationName = (): string => {
+    return locationListQuery.data?.data.items.find((i: any) => i.id === locationControl.value)?.name
+  }
+  //#endregion
 
   const validateAll = () => {
     nameControl.validate()
@@ -563,17 +576,27 @@ export default function CreateAsset() {
         />,
         <ControllableInput key={2} control={locationControl} label="Vị trí" errorText='Vị trí không thể trống' isRequired={false}
           input={
-            <Input
-              className="text-center"
-              size="lg"
-              ref={(el) => (elementsRef.current[inputFieldNameList.location] = el)}
-            >
-              <InputField
-                type="text"
-                placeholder="Nhập vị trí"
-                value={locationControl.value}
-                onChangeText={locationControl.onChange} />
-            </Input>
+            <>
+              <LocationUpdateModal
+                showModal={locationModalShow}
+                setShowModal={setLocationModalShow}
+                data={locationListQuery.data?.data.items}
+                pickFn={locationControl.onChange}
+                createFn={() => { }}
+              />
+              <Input
+                isReadOnly={true}
+                variant="outline"
+                size="lg"
+                onTouchEnd={() => setLocationModalShow(true)}
+                ref={(el) => (elementsRef.current[inputFieldNameList.location] = el)}
+              >
+                <InputField placeholder="Vị trí" value={getLocationName()} />
+                <InputSlot >
+                  <InputIcon className="mr-3" as={ChevronDownIcon} />
+                </InputSlot>
+              </Input>
+            </>
           }
         />,
       ],

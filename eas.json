@@ -20,6 +20,14 @@
     "preview4": {
       "distribution": "internal"
     },
-    "production": {}
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_CLIENT_ID": "hometopia-client",
+        "EXPO_PUBLIC_CLIENT_SECRET": "TEQJRvxLkbny0hHAGsSYDrEDrsmMPh3n"
+      },
+      "android": {
+        "buildType": "apk"
+      }
+    }
   }
 }

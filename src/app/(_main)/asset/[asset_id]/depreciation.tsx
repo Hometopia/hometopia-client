@@ -36,11 +36,12 @@ export default function AssetDepreciation() {
             data={`${depreciationQuery.isPending ?
               'Đang tải...'
               :
-              currencyFormatter().format(
-                depreciationQuery.data.data.straightLineDepreciation
-                  .find((i: DepreciationItemType) => i.year === getYear(new Date()))
-                  .value || assetQuery.data.purchasePrice
-              )
+              depreciationQuery.data.data !== undefined ?
+                currencyFormatter().format(
+                  depreciationQuery.data.data.straightLineDepreciation
+                    .find((i: DepreciationItemType) => i.year === getYear(new Date()))
+                    .value || assetQuery.data.purchasePrice
+                ) : assetQuery.data.purchasePrice
               }`}
             opts='em'
           />
@@ -51,31 +52,38 @@ export default function AssetDepreciation() {
           <AssetInfoDisplay
             head="Thời gian khấu hao"
             // data=''
-            data={`${depreciationQuery.isPending ? new String('Đang tải...') : depreciationQuery.data.data.straightLineDepreciation.length} năm`}
+            data={`${depreciationQuery.isPending ? new String('Đang tải...') :
+              depreciationQuery.data.data !== undefined ?
+                depreciationQuery.data.data.straightLineDepreciation.length + ' năm' : 'Chưa tính được'}`}
           />
-          <Table className='w-full rounded-lg overflow-hidden'>
-            <TableHeader>
-              <TableRow className="bg-background-100">
-                <TableHead>Giá trị</TableHead>
-                <TableHead>Năm</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {depreciationQuery.isPending ?
-                <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
-                :
-                depreciationQuery.data.data.straightLineDepreciation
-                  .map((i: DepreciationItemType) =>
-                    <TableRow key={i.year}>
-                      <TableData>{currencyFormatter().format(i.value)}</TableData>
-                      <TableData>{i.year}</TableData>
-                    </TableRow>
-                  )
-              }
+          {depreciationQuery.isFetched && depreciationQuery.data.data !== undefined ?
+            <Table className='w-full rounded-lg overflow-hidden'>
+              <TableHeader>
+                <TableRow className="bg-background-100">
+                  <TableHead>Giá trị</TableHead>
+                  <TableHead>Năm</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {depreciationQuery.isPending ?
+                  <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
+                  :
+                  depreciationQuery.data.data.straightLineDepreciation
+                    .map((i: DepreciationItemType) =>
+                      <TableRow key={i.year}>
+                        <TableData>{currencyFormatter().format(i.value)}</TableData>
+                        <TableData>{i.year}</TableData>
+                      </TableRow>
+                    )
+                }
 
-            </TableBody>
-          </Table>
-
+              </TableBody>
+            </Table>
+            :
+            <View className='w-full p-8 flex flex-row justify-center items-center'>
+              <Text>Chưa tính được, đợi thêm hoặc thử đổi ảnh khác xem.</Text>
+            </View>
+          }
         </ScrollView>
       }
 

@@ -47,17 +47,28 @@ export default function CreateSchedule() {
   const assetQuery: ResponseBaseType | undefined = queryClient.getQueryData(['asset', asset_id])
   const predictCategoryQuery = useQuery({
     queryKey: ['predict-category', asset_id],
-    queryFn: () => ClassificationService.getPredictCategoryByImg(assetQuery?.data?.images[0].fileName as string),
+    queryFn: () => ClassificationService.getPredictCategoryByImg(
+      assetQuery?.data?.images[0] !== null ? assetQuery?.data?.images[0].fileName : ''
+    ),
     enabled: assetQuery !== undefined
   })
 
   const vendorsQuery = useQuery({
     queryKey: ['vendors', asset_id, values.location?.coords.latitude, values.location?.coords.longitude],
-    queryFn: () => VendorService.getListVendor(
-      page, size,
-      predictCategoryQuery.data.prediction,
-      values.location?.coords.latitude || 10, values.location?.coords.longitude || 10
-    ),
+    queryFn: async () => {
+      const res = await VendorService.getListVendor(
+        page, size,
+        predictCategoryQuery.data.prediction,
+        values.location?.coords.latitude || 10, values.location?.coords.longitude || 10
+      )
+
+      if (res === undefined) {
+        return {
+          data: undefined
+        }
+      }
+      return res
+    },
     enabled: predictCategoryQuery.isFetched,
     initialData: []
   })

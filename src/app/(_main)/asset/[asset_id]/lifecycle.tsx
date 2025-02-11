@@ -48,9 +48,10 @@ export default function AssetLifecycle() {
     queryFn: () => AssetService.getAssetLifecycle(asset_id as string),
   })
   const predictCategoryQuery = useQuery({
-    queryKey: ['predict-category', assetQuery?.data?.images[0].fileName],
+    queryKey: ['predict-category', assetQuery?.data?.images[0] !== null ? assetQuery?.data?.images[0].fileName : ''],
     queryFn: async () => {
-      const res = await ClassificationService.getPredictCategoryByImg(assetQuery?.data?.images[0].fileName as string)
+      const res = await ClassificationService.getPredictCategoryByImg(
+        assetQuery?.data?.images[0] !== null ? assetQuery?.data?.images[0].fileName : '')
       if (!res.prediction)
         return {
           prediction: ''

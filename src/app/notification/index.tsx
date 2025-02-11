@@ -53,7 +53,10 @@ export default function Notification() {
   const NotiItem = ({ data }: { data: NotificationType }) => {
     return (
       <TouchableOpacity disabled={data.isRead}
-        onPress={() => handleMarkIsRead(data)}
+        onPress={() => {
+          handleMarkIsRead(data)
+          router.push(`/(_main)/asset/${data.hyperLink.id}`)
+        }}
         className={
           !data.isRead ?
             'flex flex-col gap-2 px-4 py-6 bg-white/10 border-b border-outline-100'

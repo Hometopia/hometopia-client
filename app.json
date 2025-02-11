@@ -28,7 +28,21 @@
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.ACCESS_FINE_LOCATION"
       ],
-      "package": "com.hometopia.Hometopia"
+      "package": "com.hometopia.Hometopia",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "hometopia"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -64,6 +78,14 @@
           "photosPermission": "Allow $(PRODUCT_NAME) to access your photos.",
           "savePhotosPermission": "Allow $(PRODUCT_NAME) to save photos.",
           "isAccessMediaLocationEnabled": true
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
         }
       ]
     ],

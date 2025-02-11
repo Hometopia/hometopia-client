@@ -7,7 +7,7 @@ import { AlertCircleIcon, EyeClosedIcon, EyeIcon } from "lucide-react-native";
 import { Button, ButtonText } from "@/components/ui/button";
 import { HStack } from "@/components/ui/hstack";
 import { Divider } from "@/components/ui/divider";
-import { Pressable, SafeAreaView, View } from "react-native";
+import { Pressable, SafeAreaView, ScrollView, View } from "react-native";
 import { router } from "expo-router";
 import useFormControl from "@/hooks/useFormControl";
 import { isValidEmail, isValidPassword } from "@/helpers/validation";
@@ -20,6 +20,7 @@ import { useMutation } from "@tanstack/react-query";
 import Loading from "@/components/feedback/Loading";
 import BaseScreenContainer from "@/components/container/BaseScreenContainer";
 import { Spinner } from "@/components/ui/spinner";
+import MainContainer from "@/components/container/MainContainer";
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false)
@@ -32,9 +33,13 @@ export default function SignIn() {
     return isValidPassword(value)
   })
 
+  //for test
+  const [loginRes, setLoginRes] = useState()
+  //
   const signInMutation = useMutation({
     mutationFn: (form: LoginForm) => AuthService.signIn(form),
     onSuccess: (res) => {
+      // setLoginRes(res)
       if (res === true) {
         router.replace('/')
       } else {
@@ -200,17 +205,6 @@ export default function SignIn() {
 
 
           <VStack className="items-center">
-            {/* <Button
-              className="w-fit"
-              variant="link"
-              size="xs"
-              onPress={handleNavigateToForgotPassword}
-              disabled
-            >
-              <ButtonText className="text-md text-primary-500">
-                Quên mật khẩu
-              </ButtonText>
-            </Button> */}
             <Divider className="my-4 w-16" />
             <HStack className="items-center gap-4">
               <Text className="text-md text-typography-500">
@@ -224,6 +218,9 @@ export default function SignIn() {
             </HStack>
           </VStack>
         </VStack>
+        {/* <ScrollView>
+          <Text>{JSON.stringify(loginRes)}</Text>
+        </ScrollView> */}
       </View>
     </BaseScreenContainer>
   );

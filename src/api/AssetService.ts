@@ -176,7 +176,10 @@ const AssetService = {
       .then(res => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        console.log(error.response.data)
+        return { data: undefined }
+      })
   }
 }
 
