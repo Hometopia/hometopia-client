@@ -13,7 +13,7 @@ import { parseAdress } from "@/helpers/address";
 import { currencyFormatter } from "@/helpers/currency";
 import { dateToYYYYMMDD, getTime, YYYYMMDDtoLocalDate } from "@/helpers/time";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router, useLocalSearchParams } from "expo-router";
+import { Href, router, useLocalSearchParams } from "expo-router";
 import { ClockIcon, EditIcon, TrashIcon } from "lucide-react-native";
 import React, { useState } from "react";
 import { SafeAreaView, ScrollView, View } from "react-native";
@@ -159,9 +159,8 @@ export default function AssetFix() {
                 })}
                 lookFn={() => {
                   router.push({
-                    pathname: '/(_main)/calendar/[schedule_details]',
+                    pathname: `/(_main)/calendar/${upcomingQuery.data.data.items[0].id}`,
                     params: {
-                      schedule_details: upcomingQuery.data.data.items[0].id,
                       data: JSON.stringify(upcomingQuery.data.data.items[0]),
                       from: 'asset'
                     }

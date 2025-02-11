@@ -16,7 +16,7 @@ import { ScheduleType } from "@/constants/data_enum";
 import { currencyFormatter } from "@/helpers/currency";
 import { calcDuration, dateToISOString, dateToYYYYMMDD, getTime, YYYYMMDDtoLocalDate } from "@/helpers/time";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { router, useFocusEffect, useLocalSearchParams } from "expo-router";
+import { Href, router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { ClockIcon, EditIcon, TrashIcon } from "lucide-react-native";
 import React, { useCallback, useState } from "react";
 import { Alert, SafeAreaView, ScrollView, View } from "react-native";
@@ -166,7 +166,7 @@ export default function AssetMaintenance() {
                     queryKey: ['schedule-upcoming', ScheduleType.MAINTENANCE, asset_id]
                   })
                   router.push({
-                    pathname: '/(_main)/calendar/[schedule_details]',
+                    pathname: `/(_main)/calendar/${upcomingQuery.data.data.items[0].id}`,
                     params: {
                       schedule_details: upcomingQuery.data.data.items[0].id,
                       data: JSON.stringify(upcomingQuery.data.data.items[0]),

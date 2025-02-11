@@ -169,9 +169,8 @@ export default function ScheduleDetails() {
             </View>
             <Button className='bg-primary-400/10 rounded-lg' onPress={() =>
               router.push({
-                pathname: '/(_main)/asset/[asset_id]',
+                pathname: `/(_main)/asset/${parseData.asset.id}`,
                 params: {
-                  asset_id: parseData.asset.id,
                   redirect: `/(_main)/calendar/${parseData.id}`,
                   data: JSON.stringify(parseData)
                 }

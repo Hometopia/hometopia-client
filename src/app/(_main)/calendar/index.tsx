@@ -36,9 +36,8 @@ export default function Calendar() {
           data={scheduleListQuery.data.items.filter((i: ScheduleResponseType) => i.vendor !== null)}
           selected={selected ? selected as string : dateToYYYYMMDD(new Date())}
           touchFn={(id: string) => router.push({
-            pathname: '/(_main)/calendar/[schedule_details]',
+            pathname: `/(_main)/calendar/${id}`,
             params: {
-              schedule_details: id,
               data: JSON.stringify(scheduleListQuery.data.items.find((i: ScheduleResponseType) => i.id == id))
             }
           })}
