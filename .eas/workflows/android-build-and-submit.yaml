@@ -2,7 +2,8 @@ name: Release Android app
 
 on:
   push:
-    branches: ['*']
+    branches: 
+    - product
 
 jobs:
   build:
