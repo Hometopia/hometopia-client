@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Hometopia",
-    "scheme": "hometopia",
+    "scheme": "Hometopia",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
