@@ -5,10 +5,7 @@ import { useQuery } from '@tanstack/react-query'
 import { ScheduleService } from '@/api/ScheduleService'
 
 export default function CalendarLayout() {
-  const scheduleListQuery = useQuery({
-    queryKey: ['schedule-list'],
-    queryFn: () => ScheduleService.getListSchedule()
-  })
+
   return (
     <Stack
       screenOptions={{

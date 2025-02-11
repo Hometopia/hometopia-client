@@ -20,7 +20,10 @@ export default function Calendar() {
 
   const queryClient = useQueryClient()
 
-  const [scheduleListQuery, setScheduleListQuery] = useState<ResponseBaseType | undefined>(queryClient.getQueryData(['schedule-list']))
+  const scheduleListQuery = useQuery({
+    queryKey: ['schedule-list'],
+    queryFn: () => ScheduleService.getListSchedule()
+  })
 
   return (
     <BaseScreenContainer>
