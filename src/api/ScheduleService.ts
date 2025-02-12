@@ -124,6 +124,21 @@ const ScheduleService = {
       })
       .catch((error) => console.error(error.response.data))
   },
+
+  getSuggestedMaintenance: async (id: string, lat: number, lon: number): Promise<any> => {
+    return await axios.get(
+      `${BASE_URL}/schedules/suggested-maintenance-schedule/${id}?lat=${lat}&lon=${lon}`,
+      {
+        headers: {
+          Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,
+        }
+      }
+    )
+      .then((res) => {
+        return res.data
+      })
+      .catch((error) => console.error(error.response.data))
+  }
 }
 
 export { ScheduleService }

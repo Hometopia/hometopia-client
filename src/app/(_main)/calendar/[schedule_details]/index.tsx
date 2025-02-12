@@ -67,6 +67,7 @@ export default function ScheduleDetails() {
   // 
   const backFn = () => {
     if (!from) router.back()
+    if (!scheduleQuery.isFetched) router.back()
     if (from === 'asset')
       router.push(`/(_main)/asset/${scheduleQuery.data.data.items[0].asset.id}/${scheduleQuery.data.data.items[0].type === ScheduleType.MAINTENANCE ? 'maintenance' : 'fix'}` as Href)
     else if (from === 'asset-back') {
@@ -177,52 +178,53 @@ export default function ScheduleDetails() {
               <Text className='text-lg font-bold'>Chi phí dự kiến</Text>
               <Text className='text-lg'>{scheduleQuery.data.data.items[0].cost ? currencyFormatter().format(scheduleQuery.data.data.items[0].cost) : 'Không có'}</Text>
             </View>
-            <View className='self-stretch'>
-              <Text className='text-lg font-bold'>Bên cung cấp dịch vụ</Text>
-              <View className='h-60 rounded-lg my-2'>
-                <MapView
-                  provider={PROVIDER_GOOGLE}
-                  style={StyleSheet.absoluteFillObject}
-                  initialRegion={{
-                    latitude: extractLatLng(scheduleQuery.data.data.items[0].vendor.link).latitude,
-                    longitude: extractLatLng(scheduleQuery.data.data.items[0].vendor.link).longitude,
-                    latitudeDelta: 0.01,
-                    longitudeDelta: 0.01,
-                  }}
-                  scrollEnabled={false}
-                  zoomEnabled={false}
-                  rotateEnabled={false}
-                  pitchEnabled={false}
-                >
-                  <Marker
-                    coordinate={{
+            {scheduleQuery.data.data.items[0].vendor &&
+              <View className='self-stretch'>
+                <Text className='text-lg font-bold'>Bên cung cấp dịch vụ</Text>
+                <View className='h-60 rounded-lg my-2'>
+                  <MapView
+                    provider={PROVIDER_GOOGLE}
+                    style={StyleSheet.absoluteFillObject}
+                    initialRegion={{
                       latitude: extractLatLng(scheduleQuery.data.data.items[0].vendor.link).latitude,
-                      longitude: extractLatLng(scheduleQuery.data.data.items[0].vendor.link).longitude
+                      longitude: extractLatLng(scheduleQuery.data.data.items[0].vendor.link).longitude,
+                      latitudeDelta: 0.01,
+                      longitudeDelta: 0.01,
                     }}
-                    title={scheduleQuery.data.data.items[0].vendor.name}
-                    description="Vị trí này được lấy từ Google Maps"
-                  />
-                </MapView>
+                    scrollEnabled={false}
+                    zoomEnabled={false}
+                    rotateEnabled={false}
+                    pitchEnabled={false}
+                  >
+                    <Marker
+                      coordinate={{
+                        latitude: extractLatLng(scheduleQuery.data.data.items[0].vendor.link).latitude,
+                        longitude: extractLatLng(scheduleQuery.data.data.items[0].vendor.link).longitude
+                      }}
+                      title={scheduleQuery.data.data.items[0].vendor.name}
+                      description="Vị trí này được lấy từ Google Maps"
+                    />
+                  </MapView>
+                </View>
+                <View className='flex flex-col py-2 gap-4'>
+                  <View className='flex flex-col'>
+                    <Text className='text-lg font-bold'>Tên:</Text>
+                    <Text className='text-lg'>{scheduleQuery.data.data.items[0].vendor.name}</Text>
+                  </View>
+                  <View className='flex flex-col'>
+                    <Text className='text-lg font-bold'>Website:</Text>
+                    <Link className='text-lg text-info-500 focus:text-info-500/50'
+                      href={scheduleQuery.data.data.items[0].vendor.website as Href}>
+                      {scheduleQuery.data.data.items[0].vendor.website}
+                    </Link>
+                  </View>
+                  <View className='flex flex-col'>
+                    <Text className='text-lg font-bold'>Điện thoại:</Text>
+                    <Text className='text-lg'>{scheduleQuery.data.data.items[0].vendor.phoneNumber}</Text>
+                  </View>
+                </View>
               </View>
-              <View className='flex flex-col py-2 gap-4'>
-                <View className='flex flex-col'>
-                  <Text className='text-lg font-bold'>Tên:</Text>
-                  <Text className='text-lg'>{scheduleQuery.data.data.items[0].vendor.name}</Text>
-                </View>
-                <View className='flex flex-col'>
-                  <Text className='text-lg font-bold'>Website:</Text>
-                  <Link className='text-lg text-info-500 focus:text-info-500/50'
-                    href={scheduleQuery.data.data.items[0].vendor.website as Href}>
-                    {scheduleQuery.data.data.items[0].vendor.website}
-                  </Link>
-                </View>
-                <View className='flex flex-col'>
-                  <Text className='text-lg font-bold'>Điện thoại:</Text>
-                  <Text className='text-lg'>{scheduleQuery.data.data.items[0].vendor.phoneNumber}</Text>
-                </View>
-              </View>
-            </View>
-
+            }
           </View>
           :
           <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />

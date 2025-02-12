@@ -143,6 +143,13 @@ type ScheduleResponseType = {
     name: string
   }
 }
+type SuggestedScheduleResponseType = {
+  title: string,
+  start: string,
+  vendor: VendorType,
+  type: string,
+  assetId: string
+}
 //#endregion
 
 //#region statistic
@@ -189,5 +196,6 @@ export {
   LocationResponseType,
   AssetOnListResponseType,
   DepreciationItemType,
-  DepreciationType
+  DepreciationType,
+  SuggestedScheduleResponseType
 }

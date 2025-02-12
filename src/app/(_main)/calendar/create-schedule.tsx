@@ -2,7 +2,7 @@ import { View, Text, SafeAreaView, ScrollView, StyleSheet, findNodeHandle, BackH
 import React, { useEffect, useRef, useState } from 'react'
 import { Href, router, useLocalSearchParams, useNavigation } from 'expo-router'
 import BackButton from '@/components/custom/BackButton'
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+import MapView, { LatLng, Marker, PROVIDER_GOOGLE } from 'react-native-maps'
 import * as Location from 'expo-location'
 import { useGlobalContext } from '@/contexts/GlobalProvider'
 import { Input, InputField, InputSlot } from '@/components/ui/input'
@@ -29,6 +29,7 @@ import { useToast } from '@/components/ui/toast'
 import CommonToast from '@/components/feedback/CommonToast'
 import { deformatNumber, formatNumber } from '@/helpers/currency'
 import BaseScreenContainer from '@/components/container/BaseScreenContainer'
+import OnMapLocationPicker from '@/components/custom/OnMapLocationPicker'
 
 enum inputFieldNameList {
   title
@@ -37,6 +38,10 @@ enum inputFieldNameList {
 export default function CreateSchedule() {
   const { asset_id, type } = useLocalSearchParams()
   const values = useGlobalContext()
+  const [selectedLocation, setSelectedLocation] = useState<LatLng>({
+    latitude: values.location?.coords.latitude || 10,
+    longitude: values.location?.coords.longitude || 100,
+  })
 
   const [page, setPage] = useState(1)
   const [size, setSize] = useState(10)
@@ -47,19 +52,27 @@ export default function CreateSchedule() {
   const assetQuery: ResponseBaseType | undefined = queryClient.getQueryData(['asset', asset_id])
   const predictCategoryQuery = useQuery({
     queryKey: ['predict-category', asset_id],
-    queryFn: () => ClassificationService.getPredictCategoryByImg(
-      assetQuery?.data?.images[0] !== null ? assetQuery?.data?.images[0].fileName : ''
-    ),
+    queryFn: async () => {
+      const res = await ClassificationService.getPredictCategoryByImg(
+        assetQuery?.data?.images[0] !== null ? assetQuery?.data?.images[0].fileName : ''
+      )
+      if (res === undefined) {
+        return {
+          data: undefined
+        }
+      }
+      return res
+    },
     enabled: assetQuery !== undefined
   })
 
   const vendorsQuery = useQuery({
-    queryKey: ['vendors', asset_id, values.location?.coords.latitude, values.location?.coords.longitude],
+    queryKey: ['vendors', asset_id, selectedLocation.latitude, selectedLocation.longitude],
     queryFn: async () => {
       const res = await VendorService.getListVendor(
         page, size,
         predictCategoryQuery.data.prediction,
-        values.location?.coords.latitude || 10, values.location?.coords.longitude || 10
+        selectedLocation.latitude, selectedLocation.longitude
       )
 
       if (res === undefined) {
@@ -201,16 +214,16 @@ export default function CreateSchedule() {
       <SectionHead text='Vị trí của bạn'>
         <Icon as={LocateIcon} className='text-primary-400 w-6 h-6' />
       </SectionHead>
-      <Text className='text-lg font-normal italic'>Vị trí này được lấy từ GPS </Text>
-      <View className='h-60 rounded-lg my-2'>
+
+      <View className='h-60 rounded-lg my-2 overflow-hidden'>
         <MapView
           provider={PROVIDER_GOOGLE}
           style={StyleSheet.absoluteFillObject}
           initialRegion={{
-            latitude: values.location?.coords.latitude || 10,
-            longitude: values.location?.coords.longitude || 10,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
+            latitude: selectedLocation.latitude,
+            longitude: selectedLocation.longitude,
+            latitudeDelta: 0.02,
+            longitudeDelta: 0.02,
           }}
           scrollEnabled={false}
           zoomEnabled={false}
@@ -225,6 +238,14 @@ export default function CreateSchedule() {
             description="Vị trí này được lấy từ Google Maps"
           />
         </MapView>
+      </View>
+      <View className='w-full flex flex-row justify-center'>
+        <OnMapLocationPicker
+          selectedLocation={selectedLocation}
+          pickFn={(coord: LatLng) => {
+            setSelectedLocation(coord)
+            vendorsQuery.refetch()
+          }} />
       </View>
     </View>
   )

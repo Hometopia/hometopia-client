@@ -25,7 +25,7 @@ export default function Calendar() {
 
   return (
     <BaseScreenContainer>
-      {scheduleListQuery === undefined ?
+      {scheduleListQuery.isPending ?
         <Loading texts={[{
           condition: true,
           text: 'Đang tải...'

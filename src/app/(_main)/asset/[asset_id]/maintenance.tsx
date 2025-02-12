@@ -1,11 +1,14 @@
 import { AssetService } from "@/api/AssetService";
 import { ScheduleService } from "@/api/ScheduleService";
 import { ScheduleType as ScheduleRequestType } from "@/api/types/request";
-import { AssetResponseType, ResponseBaseType, ScheduleResponseType } from "@/api/types/response";
+import { AssetResponseType, ResponseBaseType, ScheduleResponseType, SuggestedScheduleResponseType } from "@/api/types/response";
 import BaseScreenContainer from "@/components/container/BaseScreenContainer";
 import Callout from "@/components/custom/Callout";
 import { CustomTable, TableCol } from "@/components/custom/CustomTable";
+import DeleteDialog from "@/components/custom/DeleteDialog";
+import OnMapLocationPicker from "@/components/custom/OnMapLocationPicker";
 import ScheduleUpdateModal from "@/components/custom/ScheduleUpdateModal";
+import SuggestedMaintenanceCard from "@/components/custom/SuggestedMaintenanceCard";
 import Loading from "@/components/feedback/Loading";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
@@ -13,13 +16,16 @@ import { Pressable } from "@/components/ui/pressable";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Text } from "@/components/ui/text";
 import { ScheduleType } from "@/constants/data_enum";
+import { useGlobalContext } from "@/contexts/GlobalProvider";
 import { currencyFormatter } from "@/helpers/currency";
 import { calcDuration, dateToISOString, dateToYYYYMMDD, getTime, YYYYMMDDtoLocalDate } from "@/helpers/time";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { compareAsc } from "date-fns";
 import { Href, router, useFocusEffect, useLocalSearchParams } from "expo-router";
 import { ClockIcon, EditIcon, TrashIcon } from "lucide-react-native";
 import React, { useCallback, useState } from "react";
 import { Alert, SafeAreaView, ScrollView, View } from "react-native";
+import { LatLng } from "react-native-maps";
 const totalOf = (arr: number[]) => {
   var total = 0
   arr.forEach(i => {
@@ -47,12 +53,17 @@ const data = (assetData: AssetResponseType, history: ScheduleResponseType[]) => 
 
 export default function AssetMaintenance() {
   const { asset_id } = useLocalSearchParams()
-
+  const globalValues = useGlobalContext()
   const queryClient = useQueryClient()
 
+  const [selectedLocation, setSelectedLocation] = useState<LatLng>({
+    latitude: globalValues.location?.coords.latitude || 10,
+    longitude: globalValues.location?.coords.longitude || 100,
+  })
   const [assetQuery, setAssetQuery] = React.useState<ResponseBaseType | undefined>(queryClient.getQueryData(['asset', asset_id]))
 
   const [showUpdateModal, setShowUpdateModal] = useState(false)
+  const [deleteScheduleDialogShow, setDeleteScheduleDialogShow] = useState(false)
   const [currentSchedule, setCurrentSchedule] = useState<ScheduleResponseType>()
 
   const historyQuery = useQuery({
@@ -71,7 +82,13 @@ export default function AssetMaintenance() {
         ScheduleType.MAINTENANCE,
         new Date()
       ),
-
+  })
+  const suggestedScheduleQuery = useQuery({
+    queryKey: ['suggested-schedule', asset_id],
+    queryFn: () => ScheduleService.getSuggestedMaintenance(
+      asset_id as string,
+      selectedLocation?.latitude,
+      selectedLocation?.longitude)
   })
   const scheduleUpdateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string, data: ScheduleRequestType }) => ScheduleService.updateSchedule(id, data),
@@ -126,7 +143,8 @@ export default function AssetMaintenance() {
             </Button>
             <Button
               onPress={() => {
-                scheduleDeleteMutation.mutate(i.id)
+                setCurrentSchedule(i)
+                setDeleteScheduleDialogShow(true)
               }}
               className="px-3 rounded-xl"
               variant='outline'
@@ -166,6 +184,40 @@ export default function AssetMaintenance() {
                 }}
               />
             }
+            <View className="flex flex-col items-start gap-2">
+              <View className="flex flex-row gap-4">
+                <View className="py-2">
+                  <Text className="text-typography-800 font-bold text-md ">
+                    Đề xuất bảo trì
+                  </Text>
+                </View>
+                <OnMapLocationPicker
+                  selectedLocation={selectedLocation}
+                  pickFn={(coord: LatLng) => {
+                    setSelectedLocation(coord)
+                    suggestedScheduleQuery.refetch()
+                  }} />
+              </View>
+
+              {suggestedScheduleQuery.isFetched &&
+                suggestedScheduleQuery.data.data.items.length > 0 ?
+                <ScrollView className="h-40" horizontal>
+                  <View className="flex flex-row gap-4">
+                    {suggestedScheduleQuery.data.data.items
+                      .filter((i: SuggestedScheduleResponseType) =>
+                        compareAsc(new Date(i.start), new Date()) === 1)
+                      .map((i: SuggestedScheduleResponseType) => (
+                        <SuggestedMaintenanceCard key={i.title} data={i} scheduleFn={() => { }} />
+                      ))}
+                  </View>
+                </ScrollView>
+                :
+                <View className="w-full flex flex-col justify-center items-center">
+                  <Text className="text-typography-600 text-center">Không có</Text>
+                </View>
+              }
+
+            </View>
 
             <View className="flex flex-col gap-2">
               {historyQuery.isFetched && data(assetQuery.data, historyQuery.data.data.items).map((i) => (
@@ -204,6 +256,20 @@ export default function AssetMaintenance() {
             </View>
           </View>
         </ScrollView>
+      }
+      {
+        currentSchedule &&
+        <DeleteDialog text={`lịch sử ngày ${dateToYYYYMMDD(new Date(currentSchedule.start))}`}
+          show={deleteScheduleDialogShow}
+          setShow={(bool: boolean) => {
+            setDeleteScheduleDialogShow(bool)
+            if (!bool)
+              setCurrentSchedule(undefined)
+          }}
+          deleteFn={() => {
+            scheduleDeleteMutation.mutate(currentSchedule.id)
+            setCurrentSchedule(undefined)
+          }} />
       }
       {currentSchedule ?
         <ScheduleUpdateModal

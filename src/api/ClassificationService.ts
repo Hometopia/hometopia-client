@@ -20,7 +20,7 @@ const ClassificationService = {
       })
       .catch((error) => {
         // console.error(error.response.data)
-        return error.response.data
+        return undefined
       })
   }
 
