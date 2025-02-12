@@ -36,6 +36,19 @@ const ScheduleService = {
       })
   },
 
+  getSchedule: async (id: string): Promise<any> => {
+    return await axios.get(
+      `${BASE_URL}/schedules?filter=id==${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${await LoginSession.getTokenWithKey(tokenKeyStorage.ACCESS_KEY)}`,
+        }
+      }
+    )
+      .then((res) => res.data)
+      .catch((error) => console.error(error.response.data))
+  },
+
   getUpcomingSchedule: async (asssetId: string, type: string, date: Date): Promise<any> => {
     const tranfDate: string = dateToISOString(date)
     return await axios.get(

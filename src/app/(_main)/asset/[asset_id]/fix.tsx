@@ -150,21 +150,12 @@ export default function AssetFix() {
               <Skeleton className="h-10 w-full" variant='rounded' />
               :
               <Callout what="fix" size='mobile' data={upcomingQuery.data.data.items}
-                scheduleFn={() => router.push({
-                  pathname: `/(_main)/calendar/create-schedule`,
-                  params: {
-                    asset_id: asset_id,
-                    type: ScheduleType.REPAIR
-                  }
-                })}
+                scheduleFn={() => router.push(`/(_main)/calendar/create-schedule?asset_id=${asset_id}&type=${ScheduleType.REPAIR}`)}
                 lookFn={() => {
-                  router.push({
-                    pathname: `/(_main)/calendar/${upcomingQuery.data.data.items[0].id}`,
-                    params: {
-                      data: JSON.stringify(upcomingQuery.data.data.items[0]),
-                      from: 'asset'
-                    }
+                  queryClient.invalidateQueries({
+                    queryKey: ['schedule-upcoming', ScheduleType.REPAIR, asset_id]
                   })
+                  router.push(`/(_main)/calendar/${upcomingQuery.data.data.items[0].id as string}?from=asset` as Href)
                 }}
                 cancelFn={() => {
                   scheduleDeleteMutation.mutate(upcomingQuery.data.data.items[0].id)

@@ -154,25 +154,12 @@ export default function AssetMaintenance() {
               <Skeleton className="h-10 w-full" variant='rounded' />
               :
               <Callout what="maintenance" size='mobile' data={upcomingQuery.data.data.items}
-                scheduleFn={() => router.push({
-                  pathname: `/(_main)/calendar/create-schedule`,
-                  params: {
-                    asset_id: asset_id,
-                    type: ScheduleType.MAINTENANCE
-                  }
-                })}
+                scheduleFn={() => router.push(`/(_main)/calendar/create-schedule?asset_id=${asset_id}&type=${ScheduleType.MAINTENANCE}`)}
                 lookFn={() => {
                   queryClient.invalidateQueries({
                     queryKey: ['schedule-upcoming', ScheduleType.MAINTENANCE, asset_id]
                   })
-                  router.push({
-                    pathname: `/(_main)/calendar/${upcomingQuery.data.data.items[0].id}`,
-                    params: {
-                      schedule_details: upcomingQuery.data.data.items[0].id,
-                      data: JSON.stringify(upcomingQuery.data.data.items[0]),
-                      from: 'asset'
-                    }
-                  })
+                  router.push(`/(_main)/calendar/${upcomingQuery.data.data.items[0].id as string}?from=asset` as Href)
                 }}
                 cancelFn={() => {
                   scheduleDeleteMutation.mutate(upcomingQuery.data.data.items[0].id)

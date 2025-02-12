@@ -240,18 +240,23 @@ export default function CreateSchedule() {
             text: "Đang tải..."
           }]} />
         :
-        <ScrollView horizontal={true} overScrollMode='never'>
-          <View className='flex flex-row gap-2'>
-            {vendorsQuery.data.data?.items?.map((i: VendorType) =>
-              <VendorCard
-                key={i.name}
-                data={i}
-                isChosen={vendor?.address === i.address}
-                choosenFn={() => setVendor(i)}
-                cancelFn={() => setVendor(undefined)}
-              />)}
+        vendorsQuery.data.data !== undefined ?
+          <ScrollView horizontal={true} overScrollMode='never'>
+            <View className='flex flex-row gap-2'>
+              {vendorsQuery.data.data?.items?.map((i: VendorType) =>
+                <VendorCard
+                  key={i.name}
+                  data={i}
+                  isChosen={vendor?.address === i.address}
+                  choosenFn={() => setVendor(i)}
+                  cancelFn={() => setVendor(undefined)}
+                />)}
+            </View>
+          </ScrollView>
+          :
+          <View className='h-10 flex flex-row justify-center'>
+            <Text className='text-warning-400'>Tạm thời không thể nhận diện được lại tài sản này.</Text>
           </View>
-        </ScrollView>
       }
       {/* <View className='flex flex-row justify-end'>
         <Button variant='outline' action='primary'>

@@ -13,13 +13,11 @@ import ControllableInput from "@/components/custom/ControllableInput";
 import { Input, InputField } from "@/components/ui/input";
 import BaseScreenContainer from "@/components/container/BaseScreenContainer";
 import { useGlobalContext } from "@/contexts/GlobalProvider";
+import { Button } from "@/components/ui/button";
 
 export default function Calendar() {
   const { selected } = useLocalSearchParams()
   const globalValues = useGlobalContext()
-
-  const queryClient = useQueryClient()
-
   const scheduleListQuery = useQuery({
     queryKey: ['schedule-list'],
     queryFn: () => ScheduleService.getListSchedule()
@@ -36,14 +34,9 @@ export default function Calendar() {
         :
         <Schedule
           theme={globalValues.themeMode === 'dark' ? 'dark' : 'light'}
-          data={scheduleListQuery.data.items.filter((i: ScheduleResponseType) => i.vendor !== null)}
+          data={scheduleListQuery.data.data.items.filter((i: ScheduleResponseType) => i.vendor !== null)}
           selected={selected ? selected as string : dateToYYYYMMDD(new Date())}
-          touchFn={(id: string) => router.push({
-            pathname: `/(_main)/calendar/${id}`,
-            params: {
-              data: JSON.stringify(scheduleListQuery.data.items.find((i: ScheduleResponseType) => i.id == id))
-            }
-          })}
+          touchFn={(id: string) => router.push(`/(_main)/calendar/${id}`)}
         />
       }
 

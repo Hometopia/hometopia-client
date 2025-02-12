@@ -1,7 +1,7 @@
 import { Button, ButtonIcon, ButtonText } from "../ui/button";
 import { PrinterIcon, QrCode, QrCodeIcon } from "lucide-react-native";
 import { Menu, MenuItem, MenuItemLabel } from "../ui/menu";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import QRCode from "react-native-qrcode-svg";
 import { TouchableOpacity, View } from "react-native";
 import { CloseIcon, Icon } from "../ui/icon";
@@ -9,6 +9,9 @@ import { DEEP_LINK } from "@/constants/client";
 import { Modal, ModalBackdrop, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader } from "../ui/modal";
 import { Text } from "../ui/text";
 import { Spinner } from "../ui/spinner";
+import ViewShot from 'react-native-view-shot'
+import * as FileSystem from "expo-file-system";
+import * as Sharing from "expo-sharing";
 export default function QRGenerateButton({
   uri, size = 'lg', name
 }: {
@@ -18,12 +21,35 @@ export default function QRGenerateButton({
 }) {
   const [generate, setGenerate] = useState(false)
   const [qrValue, setQrValue] = useState<string | null>(null)
+  const viewShotRef = useRef<ViewShot>(null)
 
   const generateQR = () => {
     setQrValue(DEEP_LINK + uri)
     setGenerate(true)
   }
 
+  const exportQRCode = async () => {
+    try {
+      if (!viewShotRef.current) return
+      const viewShot = viewShotRef.current
+      if (viewShot.capture) {
+        viewShot.capture().then(async (uri) => {
+          // Lưu QR code vào bộ nhớ tạm
+          const fileUri = `${FileSystem.cacheDirectory}qrcode.png`;
+          await FileSystem.moveAsync({
+            from: uri,
+            to: fileUri,
+          });
+
+          await Sharing.shareAsync(fileUri);
+
+        })
+      }
+    } catch (error) {
+      console.error("Error exporting QR code:", error);
+    }
+
+  }
   return (
     <View>
       <TouchableOpacity
@@ -54,7 +80,11 @@ export default function QRGenerateButton({
           <ModalBody className="py-4">
             {qrValue ?
               <View className="flex justify-center items-center">
-                <QRCode value={qrValue} size={200} />
+                <ViewShot ref={viewShotRef} options={{ format: "png", quality: 1 }}>
+                  <View className="p-4">
+                    <QRCode value={qrValue} size={200} />
+                  </View>
+                </ViewShot>
               </View>
               :
               <View className="flex justify-center items-center h-[200px] w-[200px]">
@@ -65,7 +95,7 @@ export default function QRGenerateButton({
 
           </ModalBody>
           <ModalFooter>
-            <Button className="rounded-lg w-full" size='lg'>
+            <Button className="rounded-lg w-full" size='lg' onPress={exportQRCode}>
               <ButtonIcon as={PrinterIcon} />
               <ButtonText>In</ButtonText>
             </Button>
