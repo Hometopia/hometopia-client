@@ -216,7 +216,7 @@ export default function CreateSchedule() {
       </SectionHead>
 
       <View className='h-60 rounded-lg my-2 overflow-hidden'>
-        <MapView
+        {/* <MapView
           provider={PROVIDER_GOOGLE}
           style={StyleSheet.absoluteFillObject}
           initialRegion={{
@@ -237,15 +237,15 @@ export default function CreateSchedule() {
             }}
             description="Vị trí này được lấy từ Google Maps"
           />
-        </MapView>
+        </MapView> */}
       </View>
       <View className='w-full flex flex-row justify-center'>
-        <OnMapLocationPicker
+        {/* <OnMapLocationPicker
           selectedLocation={selectedLocation}
           pickFn={(coord: LatLng) => {
             setSelectedLocation(coord)
             vendorsQuery.refetch()
-          }} />
+          }} /> */}
       </View>
     </View>
   )

@@ -187,10 +187,10 @@ export default function ScheduleDetails() {
               <Text className='text-lg font-bold'>Chi phí dự kiến</Text>
               <Text className='text-lg'>{scheduleQuery.data.data.items[0].cost ? currencyFormatter().format(scheduleQuery.data.data.items[0].cost) : 'Không có'}</Text>
             </View>
-            {/* {scheduleQuery.data.data.items[0].vendor &&
+            {scheduleQuery.data.data.items[0].vendor &&
               <View className='self-stretch'>
                 <Text className='text-lg font-bold'>Bên cung cấp dịch vụ</Text>
-                <View className='h-60 rounded-lg my-2'>
+                {/* <View className='h-60 rounded-lg my-2'>
                   <MapView
                     provider={PROVIDER_GOOGLE}
                     style={StyleSheet.absoluteFillObject}
@@ -214,7 +214,7 @@ export default function ScheduleDetails() {
                       description="Vị trí này được lấy từ Google Maps"
                     />
                   </MapView>
-                </View>
+                </View> */}
                 <View className='flex flex-col py-2 gap-4'>
                   <View className='flex flex-col'>
                     <Text className='text-lg font-bold'>Tên:</Text>
@@ -233,7 +233,7 @@ export default function ScheduleDetails() {
                   </View>
                 </View>
               </View>
-            } */}
+            }
           </View>
           :
           <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
