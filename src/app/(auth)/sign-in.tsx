@@ -41,7 +41,7 @@ export default function SignIn() {
     onSuccess: (res) => {
       // setLoginRes(res)
       if (res === true) {
-        router.replace('/')
+        router.replace('/(_main)/asset')
       } else {
         handleToast()
       }
