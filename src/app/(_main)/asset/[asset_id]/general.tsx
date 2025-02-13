@@ -106,7 +106,7 @@ export default function AssetGeneral() {
       }
       fileUploadErrorToast.handleToast()
     },
-    onError: (err) => console.error(err)
+    // onError: (err) => console.error(err)
   })
   const truthData = (asset: AssetResponseType) => [
     {
@@ -120,6 +120,9 @@ export default function AssetGeneral() {
         },
         { head: 'Mô tả', data: asset.description },
         { head: 'Tạo vào', data: ISOtoLocal(asset.createdAt) },
+        { head: 'Chu kỳ bảo trì', data: asset.maintenanceCycle.toString() + ' tháng' || 'Chưa có' },
+        { head: 'Thời gian sống', data: asset.usefulLife.toString() + ' năm' || 'Chưa có' },
+        { head: 'Nhãn', data: asset.label.toString() || 'Chưa có' },
       ],
     },
     {

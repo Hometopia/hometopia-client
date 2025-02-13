@@ -31,7 +31,9 @@ const AssetService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
   getAssetListByLocation: async (
     location: string,
@@ -58,7 +60,9 @@ const AssetService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
   getAllAsset: async (): Promise<any> => {
     return await axios.get(
@@ -72,7 +76,9 @@ const AssetService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
   getAsset: async (assetId: string): Promise<any> => {
     return await axios.get(
@@ -86,7 +92,9 @@ const AssetService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
   createAsset: async (assetData: AssetType): Promise<any> => {
     console.log('assetData', assetData)
@@ -102,7 +110,9 @@ const AssetService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
   deleteAsset: async (assetId: string): Promise<any> => {
     return await axios.delete(
@@ -116,7 +126,9 @@ const AssetService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
   deleteListAsset: async (assetIds: string[]): Promise<any> => {
     return await axios.delete(
@@ -130,7 +142,9 @@ const AssetService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
   updateAsset: async (assetId: string, updateData: AssetType): Promise<any> => {
     return await axios.put(
@@ -145,7 +159,9 @@ const AssetService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
   getAssetLifecycle: async (assetId: string): Promise<AssetLifecycleResponseType | any> => {
     return await axios.get(
@@ -177,7 +193,7 @@ const AssetService = {
         return res.data
       })
       .catch((error) => {
-        console.log(error.response.data)
+
         return { data: undefined }
       })
   }

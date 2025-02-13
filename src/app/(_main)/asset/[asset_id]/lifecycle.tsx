@@ -47,31 +47,6 @@ export default function AssetLifecycle() {
     queryKey: ['asset-life-cycle', asset_id],
     queryFn: () => AssetService.getAssetLifecycle(asset_id as string),
   })
-  const predictCategoryQuery = useQuery({
-    queryKey: ['predict-category', assetQuery?.data?.images[0] !== null ? assetQuery?.data?.images[0].fileName : ''],
-    queryFn: async () => {
-      const res = await ClassificationService.getPredictCategoryByImg(
-        assetQuery?.data?.images[0] !== null ? assetQuery?.data?.images[0].fileName : '')
-      if (!res.prediction)
-        return {
-          prediction: ''
-        }
-      return {
-        prediction: res.prediction
-      }
-    },
-    enabled: !!assetQuery?.data
-  })
-
-  const usefulLifeQuery = useQuery({
-    queryKey: ['useful-life', asset_id],
-    queryFn: async () => {
-      if (predictCategoryQuery.data?.prediction === '')
-        return { usefulLife: 3 }
-      return await RuleService.getUsefulLife(predictCategoryQuery.data?.prediction)
-    },
-    enabled: predictCategoryQuery.isFetched
-  })
 
   const createScheduleMutation = useMutation({
     mutationFn: (data: ScheduleRequestType) => ScheduleService.createSchedule(data),
@@ -113,7 +88,7 @@ export default function AssetLifecycle() {
                 Thời gian sống của {assetQuery?.data && assetQuery?.data.name} :
               </Text>
               <Text className='text-lg text-success-400'>
-                {usefulLifeQuery.isFetched && usefulLifeQuery.data !== undefined && usefulLifeQuery.data.usefulLife} năm
+                {assetQuery?.data && assetQuery?.data.usefulLife} năm
               </Text>
             </View>
           </View>

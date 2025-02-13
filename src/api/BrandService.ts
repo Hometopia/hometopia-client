@@ -16,7 +16,7 @@ const BrandService = {
       return res.data
     })
       .catch((error) => {
-        console.error(error.response.data)
+        // console.error(error.response.data)
       })
   }
 }

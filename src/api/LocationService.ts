@@ -14,7 +14,9 @@ const LocationService = {
       }
     )
       .then((res) => res.data)
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
   getLocationById: async (id: string): Promise<any> => {
     return await axios.get(
@@ -26,7 +28,9 @@ const LocationService = {
       }
     )
       .then((res) => res.data)
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   createLocation: async (payload: LocationType): Promise<any> => {
@@ -40,7 +44,9 @@ const LocationService = {
       }
     )
       .then((res) => res.data)
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   updateLocation: async (id: string, payload: LocationType): Promise<any> => {
@@ -54,7 +60,9 @@ const LocationService = {
       }
     )
       .then((res) => res.data)
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   deleteLocation: async (id: string): Promise<any> => {
@@ -67,7 +75,9 @@ const LocationService = {
       }
     )
       .then((res) => true)
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 }
 

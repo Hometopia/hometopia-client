@@ -34,7 +34,7 @@ const RuleService = {
     )
       .then((res) => res.data)
       .catch((error) => {
-        console.error(error.response.data)
+        // console.error(error.response.data)
         return undefined
       })
   }

@@ -9,7 +9,9 @@ const AddressService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
   getDistrictList: async (provinceId: string): Promise<any> => {
     return await axios.get(
@@ -18,7 +20,9 @@ const AddressService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
   getWardList: async (districtId: string): Promise<any> => {
     return await axios.get(
@@ -27,7 +31,9 @@ const AddressService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
 }

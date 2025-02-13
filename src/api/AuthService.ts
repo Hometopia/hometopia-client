@@ -44,7 +44,7 @@ const AuthService = {
         return res.data
       })
       .catch(error => {
-        console.error(error.response.data)
+        // console.error(error.response.data)
         return error.response.data
       })
   },
@@ -103,7 +103,7 @@ const AuthService = {
         return true
       })
       .catch((error) => {
-        console.error(error.response.data)
+        // console.error(error.response.data)
         return false
       })
   }

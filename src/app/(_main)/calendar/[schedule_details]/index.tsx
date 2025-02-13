@@ -1,4 +1,4 @@
-import { View, SafeAreaView, ScrollView, StyleSheet, BackHandler } from 'react-native'
+import { View, SafeAreaView, ScrollView, StyleSheet, BackHandler, TouchableOpacity, Linking } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { Href, Link, router, useLocalSearchParams } from 'expo-router'
 import { Button, ButtonIcon, ButtonText } from '@/components/ui/button'
@@ -229,7 +229,11 @@ export default function ScheduleDetails() {
                   </View>
                   <View className='flex flex-col'>
                     <Text className='text-lg font-bold'>Điện thoại:</Text>
-                    <Text className='text-lg'>{scheduleQuery.data.data.items[0].vendor.phoneNumber}</Text>
+                    <TouchableOpacity onPress={() => Linking.openURL(`tel:${scheduleQuery.data.data.items[0].vendor.phoneNumber}`)}>
+                      <Text className='text-lg'>
+                        {scheduleQuery.data.data.items[0].vendor.phoneNumber}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
               </View>

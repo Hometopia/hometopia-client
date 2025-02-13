@@ -189,7 +189,7 @@ const YearReport = ({
             <View className='flex flex-col gap-2 px-4 py-4 rounded-xl border border-outline-100'>
               <View className='flex flex-row gap-2'>
                 <Icon as={WrenchIcon} className='text-error-400' />
-                <Text className='text-typography-400'>Tài sản hỏng nhiều nhất năm:
+                <Text className='text-typography-400'>Tài sản hỏng / bảo trì nhiều nhất năm:
                   <Text className='text-primary-400'>
                     {assetCostByYearQuery.data.data.mostBroken.name}</Text>
                 </Text>

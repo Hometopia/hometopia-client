@@ -47,7 +47,7 @@ const FileService = {
         return res.data
       })
       .catch((error) => {
-        console.error(error.request)
+        // console.error(error.request)
         return error
       })
   },

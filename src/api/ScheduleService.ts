@@ -60,7 +60,9 @@ const ScheduleService = {
       }
     )
       .then((res) => res.data)
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   getMonthSchedules: async (type: string, year: number, month: number): Promise<any> => {
@@ -75,7 +77,9 @@ const ScheduleService = {
       }
     )
       .then((res) => res.data)
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   createSchedule: async (scheduleData: ScheduleType): Promise<any> => {
@@ -91,7 +95,9 @@ const ScheduleService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   updateSchedule: async (id: string, scheduleData: ScheduleType): Promise<any> => {
@@ -107,7 +113,9 @@ const ScheduleService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   deleteSchedule: async (scheduleId: string): Promise<any> => {
@@ -122,7 +130,9 @@ const ScheduleService = {
       .then((res) => {
         return true
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   getSuggestedMaintenance: async (id: string, lat: number, lon: number): Promise<any> => {
@@ -137,7 +147,9 @@ const ScheduleService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   }
 }
 

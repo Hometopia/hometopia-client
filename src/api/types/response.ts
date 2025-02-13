@@ -55,8 +55,10 @@ type AssetResponseType = {
   warrantyExpiryDate: string,
   documents: FileInfoType[],
   status: string,
-  maintenanceCycle: any,
-  category: CategoryInAssetResponseType
+  maintenanceCycle: number,
+  category: CategoryInAssetResponseType,
+  usefulLife: number,
+  label: number
 }
 
 type AssetOnListResponseType = {

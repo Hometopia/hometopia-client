@@ -57,31 +57,61 @@ export default function AssetDepreciation() {
                 depreciationQuery.data.data.straightLineDepreciation.length + ' năm' : 'Chưa tính được'}`}
           />
           {depreciationQuery.isFetched && depreciationQuery.data.data !== undefined ?
-            <Table className='w-full rounded-lg overflow-hidden'>
-              <TableHeader>
-                <TableRow className="bg-background-100">
-                  <TableHead>Giá trị</TableHead>
-                  <TableHead>Năm</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {depreciationQuery.isPending ?
-                  <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
-                  :
-                  depreciationQuery.data.data.straightLineDepreciation
-                    .map((i: DepreciationItemType) =>
-                      <TableRow key={i.year}>
-                        <TableData>{currencyFormatter().format(i.value)}</TableData>
-                        <TableData>{i.year}</TableData>
-                      </TableRow>
-                    )
-                }
+            <View className='py-2 flex flex-col gap-4'>
+              <View className='flex flex-col gap-2'>
+                <Text className='text-typography-800 font-semibold'>Khấu hao đường thẳng</Text>
+                <Table className='w-full rounded-lg overflow-hidden'>
+                  <TableHeader>
+                    <TableRow className="bg-background-100">
+                      <TableHead>Giá trị</TableHead>
+                      <TableHead>Năm</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {depreciationQuery.isPending ?
+                      <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
+                      :
+                      depreciationQuery.data.data.straightLineDepreciation
+                        .map((i: DepreciationItemType) =>
+                          <TableRow key={i.year}>
+                            <TableData>{currencyFormatter().format(i.value)}</TableData>
+                            <TableData>{i.year}</TableData>
+                          </TableRow>
+                        )
+                    }
 
-              </TableBody>
-            </Table>
+                  </TableBody>
+                </Table>
+              </View>
+              <View className='flex flex-col gap-2'>
+                <Text className='text-typography-800 font-semibold'>Khấu hao theo số dư giảm dần có điều chỉnh</Text>
+                <Table className='w-full rounded-lg overflow-hidden'>
+                  <TableHeader>
+                    <TableRow className="bg-background-100">
+                      <TableHead>Giá trị</TableHead>
+                      <TableHead>Năm</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {depreciationQuery.isPending ?
+                      <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />
+                      :
+                      depreciationQuery.data.data.decliningBalanceDepreciation
+                        .map((i: DepreciationItemType) =>
+                          <TableRow key={i.year}>
+                            <TableData>{currencyFormatter().format(i.value)}</TableData>
+                            <TableData>{i.year}</TableData>
+                          </TableRow>
+                        )
+                    }
+
+                  </TableBody>
+                </Table>
+              </View>
+            </View>
             :
             <View className='w-full p-8 flex flex-row justify-center items-center'>
-              <Text>Chưa tính được, đợi thêm hoặc thử đổi ảnh khác xem.</Text>
+              <Text className='text-typography-900'>Chưa tính được, đợi thêm hoặc thử đổi ảnh khác xem.</Text>
             </View>
           }
         </ScrollView>

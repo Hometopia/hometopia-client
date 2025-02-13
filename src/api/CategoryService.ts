@@ -17,7 +17,9 @@ const CategoryService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   getAllCategory: async (): Promise<any> => {
@@ -33,7 +35,7 @@ const CategoryService = {
         return res.data
       })
       .catch((error) => {
-        console.error(error.response.data)
+        // console.error(error.response.data)
         return undefined
       })
   },
@@ -62,7 +64,9 @@ const CategoryService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   getParentList: async (): Promise<any> => {
@@ -78,7 +82,9 @@ const CategoryService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   createListCategories: async (categories: CategoryType[]): Promise<any> => {
@@ -97,7 +103,9 @@ const CategoryService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   updateCategory: async (id: string, updateData: CategoryUpdateType): Promise<any> => {
@@ -114,7 +122,9 @@ const CategoryService = {
       .then((res) => {
         return res.data
       })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   deleteCategoryList: async (ids: string[]): Promise<any> => {
@@ -129,7 +139,9 @@ const CategoryService = {
       }
     )
       .then((res) => { return true })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   },
 
   deleteCategory: async (id: string): Promise<any> => {
@@ -142,7 +154,9 @@ const CategoryService = {
       }
     )
       .then((res) => { return true })
-      .catch((error) => console.error(error.response.data))
+      .catch((error) => {
+        return undefined
+      })
   }
 }
 

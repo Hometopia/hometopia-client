@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native'
 import React from 'react'
 import VendorDetailsModal from './VendorDetailsModal'
 import { Icon } from '../ui/icon'
@@ -26,11 +26,14 @@ export default function VendorCard({ data, choosenFn, isChosen, cancelFn }: Vend
   )
   const Phone = () => (
     <View>
-      <Text
-        className={!isChosen ? 'text-md text-typography-800' :
-          'text-md text-white'
-        }
-      >{data.phoneNumber}</Text>
+      <TouchableOpacity onPress={() => Linking.openURL(`tel:${data.phoneNumber}`)}>
+        <Text
+          className={!isChosen ? 'text-md text-typography-800' :
+            'text-md text-white'
+          }
+        >{data.phoneNumber}</Text>
+      </TouchableOpacity>
+
     </View>
   )
   const Website = () => (
