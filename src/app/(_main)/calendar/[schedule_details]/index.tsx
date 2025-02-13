@@ -36,7 +36,16 @@ export default function ScheduleDetails() {
 
   const scheduleQuery = useQuery({
     queryKey: ['scheldule-details', schedule_details],
-    queryFn: () => ScheduleService.getSchedule(schedule_details as string)
+    queryFn: async () => {
+      const res = await ScheduleService.getSchedule(schedule_details as string)
+      if (res === undefined) {
+        return {
+          data: undefined
+        }
+      }
+
+      return res
+    }
   })
 
   const scheduleUpdateMutation = useMutation({
@@ -178,7 +187,7 @@ export default function ScheduleDetails() {
               <Text className='text-lg font-bold'>Chi phí dự kiến</Text>
               <Text className='text-lg'>{scheduleQuery.data.data.items[0].cost ? currencyFormatter().format(scheduleQuery.data.data.items[0].cost) : 'Không có'}</Text>
             </View>
-            {scheduleQuery.data.data.items[0].vendor &&
+            {/* {scheduleQuery.data.data.items[0].vendor &&
               <View className='self-stretch'>
                 <Text className='text-lg font-bold'>Bên cung cấp dịch vụ</Text>
                 <View className='h-60 rounded-lg my-2'>
@@ -224,7 +233,7 @@ export default function ScheduleDetails() {
                   </View>
                 </View>
               </View>
-            }
+            } */}
           </View>
           :
           <Loading texts={[{ condition: true, text: 'Đang tải...' }]} />

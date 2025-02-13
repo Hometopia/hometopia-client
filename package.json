@@ -87,7 +87,6 @@
     "react-native-dotenv": "^3.4.11",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-gifted-charts": "^1.4.54",
-    "react-native-google-places-autocomplete": "^2.5.7",
     "react-native-maps": "1.14.0",
     "react-native-modal-datetime-picker": "^18.0.0",
     "react-native-qrcode-svg": "^6.3.12",
